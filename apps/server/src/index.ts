@@ -5,6 +5,7 @@ import { logger } from "./logger.js";
 import { prisma } from "./db/client.js";
 import { analysisRouter } from "./routes/analysis.js";
 import { graphRouter } from "./routes/graph.js";
+import { complianceRouter } from "./routes/compliance.js";
 import { startWorker, stopWorker } from "./queue/worker.js";
 import { closeQueue } from "./queue/index.js";
 
@@ -24,6 +25,7 @@ app.get("/health", async (_req, res) => {
 
 app.use("/api/analyze", analysisRouter);
 app.use("/api/analysis", graphRouter);
+app.use("/api/compliance", complianceRouter);
 
 startWorker();
 
