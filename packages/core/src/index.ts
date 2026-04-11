@@ -492,6 +492,195 @@ export interface CorridorAnalysis {
   recommendedPathIndex: number;
 }
 
+// ─── Expanded corridor catalog types ────────────────────────
+// These power the Corridor atlas page: a large static catalog
+// (seeded into the DB) of institutional lanes scanned hourly
+// against mainnet and enriched with AI commentary.
+
+export type CorridorRegion =
+  | "global"
+  | "europe"
+  | "asia"
+  | "latam"
+  | "africa"
+  | "middle_east"
+  | "oceania"
+  | "cross";
+
+// Categories mark how a corridor should be presented:
+//  - fiat-fiat:        canonical FX lane (USD→EUR) with on-chain XRPL issuers
+//  - stable-onramp:    USD/EUR → RLUSD/USDC (mint into stablecoin)
+//  - stable-offramp:   RLUSD/USDC → USD/EUR (back to fiat)
+//  - xrp-offramp:      XRP → fiat (validator payouts, ODL destination)
+//  - crypto-spot:      USD → BTC/SOLO
+//  - special:          deep direct stablecoin↔fiat books (RLUSD↔CNY)
+//  - off-chain-bridge: fiat↔fiat lane with no on-chain IOU issuers; the XRPL
+//                      hop is RLUSD (or XRP) held by off-chain CEX/remittance
+//                      partners. No XRPL pathfind is performed; the corridor
+//                      is populated from the off-chain actor registry.
+export type CorridorCategory =
+  | "fiat-fiat"
+  | "stable-onramp"
+  | "stable-offramp"
+  | "xrp-offramp"
+  | "crypto-spot"
+  | "special"
+  | "off-chain-bridge";
+
+export type CorridorStatus = "GREEN" | "AMBER" | "RED" | "UNKNOWN";
+
+export type CorridorAssetType = "fiat" | "stable" | "xrp" | "crypto";
+
+export interface CorridorAsset {
+  symbol: string;
+  type: CorridorAssetType;
+  flag: string; // emoji
+  label?: string; // optional pretty name
+}
+
+export interface CorridorLiquiditySnapshot {
+  xrpLeg?: { toIouOffers: number; toXrpOffers: number };
+  directBook?: { fwdOffers: number; revOffers: number };
+  amm?: { xrpReserve?: string; iouReserve?: string; tvlUsd?: number | null };
+  issuerObligation?: string;
+  notes?: string[];
+}
+
+// One candidate route inside a corridor (a specific issuer pair)
+export interface CorridorRouteCandidate {
+  routeId: string; // unique within the parent corridor (e.g. "bs-fox")
+  label: string; // "USD.Bitstamp → CNY.RippleFox"
+  sourceIssuerKey?: string; // "bs" — null when source is XRP
+  sourceIssuerName?: string; // "Bitstamp"
+  destIssuerKey: string;
+  destIssuerName: string;
+  request: CorridorRequest;
+  rationale?: string; // why this route is in the candidate set
+}
+
+// Live result of scanning one route
+export interface CorridorRouteResult extends CorridorRouteCandidate {
+  status: CorridorStatus;
+  pathCount: number;
+  recommendedRiskScore: number | null;
+  recommendedHops: number | null;
+  recommendedCost: string | null;
+  flags: RiskFlagData[];
+  liquidity: CorridorLiquiditySnapshot | null;
+  analysis: CorridorAnalysis | null;
+  isWinner: boolean;
+  rejectedReason?: string;
+  // Score is internal, exposed mainly for debugging/UI
+  score?: number;
+  scannedAt: string;
+}
+
+// An off-chain ramp actor: a CEX, remittance operator, Ripple ODL partner,
+// mobile-money bridge, or bank that converts local fiat to/from an XRPL
+// asset (XRP, RLUSD, USDC, or a native stablecoin). Populated from the
+// research atlas in `xrplens/docs/xrpl-fiat-actors.md`. Used to annotate
+// corridors whose XRPL leg is bridged via RLUSD/USDC held by the actor's
+// XRPL account, as well as to enrich the tier-A on-chain fiat corridors
+// with their real-world counterparties.
+export type CorridorActorType =
+  | "cex" // licensed exchange (Bitso, Rain, Kraken, Upbit, …)
+  | "odl" // Ripple ODL / Ripple Payments partner
+  | "bank" // regulated bank (Travelex Bank, Zand, SABB, …)
+  | "remittance" // remittance operator (SBI Remit, iRemit, Tranglo, …)
+  | "fintech" // e-money / BaaS / card fintech
+  | "mobile-money" // M-Pesa bridges, BarkaChange, Kotani Pay
+  | "otc" // OTC desk / market-maker (B2C2, Keyrock, Flowdesk, …)
+  | "custodian" // qualified custodian (BNY Mellon, Standard Custody, Metaco)
+  | "hub" // cross-country ODL super-hub (Tranglo, Onafriq, Yellow Card)
+  | "p2p"; // licensed P2P venue where fiat-crypto flows happen peer-to-peer
+
+export type CorridorActorDirection = "onramp" | "offramp" | "both";
+
+export interface CorridorActor {
+  key: string; // stable slug
+  name: string; // display name
+  type: CorridorActorType;
+  country?: string; // ISO-2 or short region label
+  supportsXrp?: boolean;
+  supportsRlusd?: boolean;
+  direction: CorridorActorDirection;
+  odl?: boolean; // true if listed as Ripple ODL / Ripple Payments partner
+  note?: string; // short qualifier: "first HK RLUSD listing", etc.
+  url?: string; // one evidence URL
+}
+
+// Legacy 1..5 numeric importance tier. Persisted as Int in the DB. The
+// human-readable A/B/C/D/E compliance taxonomy lives only in the research
+// atlas (xrpl-fiat-actors.md) and in corridor `highlights`, not the schema.
+export type CorridorTier = 1 | 2 | 3 | 4 | 5;
+
+export interface CorridorPairDef {
+  id: string; // pair slug, e.g. "usd-cny"
+  label: string; // "USD → CNY"
+  shortLabel: string; // "USD → CNY (3 issuers)"
+  flag: string;
+  tier: CorridorTier;
+  importance: number;
+  region: CorridorRegion;
+  category: CorridorCategory;
+  description: string;
+  useCase: string;
+  highlights: string[];
+  relatedCorridorIds?: string[];
+  source: CorridorAsset;
+  dest: CorridorAsset;
+  amount: string;
+  routes: CorridorRouteCandidate[]; // candidate routes to evaluate
+  // Off-chain actor registry. For on-chain fiat corridors (USD, EUR, …) these
+  // annotate who handles the retail fiat legs in the real world. For
+  // off-chain-bridge corridors they are the only routing information — the
+  // XRPL hop is RLUSD held by one of these actors.
+  sourceActors?: CorridorActor[];
+  destActors?: CorridorActor[];
+  // For off-chain-bridge corridors: which XRPL asset the lane settles on.
+  bridgeAsset?: "RLUSD" | "USDC" | "XRP" | "EUROP" | "XSGD" | "USDB";
+}
+
+// Backwards compatibility alias used by older code paths.
+export type CorridorCatalogEntry = CorridorPairDef;
+
+export interface CorridorListItem extends CorridorPairDef {
+  status: CorridorStatus; // status of the winning route
+  bestRouteId: string | null;
+  routeResults: CorridorRouteResult[];
+  lastRefreshedAt: string | null;
+  pathCount: number; // winner's
+  recommendedRiskScore: number | null;
+  recommendedHops: number | null;
+  recommendedCost: string | null;
+  flags: RiskFlagData[]; // winner's
+  aiNote: string | null;
+  liquidity: CorridorLiquiditySnapshot | null; // winner's
+}
+
+export interface CorridorDetailResponse extends CorridorListItem {
+  analysis: CorridorAnalysis | null; // winner's full analysis
+}
+
+export interface CorridorChatRequest {
+  message: string;
+  corridorId?: string | null;
+  chatId?: string | null;
+}
+
+export interface CorridorChatSource {
+  corridorId: string;
+  label: string;
+  snippet: string;
+  score: number;
+}
+
+export interface CorridorChatResponse {
+  chatId: string;
+  message: { role: "assistant"; content: string };
+  sources: CorridorChatSource[];
+}
+
 // ─── Color Maps ─────────────────────────────────────────────
 export const NODE_COLORS: Record<NodeKind, string> = {
   token: "#f59e0b",
