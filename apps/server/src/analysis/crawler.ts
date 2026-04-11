@@ -9,7 +9,13 @@ import {
   fetchPaymentPaths,
   fetchAccountObjects,
   fetchAccountCurrencies,
+  fetchAccountNFTs,
+  fetchAccountChannels,
   fetchAccountTransactions,
+  fetchAccountOffers,
+  fetchNoripppleCheck,
+  fetchNFTBuyOffers,
+  fetchNFTSellOffers,
 } from "../xrpl/fetchers.js";
 import { logger } from "../logger.js";
 
@@ -39,7 +45,12 @@ export interface CrawlResult {
   currencies: any;
   topAccounts: Map<string, any>;
   accountTransactions: any[];
+  nfts: any[];
+  channels: any[];
   txTypeSummary: TxTypeSummary[];
+  accountOffers: any[];
+  noripppleProblems: string[];
+  nftOffers: any[];
 }
 
 export type CrawlProgressCallback = (step: string, detail?: string) => void;
@@ -61,6 +72,7 @@ export async function crawlFromSeed(
   progress("fetch_issuer_info", `Fetching account info for ${seedAddress}`);
   const issuerInfoResp = (await fetchAccountInfo(client, seedAddress)) as any;
   const issuerInfo = issuerInfoResp?.result?.account_data ?? null;
+  // signer_lists is a sibling of account_data in the xrpl.js response, not nested within it
   if (issuerInfoResp?.result?.signer_lists) {
     issuerInfo.signer_lists = issuerInfoResp.result.signer_lists;
   }
@@ -85,6 +97,8 @@ export async function crawlFromSeed(
       obligations: Object.keys(gatewayBalances?.obligations ?? {}),
     });
   } catch (err: any) {
+    // Some XRPL nodes return "Internal error" for accounts with complex object sets.
+    // Treat as non-issuer and continue with empty obligations.
     logger.warn("[crawler] gateway_balances failed, treating as non-issuer", {
       error: err?.message,
     });
@@ -99,6 +113,7 @@ export async function crawlFromSeed(
   progress("fetch_amm_pool", `Fetching AMM pool info for XRP/${seedLabel ?? seedAddress}`);
   let ammPool: any = null;
 
+  // Check if this account IS an AMM pool (has AMMID in account_info)
   const isAmmAccount = !!issuerInfo?.AMMID;
   if (isAmmAccount) {
     try {
@@ -196,7 +211,27 @@ export async function crawlFromSeed(
     logger.warn("[crawler] Failed to fetch account objects", { error: err?.message });
   }
 
-  // ── Step 9: Fetch & classify account transactions ────────────────────────
+  // ── Step 9: Fetch account NFTs ─────────────────────────────────────────────
+  progress("fetch_nfts", `Fetching NFTs for ${seedAddress}`);
+  let nfts: any[] = [];
+  try {
+    nfts = (await fetchAccountNFTs(client, seedAddress, 500)) as any[];
+    logger.debug("[crawler] nfts fetched", { count: nfts.length });
+  } catch (err: any) {
+    logger.warn("[crawler] Failed to fetch NFTs (may not be supported)", { error: err?.message });
+  }
+
+  // ── Step 10: Fetch account channels ───────────────────────────────────────
+  progress("fetch_channels", `Fetching payment channels for ${seedAddress}`);
+  let channels: any[] = [];
+  try {
+    channels = (await fetchAccountChannels(client, seedAddress, 500)) as any[];
+    logger.debug("[crawler] channels fetched", { count: channels.length });
+  } catch (err: any) {
+    logger.warn("[crawler] Failed to fetch channels", { error: err?.message });
+  }
+
+  // ── Step 11: Fetch & classify account transactions ────────────────────────
   progress("fetch_transactions", `Fetching transactions for ${seedAddress}`);
   let accountTransactions: any[] = [];
   let txTypeSummary: TxTypeSummary[] = [];
@@ -204,6 +239,7 @@ export async function crawlFromSeed(
     accountTransactions = await fetchAccountTransactions(client, seedAddress, { limit: 200 });
     logger.debug("[crawler] transactions fetched", { count: accountTransactions.length });
 
+    // Classify by TransactionType
     const txCounts = new Map<string, { count: number; lastSeen?: string }>();
     for (const tx of accountTransactions) {
       const txType =
@@ -225,6 +261,16 @@ export async function crawlFromSeed(
     logger.warn("[crawler] Failed to fetch transactions", { error: err?.message });
   }
 
+  // ── Step 11b: Fetch account's own DEX offers ──────────────────────────────
+  progress("fetch_account_offers", `Fetching DEX offers for ${seedAddress}`);
+  let accountOffers: any[] = [];
+  try {
+    accountOffers = (await fetchAccountOffers(client, seedAddress, 200)) as any[];
+    logger.debug("[crawler] accountOffers fetched", { count: accountOffers.length });
+  } catch (err: any) {
+    logger.warn("[crawler] Failed to fetch account offers", { error: err?.message });
+  }
+
   progress("fetch_currencies", `Fetching account currencies for ${seedAddress}`);
   let currencies: any = null;
   try {
@@ -238,14 +284,16 @@ export async function crawlFromSeed(
     logger.warn("[crawler] Failed to fetch currencies", { error: err?.message });
   }
 
-  // ── Step 10: Enrich top 20 accounts ───────────────────────────────────────
+  // ── Step 13: Enrich top 20 accounts ───────────────────────────────────────
   progress("enrich_top_accounts", "Enriching top 20 accounts with account_info");
   const topAccounts = new Map<string, any>();
 
+  // Top 10 LP holders by abs(balance)
   const sortedLpHolders = [...lpHolders]
     .sort((a, b) => Math.abs(Number(b.balance)) - Math.abs(Number(a.balance)))
     .slice(0, 10);
 
+  // Top 10 trust line holders by balance
   const sortedTrustLineHolders = [...trustLines]
     .sort((a, b) => Math.abs(Number(b.balance)) - Math.abs(Number(a.balance)))
     .slice(0, 10);
@@ -269,6 +317,42 @@ export async function crawlFromSeed(
     }
   }
 
+  // ── Step 14: Noripple check (for issuers/gateways) ────────────────────────
+  progress("noripple_check", "Checking trust line rippling configuration");
+  let noripppleProblems: string[] = [];
+  const isIssuer = Object.keys(obligations).length > 0;
+  if (isIssuer) {
+    try {
+      const checkResp = (await fetchNoripppleCheck(client, seedAddress, "gateway")) as any;
+      noripppleProblems = checkResp?.result?.problems ?? [];
+      logger.debug("[crawler] noripple_check done", { problems: noripppleProblems.length });
+    } catch (err: any) {
+      logger.warn("[crawler] Failed noripple_check", { error: err?.message });
+    }
+  }
+
+  // ── Step 15: Fetch NFT buy/sell offers (for first 5 NFTs) ────────────────
+  progress("fetch_nft_offers", "Fetching NFT marketplace offers");
+  let nftOffers: any[] = [];
+  const nftsToCheck = nfts.slice(0, 5);
+  for (const nft of nftsToCheck) {
+    const nftId = nft.NFTokenID ?? nft.nft_id;
+    if (!nftId) continue;
+    try {
+      const buyOffers = await fetchNFTBuyOffers(client, nftId, 10);
+      const sellOffers = await fetchNFTSellOffers(client, nftId, 10);
+      for (const o of buyOffers as any[]) {
+        nftOffers.push({ ...o, nftId, isSellOffer: false });
+      }
+      for (const o of sellOffers as any[]) {
+        nftOffers.push({ ...o, nftId, isSellOffer: true });
+      }
+    } catch (err: any) {
+      logger.warn("[crawler] Failed to fetch NFT offers", { nftId, error: err?.message });
+    }
+  }
+  logger.debug("[crawler] nftOffers fetched", { count: nftOffers.length });
+
   logger.info("[crawler] Crawl complete", {
     seedAddress,
     trustLines: trustLines.length,
@@ -277,8 +361,13 @@ export async function crawlFromSeed(
     bids: bids.length,
     paths: paths.length,
     accountObjects: accountObjects.length,
+    nfts: nfts.length,
+    channels: channels.length,
+    accountOffers: accountOffers.length,
     txTypes: txTypeSummary.length,
     topAccounts: topAccounts.size,
+    noripppleProblems: noripppleProblems.length,
+    nftOffers: nftOffers.length,
   });
 
   progress("done", "Crawl complete");
@@ -296,6 +385,11 @@ export async function crawlFromSeed(
     currencies,
     topAccounts,
     accountTransactions,
+    nfts,
+    channels,
     txTypeSummary,
+    accountOffers,
+    noripppleProblems,
+    nftOffers,
   };
 }
