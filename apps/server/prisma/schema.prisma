@@ -1,0 +1,73 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pgvector(map: "vector")]
+}
+
+model Analysis {
+  id          String   @id @default(uuid())
+  status      String   @default("queued")
+  seedAddress String
+  seedLabel   String?
+  depth       Int      @default(1)
+  error       String?
+  summaryJson Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([seedAddress, depth, status])
+
+  nodes     Node[]
+  edges     Edge[]
+  riskFlags RiskFlag[]
+}
+
+model Node {
+  id            String   @id @default(uuid())
+  analysisId    String
+  analysis      Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  nodeId        String
+  kind          String
+  label         String
+  data          Json
+  aiExplanation String?
+  createdAt     DateTime @default(now())
+
+  @@unique([analysisId, nodeId])
+  @@index([analysisId])
+}
+
+model Edge {
+  id         String   @id @default(uuid())
+  analysisId String
+  analysis   Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  edgeId     String
+  source     String
+  target     String
+  kind       String
+  label      String?
+  data       Json?
+  createdAt  DateTime @default(now())
+
+  @@unique([analysisId, edgeId])
+  @@index([analysisId])
+}
+
+model RiskFlag {
+  id         String   @id @default(uuid())
+  analysisId String
+  analysis   Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  nodeId     String
+  flag       String
+  severity   String
+  detail     String
+  data       Json?
+  createdAt  DateTime @default(now())
+
+  @@index([analysisId])
+}
