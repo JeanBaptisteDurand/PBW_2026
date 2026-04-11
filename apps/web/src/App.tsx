@@ -6,6 +6,8 @@ const Analyze = lazy(() => import("./routes/Analyze"));
 const GraphView = lazy(() => import("./routes/GraphView"));
 const ComplianceView = lazy(() => import("./routes/ComplianceView"));
 const Chat = lazy(() => import("./routes/Chat"));
+const CorridorHealth = lazy(() => import("./routes/CorridorHealth"));
+const CorridorDetail = lazy(() => import("./routes/CorridorDetail"));
 
 function LoadingFallback() {
   return (
@@ -49,6 +51,22 @@ export function App() {
           element={
             <Suspense fallback={<LoadingFallback />}>
               <Chat />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/corridors"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <CorridorHealth />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/corridors/:id"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <CorridorDetail />
             </Suspense>
           }
         />
