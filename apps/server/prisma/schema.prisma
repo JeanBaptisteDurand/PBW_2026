@@ -22,9 +22,12 @@ model Analysis {
 
   @@index([seedAddress, depth, status])
 
-  nodes     Node[]
-  edges     Edge[]
-  riskFlags RiskFlag[]
+  nodes             Node[]
+  edges             Edge[]
+  riskFlags         RiskFlag[]
+  ragDocuments      RagDocument[]
+  ragChats          RagChat[]
+  complianceReports ComplianceReport[]
 }
 
 model Node {
@@ -70,4 +73,44 @@ model RiskFlag {
   createdAt  DateTime @default(now())
 
   @@index([analysisId])
+}
+
+model RagDocument {
+  id         String                       @id @default(uuid())
+  analysisId String
+  analysis   Analysis                     @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  content    String
+  metadata   Json?
+  embedding  Unsupported("vector(1536)")?
+  createdAt  DateTime                     @default(now())
+
+  @@index([analysisId])
+}
+
+model RagChat {
+  id         String   @id @default(uuid())
+  analysisId String
+  analysis   Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  messages RagMessage[]
+}
+
+model RagMessage {
+  id        String   @id @default(uuid())
+  chatId    String
+  chat      RagChat  @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  role      String
+  content   String
+  sources   Json?
+  createdAt DateTime @default(now())
+}
+
+model ComplianceReport {
+  id         String   @id @default(uuid())
+  analysisId String
+  analysis   Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  title      String
+  content    Json
+  createdAt  DateTime @default(now())
 }
