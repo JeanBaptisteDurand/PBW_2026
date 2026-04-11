@@ -9,6 +9,22 @@ import type {
   AMMPoolNodeData,
   OrderBookNodeData,
   AccountNodeData,
+  EscrowNodeData,
+  CheckNodeData,
+  PayChannelNodeData,
+  NFTNodeData,
+  SignerListNodeData,
+  DIDNodeData,
+  CredentialNodeData,
+  MPTokenNodeData,
+  OracleNodeData,
+  DepositPreauthNodeData,
+  OfferNodeData,
+  PermissionedDomainNodeData,
+  NFTOfferNodeData,
+  TicketNodeData,
+  BridgeNodeData,
+  VaultNodeData,
   RiskFlagData,
   XRPLAsset,
 } from "@xrplens/core";
@@ -165,6 +181,7 @@ export function buildGraph(
     let asset2: XRPLAsset = { currency: "RLUSD", issuer: seedAddress };
 
     if (pool.amount) {
+      // XRP amount is in drops (string number)
       if (typeof pool.amount === "string") {
         reserve1 = xrpDropsToString(pool.amount);
         asset1 = { currency: "XRP" };
@@ -333,8 +350,10 @@ export function buildGraph(
     // Compute spread from best ask and bid
     let spread: number | undefined;
     if (crawl.asks.length > 0 && crawl.bids.length > 0) {
+      // asks: XRP → token (want token, give XRP); best ask price = XRP per token
       const bestAsk = crawl.asks[0];
       const bestBid = crawl.bids[0];
+      // ask: taker_gets = XRP (drops), taker_pays = token
       const askPrice = bestAsk?.quality ? Number(bestAsk.quality) : null;
       const bidPrice = bestBid?.quality ? Number(bestBid.quality) : null;
 
@@ -381,10 +400,464 @@ export function buildGraph(
     }
   }
 
+  // ── 6. Escrow nodes ───────────────────────────────────────────────────────
+  const escrowObjects = crawl.accountObjects.filter(
+    (o: any) => o.LedgerEntryType === "Escrow",
+  );
+
+  for (const escrow of escrowObjects) {
+    const escrowId = `escrow:${escrow.index ?? escrow.PreviousTxnID ?? Math.random()}`;
+
+    const escrowNodeData: EscrowNodeData = {
+      account: escrow.Account ?? seedAddress,
+      destination: escrow.Destination ?? "",
+      amount: String(escrow.Amount ?? "0"),
+      condition: escrow.Condition,
+      cancelAfter: escrow.CancelAfter,
+      finishAfter: escrow.FinishAfter,
+      destinationTag: escrow.DestinationTag,
+      sourceTag: escrow.SourceTag,
+    };
+
+    addNode(
+      makeNode(
+        escrowId,
+        "escrow",
+        `Escrow → ${(escrow.Destination ?? "").slice(0, 8)}`,
+        escrowNodeData,
+      ),
+    );
+
+    // ESCROWS_TO: issuer → escrow
+    edges.push(makeEdge(issuerId, escrowId, "ESCROWS_TO", "escrows to"));
+  }
+
+  // ── 7. Check nodes ───────────────────────────────────────────────────────
+  const checkObjects = crawl.accountObjects.filter(
+    (o: any) => o.LedgerEntryType === "Check",
+  );
+
+  for (const check of checkObjects) {
+    const checkId = `check:${check.index ?? check.PreviousTxnID ?? Math.random()}`;
+
+    const sendMax = check.SendMax;
+    const sendMaxStr = typeof sendMax === "string"
+      ? xrpDropsToString(sendMax)
+      : sendMax?.value ?? "0";
+    const currency = typeof sendMax === "object" ? decodeCurrency(sendMax?.currency ?? "") : "XRP";
+
+    const checkNodeData: CheckNodeData = {
+      account: check.Account ?? seedAddress,
+      destination: check.Destination ?? "",
+      sendMax: sendMaxStr,
+      currency,
+      expiration: check.Expiration,
+      invoiceID: check.InvoiceID,
+      destinationTag: check.DestinationTag,
+      sourceTag: check.SourceTag,
+      sequence: check.Sequence,
+    };
+
+    addNode(
+      makeNode(checkId, "check", `Check → ${(check.Destination ?? "").slice(0, 8)}`, checkNodeData),
+    );
+
+    edges.push(makeEdge(issuerId, checkId, "CHECKS_TO", "checks to"));
+  }
+
+  // ── 8. Payment Channel nodes (from account_objects) ───────────���──────────
+  const payChannelObjects = crawl.accountObjects.filter(
+    (o: any) => o.LedgerEntryType === "PayChannel",
+  );
+
+  for (const ch of payChannelObjects) {
+    const chId = `payChannel:${ch.index ?? ch.PreviousTxnID ?? Math.random()}`;
+
+    const payChannelNodeData: PayChannelNodeData = {
+      account: ch.Account ?? seedAddress,
+      destination: ch.Destination ?? "",
+      amount: xrpDropsToString(ch.Amount ?? "0"),
+      balance: xrpDropsToString(ch.Balance ?? "0"),
+      settleDelay: ch.SettleDelay ?? 0,
+      expiration: ch.Expiration,
+      cancelAfter: ch.CancelAfter,
+      publicKey: ch.PublicKey,
+    };
+
+    addNode(
+      makeNode(
+        chId,
+        "payChannel",
+        `Channel → ${(ch.Destination ?? "").slice(0, 8)}`,
+        payChannelNodeData,
+      ),
+    );
+
+    edges.push(makeEdge(issuerId, chId, "CHANNELS_TO", "channels to"));
+  }
+
+  // ── 8b. Payment Channel nodes (from account_channels API) ────────────────
+  for (const ch of crawl.channels ?? []) {
+    const chId = `payChannel:${ch.channel_id ?? Math.random()}`;
+    if (nodeIndex.has(chId)) continue;
+
+    const payChannelNodeData: PayChannelNodeData = {
+      account: ch.account ?? seedAddress,
+      destination: ch.destination_account ?? "",
+      amount: xrpDropsToString(ch.amount ?? "0"),
+      balance: xrpDropsToString(ch.balance ?? "0"),
+      settleDelay: ch.settle_delay ?? 0,
+      expiration: ch.expiration,
+      cancelAfter: ch.cancel_after,
+      publicKey: ch.public_key,
+    };
+
+    addNode(
+      makeNode(
+        chId,
+        "payChannel",
+        `Channel → ${(ch.destination_account ?? "").slice(0, 8)}`,
+        payChannelNodeData,
+      ),
+    );
+
+    edges.push(makeEdge(issuerId, chId, "CHANNELS_TO", "channels to"));
+  }
+
+  // ── 9. NFT nodes ─────────────────────────────────────────────────────────
+  const nftList = (crawl.nfts ?? []).slice(0, 200); // cap at 200
+  for (const nft of nftList) {
+    const nftId = `nft:${nft.NFTokenID ?? nft.nft_id ?? Math.random()}`;
+
+    const uri = nft.URI ? hexToAscii(nft.URI) : undefined;
+
+    const nftNodeData: NFTNodeData = {
+      nftId: nft.NFTokenID ?? nft.nft_id ?? "",
+      issuer: nft.Issuer ?? seedAddress,
+      taxon: nft.NFTokenTaxon ?? nft.nft_taxon ?? 0,
+      serial: nft.nft_serial,
+      uri,
+      flags: nft.Flags,
+      transferFee: nft.TransferFee,
+    };
+
+    addNode(
+      makeNode(nftId, "nft", uri?.slice(0, 20) ?? `NFT #${nft.nft_serial ?? ""}`, nftNodeData),
+    );
+
+    edges.push(makeEdge(issuerId, nftId, "OWNS_NFT", "owns"));
+  }
+
+  // ── 10. SignerList nodes ─────────────────────────────────────────────────
+  // Sources: account_objects AND issuerInfo.signer_lists (from account_info with signer_lists:true)
+  const signerListObjects = crawl.accountObjects.filter(
+    (o: any) => o.LedgerEntryType === "SignerList",
+  );
+
+  // Also check signer_lists from account_info (more reliable — always present if exists)
+  const signerListsFromInfo = crawl.issuerInfo?.signer_lists ?? [];
+  for (const sl of signerListsFromInfo) {
+    // Avoid duplicates if also found in account_objects
+    if (!signerListObjects.some((o: any) => o.SignerQuorum === sl.SignerQuorum)) {
+      signerListObjects.push(sl);
+    }
+  }
+
+  for (const sl of signerListObjects) {
+    const slId = `signerList:${sl.index ?? `info:${seedAddress}`}`;
+
+    const signerListNodeData: SignerListNodeData = {
+      signerQuorum: sl.SignerQuorum ?? 0,
+      signers: (sl.SignerEntries ?? []).map((e: any) => ({
+        account: e.SignerEntry?.Account ?? e.Account ?? "",
+        weight: e.SignerEntry?.SignerWeight ?? e.SignerWeight ?? 0,
+      })),
+    };
+
+    addNode(
+      makeNode(
+        slId,
+        "signerList",
+        `SignerList (quorum ${sl.SignerQuorum ?? 0})`,
+        signerListNodeData,
+      ),
+    );
+
+    edges.push(makeEdge(issuerId, slId, "SIGNED_BY", "signed by"));
+  }
+
+  // ── 11. DID nodes ────────────────────────────────────────────────────────
+  const didObjects = crawl.accountObjects.filter(
+    (o: any) => o.LedgerEntryType === "DID",
+  );
+
+  for (const did of didObjects) {
+    const didId = `did:${did.index ?? Math.random()}`;
+
+    const didNodeData: DIDNodeData = {
+      account: did.Account ?? seedAddress,
+      didDocument: did.DIDDocument ? hexToAscii(did.DIDDocument) : undefined,
+      uri: did.URI ? hexToAscii(did.URI) : undefined,
+      data: did.Data ? hexToAscii(did.Data) : undefined,
+    };
+
+    addNode(makeNode(didId, "did", `DID ${seedAddress.slice(0, 8)}`, didNodeData));
+
+    edges.push(makeEdge(issuerId, didId, "HAS_DID", "has DID"));
+  }
+
+  // ── 12. Credential nodes ─────────────────────────────────────────────────
+  const credentialObjects = crawl.accountObjects.filter(
+    (o: any) => o.LedgerEntryType === "Credential",
+  );
+
+  for (const cred of credentialObjects) {
+    const credId = `credential:${cred.index ?? Math.random()}`;
+
+    const credentialNodeData: CredentialNodeData = {
+      subject: cred.Subject ?? seedAddress,
+      issuer: cred.Issuer ?? "",
+      credentialType: cred.CredentialType ? hexToAscii(cred.CredentialType) : "unknown",
+      expiration: cred.Expiration,
+      uri: cred.URI ? hexToAscii(cred.URI) : undefined,
+    };
+
+    addNode(
+      makeNode(credId, "credential", `Credential: ${credentialNodeData.credentialType}`, credentialNodeData),
+    );
+
+    edges.push(makeEdge(issuerId, credId, "HAS_CREDENTIAL", "has credential"));
+  }
+
+  // ── 13. MPToken / MPTokenIssuance nodes ──────────────────────────────────
+  const mptObjects = crawl.accountObjects.filter(
+    (o: any) =>
+      o.LedgerEntryType === "MPTokenIssuance" || o.LedgerEntryType === "MPToken",
+  );
+
+  for (const mpt of mptObjects) {
+    const mptId = `mpToken:${mpt.MPTokenIssuanceID ?? mpt.index ?? Math.random()}`;
+    if (nodeIndex.has(mptId)) continue;
+
+    const mpTokenNodeData: MPTokenNodeData = {
+      mptIssuanceID: mpt.MPTokenIssuanceID ?? "",
+      issuer: mpt.Issuer ?? seedAddress,
+      maxSupply: mpt.MaximumAmount,
+      outstandingAmount: mpt.OutstandingAmount,
+      transferFee: mpt.TransferFee,
+      metadata: mpt.MPTokenMetadata ? hexToAscii(mpt.MPTokenMetadata) : undefined,
+    };
+
+    addNode(
+      makeNode(mptId, "mpToken", `MPT ${(mpt.MPTokenIssuanceID ?? "").slice(0, 8)}`, mpTokenNodeData),
+    );
+
+    edges.push(makeEdge(issuerId, mptId, "ISSUED_MPT", "issued MPT"));
+  }
+
+  // ── 14. Oracle nodes ─────────────────────────────────────────────────────
+  const oracleObjects = crawl.accountObjects.filter(
+    (o: any) => o.LedgerEntryType === "Oracle",
+  );
+
+  for (const oracle of oracleObjects) {
+    const oracleId = `oracle:${oracle.index ?? Math.random()}`;
+
+    const oracleNodeData: OracleNodeData = {
+      account: oracle.Owner ?? seedAddress,
+      oracleDocumentID: oracle.OracleDocumentID ?? 0,
+      provider: oracle.Provider ? hexToAscii(oracle.Provider) : undefined,
+      assetClass: oracle.AssetClass ? hexToAscii(oracle.AssetClass) : undefined,
+      lastUpdateTime: oracle.LastUpdateTime,
+      priceDataSeries: (oracle.PriceDataSeries ?? []).map((pd: any) => {
+        const base = pd.PriceData?.BaseAsset;
+        const quote = pd.PriceData?.QuoteAsset;
+        return {
+          baseAsset: typeof base === "string" ? base : base?.currency ?? "",
+          quoteAsset: typeof quote === "string" ? quote : quote?.currency ?? "",
+          assetPrice: pd.PriceData?.AssetPrice,
+          scale: pd.PriceData?.Scale,
+        };
+      }),
+    };
+
+    addNode(
+      makeNode(oracleId, "oracle", `Oracle: ${oracleNodeData.provider ?? "unknown"}`, oracleNodeData),
+    );
+
+    edges.push(makeEdge(issuerId, oracleId, "PROVIDES_ORACLE", "provides oracle"));
+  }
+
+  // ── 15. DepositPreauth nodes ──────────────────────────────────────────────
+  const depositPreauthObjects = crawl.accountObjects.filter(
+    (o: any) => o.LedgerEntryType === "DepositPreauth",
+  );
+
+  for (const dp of depositPreauthObjects) {
+    const dpId = `depositPreauth:${dp.index ?? Math.random()}`;
+
+    const dpNodeData: DepositPreauthNodeData = {
+      account: dp.Account ?? seedAddress,
+      authorize: dp.Authorize ?? "",
+    };
+
+    addNode(
+      makeNode(dpId, "depositPreauth", `Preauth → ${(dp.Authorize ?? "").slice(0, 8)}`, dpNodeData),
+    );
+
+    edges.push(makeEdge(issuerId, dpId, "PREAUTHORIZES", "preauthorizes"));
+  }
+
+  // ── 16. Account's own DEX Offer nodes ───────────────────────────────────
+  for (const offer of (crawl.accountOffers ?? []).slice(0, 50)) {
+    const offerId = `offer:${offer.seq ?? offer.Sequence ?? Math.random()}`;
+
+    const offerNodeData: OfferNodeData = {
+      account: seedAddress,
+      takerGets: offer.taker_gets ?? offer.TakerGets,
+      takerPays: offer.taker_pays ?? offer.TakerPays,
+      sequence: offer.seq ?? offer.Sequence,
+      expiration: offer.expiration ?? offer.Expiration,
+      flags: offer.flags ?? offer.Flags,
+    };
+
+    addNode(
+      makeNode(offerId, "offer", `Offer #${offer.seq ?? offer.Sequence ?? ""}`, offerNodeData),
+    );
+
+    edges.push(makeEdge(issuerId, offerId, "HAS_OFFER", "has offer"));
+  }
+
+  // ── 17. PermissionedDomain nodes ────────────────────────────────────────
+  const permDomainObjects = crawl.accountObjects.filter(
+    (o: any) => o.LedgerEntryType === "PermissionedDomain",
+  );
+
+  for (const pd of permDomainObjects) {
+    const pdId = `permissionedDomain:${pd.index ?? Math.random()}`;
+
+    const pdNodeData: PermissionedDomainNodeData = {
+      account: pd.Owner ?? seedAddress,
+      domainID: pd.index ?? "",
+      acceptedCredentials: (pd.AcceptedCredentials ?? []).map((c: any) => ({
+        issuer: c.AcceptedCredential?.Issuer ?? c.Issuer ?? "",
+        credentialType: c.AcceptedCredential?.CredentialType
+          ? hexToAscii(c.AcceptedCredential.CredentialType)
+          : "unknown",
+      })),
+    };
+
+    addNode(
+      makeNode(pdId, "permissionedDomain", `PermDomain ${(pd.index ?? "").slice(0, 8)}`, pdNodeData),
+    );
+
+    edges.push(makeEdge(issuerId, pdId, "HAS_DOMAIN", "has domain"));
+  }
+
+  // ── 18. NFT Offer nodes ──────────────────────────────────────────────────
+  for (const offer of (crawl.nftOffers ?? []).slice(0, 50)) {
+    const offerId = `nftOffer:${offer.nft_offer_index ?? Math.random()}`;
+
+    const amount = typeof offer.amount === "string"
+      ? xrpDropsToString(offer.amount)
+      : offer.amount?.value ?? "0";
+
+    const nftOfferNodeData: NFTOfferNodeData = {
+      offerId: offer.nft_offer_index ?? "",
+      owner: offer.owner ?? "",
+      nftId: offer.nftId ?? "",
+      amount,
+      destination: offer.destination,
+      expiration: offer.expiration,
+      flags: offer.flags,
+      isSellOffer: offer.isSellOffer ?? false,
+    };
+
+    addNode(
+      makeNode(offerId, "nftOffer", `${offer.isSellOffer ? "Sell" : "Buy"} ${amount}`, nftOfferNodeData),
+    );
+
+    const nftNodeId = `nft:${offer.nftId}`;
+    if (nodeIndex.has(nftNodeId)) {
+      edges.push(makeEdge(offerId, nftNodeId, "NFT_OFFER_FOR", "offer for"));
+    }
+  }
+
+  // ── 19. Ticket nodes ────────────────────────────────────────────────────
+  const ticketObjects = crawl.accountObjects.filter(
+    (o: any) => o.LedgerEntryType === "Ticket",
+  );
+
+  for (const ticket of ticketObjects) {
+    const ticketId = `ticket:${ticket.TicketSequence ?? ticket.index ?? Math.random()}`;
+
+    const ticketNodeData: TicketNodeData = {
+      account: ticket.Account ?? seedAddress,
+      ticketSequence: ticket.TicketSequence ?? 0,
+    };
+
+    addNode(
+      makeNode(ticketId, "ticket", `Ticket #${ticket.TicketSequence ?? ""}`, ticketNodeData),
+    );
+
+    edges.push(makeEdge(issuerId, ticketId, "HAS_TICKET", "has ticket"));
+  }
+
+  // ── 20. Bridge nodes ────────────────────────────────────────────────────
+  const bridgeObjects = crawl.accountObjects.filter(
+    (o: any) => o.LedgerEntryType === "Bridge",
+  );
+
+  for (const bridge of bridgeObjects) {
+    const bridgeId = `bridge:${bridge.index ?? Math.random()}`;
+
+    const bridgeNodeData: BridgeNodeData = {
+      account: bridge.Account ?? seedAddress,
+      bridgeAccount: bridge.XChainBridge?.LockingChainDoor ?? bridge.XChainBridge?.IssuingChainDoor,
+      bridgeAsset: bridge.XChainBridge?.LockingChainIssue ?? bridge.XChainBridge?.IssuingChainIssue,
+      signatureReward: bridge.SignatureReward ? xrpDropsToString(bridge.SignatureReward) : undefined,
+      minAccountCreateAmount: bridge.MinAccountCreateAmount
+        ? xrpDropsToString(bridge.MinAccountCreateAmount)
+        : undefined,
+    };
+
+    addNode(
+      makeNode(bridgeId, "bridge", `Bridge ${(bridge.index ?? "").slice(0, 8)}`, bridgeNodeData),
+    );
+
+    edges.push(makeEdge(issuerId, bridgeId, "HAS_BRIDGE", "has bridge"));
+  }
+
+  // ── 21. Vault nodes ─────────────────────────────────────────────────────
+  const vaultObjects = crawl.accountObjects.filter(
+    (o: any) => o.LedgerEntryType === "Vault",
+  );
+
+  for (const vault of vaultObjects) {
+    const vaultId = `vault:${vault.index ?? Math.random()}`;
+
+    const vaultNodeData: VaultNodeData = {
+      account: vault.Account ?? seedAddress,
+      asset: vault.Asset,
+      owner: vault.Owner,
+      data: vault.Data,
+    };
+
+    addNode(
+      makeNode(vaultId, "vault", `Vault ${(vault.index ?? "").slice(0, 8)}`, vaultNodeData),
+    );
+
+    edges.push(makeEdge(issuerId, vaultId, "HAS_VAULT", "has vault"));
+  }
+
   // ── Build stats (single pass) ────────────────────────────────────────────
   const nodesByKind: Record<NodeKind, number> = {
     token: 0, issuer: 0, ammPool: 0, orderBook: 0,
-    account: 0, paymentPath: 0,
+    account: 0, paymentPath: 0, escrow: 0,
+    check: 0, payChannel: 0, nft: 0, nftOffer: 0, signerList: 0,
+    did: 0, credential: 0, mpToken: 0, oracle: 0,
+    depositPreauth: 0, offer: 0, permissionedDomain: 0,
+    ticket: 0, bridge: 0, vault: 0,
   };
   let totalRiskFlags = 0, highRiskCount = 0, medRiskCount = 0, lowRiskCount = 0;
 
