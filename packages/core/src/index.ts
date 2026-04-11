@@ -455,6 +455,43 @@ export interface ChatResponse {
   message: ChatMessage;
 }
 
+// ─── Corridor Analysis Types ────────────────────────────────
+export interface CorridorRequest {
+  sourceCurrency: string;
+  sourceIssuer?: string;
+  destCurrency: string;
+  destIssuer: string;
+  amount: string;
+  sourceAccount?: string;
+}
+
+export interface CorridorPathHop {
+  account?: string;
+  currency?: string;
+  issuer?: string;
+  type: "gateway" | "orderbook" | "amm" | "xrp_bridge";
+  riskFlags: RiskFlagData[];
+  riskScore: number;
+}
+
+export interface CorridorPath {
+  index: number;
+  hops: CorridorPathHop[];
+  sourceAmount: string;
+  cost: number;
+  riskScore: number;
+  isXrplDefault: boolean;
+  isRecommended: boolean;
+  reasoning: string;
+}
+
+export interface CorridorAnalysis {
+  request: CorridorRequest;
+  paths: CorridorPath[];
+  defaultPathIndex: number;
+  recommendedPathIndex: number;
+}
+
 // ─── Color Maps ─────────────────────────────────────────────
 export const NODE_COLORS: Record<NodeKind, string> = {
   token: "#f59e0b",
