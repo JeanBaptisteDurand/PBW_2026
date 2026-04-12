@@ -10,6 +10,7 @@ import { chatRouter } from "./routes/chat.js";
 import { corridorRouter } from "./routes/corridor.js";
 import { corridorsRouter } from "./routes/corridors.js";
 import { safePathRouter } from "./routes/safe-path.js";
+import { historyRouter } from "./routes/history.js";
 import { startWorker, stopWorker } from "./queue/worker.js";
 import { closeQueue } from "./queue/index.js";
 import {
@@ -41,6 +42,7 @@ app.use("/api/chat", chatRouter);
 app.use("/api/corridor", corridorRouter);
 app.use("/api/corridors", corridorsRouter);
 app.use("/api/safe-path", safePathRouter);
+app.use("/api/history", historyRouter);
 
 startWorker();
 startCorridorRefreshWorker();

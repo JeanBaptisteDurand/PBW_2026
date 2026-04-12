@@ -22,7 +22,7 @@ import type { XRPLClientWrapper } from "../xrpl/client.js";
 import { crawlFromSeed, type CrawlResult } from "./crawler.js";
 import { buildGraph } from "./graphBuilder.js";
 import { classifyCounterparties } from "./counterpartyClassifier.js";
-import type { HeavyKind } from "./counterpartyClassifier.js";
+import type { HeavyKind } from "./historyTypes.js";
 import { logger } from "../logger.js";
 
 // ─── Tunables ────────────────────────────────────────────────────────────────
