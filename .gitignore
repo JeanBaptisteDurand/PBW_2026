@@ -6,7 +6,3 @@ dist/
 **/.env.local
 *.log
 .DS_Store
-**/.DS_Store
-.next/
-test-results/
-playwright-report/

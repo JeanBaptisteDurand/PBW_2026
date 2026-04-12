@@ -949,10 +949,13 @@ export default function SafePath() {
           if (key.toLowerCase().includes(firstWord)) settleActorNode(key);
         });
       } else if (event.type === "analysis_started") {
-        setAnalyses((prev) => [
-          ...prev,
-          { id: event.analysisId, address: event.address, label: event.label, status: "running" },
-        ]);
+        setAnalyses((prev) => {
+          if (prev.some((a) => a.id === event.analysisId)) return prev;
+          return [
+            ...prev,
+            { id: event.analysisId, address: event.address, label: event.label, status: "running" },
+          ];
+        });
       } else if (event.type === "analysis_complete") {
         setAnalyses((prev) => {
           const exists = prev.find((a) => a.id === event.analysisId);

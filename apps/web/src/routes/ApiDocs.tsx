@@ -485,39 +485,31 @@ function McpDocsContent({ navigate }: { navigate: ReturnType<typeof useNavigate>
           </CardContent>
         </Card>
 
-        {/* Step 1: Prerequisites */}
+        {/* Step 1: Download & setup */}
         <Card className="mb-4">
           <CardHeader>
             <CardTitle className="text-sm flex items-center gap-2">
               <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-violet-500/20 text-violet-300 text-[10px] font-bold">
                 1
               </span>
-              Prerequisites
+              Download the MCP server
             </CardTitle>
           </CardHeader>
           <CardContent className="text-xs text-slate-400 space-y-3">
-            <p>You need two things before starting:</p>
-            <ul className="space-y-2 ml-1">
-              <li className="flex items-start gap-2">
-                <span className="text-emerald-400 mt-0.5">a.</span>
-                <span>
-                  <strong className="text-slate-200">Node.js</strong> installed on
-                  your computer (v18 or later).{" "}
-                  <span className="text-slate-500">
-                    Check with: <code className="text-slate-400">node --version</code>
-                  </span>
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-emerald-400 mt-0.5">b.</span>
-                <span>
-                  <strong className="text-slate-200">Claude Code</strong> or{" "}
-                  <strong className="text-slate-200">Claude Desktop</strong> installed.
-                  Claude Code is available at{" "}
-                  <code className="text-xrp-400 text-[11px]">claude.ai/code</code>.
-                </span>
-              </li>
-            </ul>
+            <p>
+              You need <strong className="text-slate-200">Node.js v18+</strong> and{" "}
+              <strong className="text-slate-200">Claude Desktop</strong> or{" "}
+              <strong className="text-slate-200">Claude Code</strong> installed.
+            </p>
+            <a
+              href="/xrplens-mcp.zip"
+              download
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors"
+            >
+              <span>Download xrplens-mcp.zip</span>
+              <span className="text-violet-200 text-[10px]">(138 KB)</span>
+            </a>
+            <p>Unzip it anywhere on your computer.</p>
           </CardContent>
         </Card>
 
@@ -528,37 +520,33 @@ function McpDocsContent({ navigate }: { navigate: ReturnType<typeof useNavigate>
               <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-violet-500/20 text-violet-300 text-[10px] font-bold">
                 2
               </span>
-              Get your XRPLens API key
+              Add your API key
             </CardTitle>
           </CardHeader>
           <CardContent className="text-xs text-slate-400 space-y-2">
             <ol className="space-y-1.5 ml-1 list-decimal list-inside">
               <li>
-                Click <strong className="text-slate-200">Connect Wallet</strong> in the top-right
-                corner of this site (you need a Crossmark browser extension)
-              </li>
-              <li>
-                Go to{" "}
-                <button
-                  onClick={() => navigate("/premium")}
-                  className="text-xrp-400 hover:underline"
-                >
-                  Premium
-                </button>{" "}
-                and pay with XRP or RLUSD to unlock premium features
-              </li>
-              <li>
-                Go to your{" "}
                 <button
                   onClick={() => navigate("/account")}
                   className="text-xrp-400 hover:underline"
                 >
-                  Account page
+                  Go to your Account page
                 </button>{" "}
-                and click <strong className="text-slate-200">Generate API Key</strong>.
-                Your key looks like <code className="text-slate-400 text-[11px]">xlens_a1b2c3...</code>
+                and click <strong className="text-slate-200">Generate API Key</strong>
+              </li>
+              <li>
+                Open the <code className="text-slate-300 text-[11px]">.env</code> file
+                inside the unzipped <code className="text-slate-300 text-[11px]">xrplens-mcp</code> folder
+              </li>
+              <li>
+                Replace <code className="text-slate-300 text-[11px]">xxxxxx</code> with
+                your key (looks like{" "}
+                <code className="text-slate-400 text-[11px]">xlens_a1b2c3...</code>)
               </li>
             </ol>
+            <pre className="text-[11px] font-mono text-emerald-300 bg-slate-950/60 border border-slate-800 rounded p-3 mt-2 overflow-x-auto whitespace-pre-wrap">
+{`XRPLENS_API_KEY=xlens_paste_your_key_here`}
+            </pre>
           </CardContent>
         </Card>
 
@@ -579,31 +567,10 @@ function McpDocsContent({ navigate }: { navigate: ReturnType<typeof useNavigate>
                 Option A: Claude Code (CLI)
               </div>
               <p className="mb-2">
-                Open your terminal and run:
+                Open your terminal and run (replace the path with where you unzipped):
               </p>
               <pre className="text-[11px] font-mono text-emerald-300 bg-slate-950/60 border border-slate-800 rounded p-3 overflow-x-auto whitespace-pre-wrap">
-{`claude mcp add xrplens -- npx @xrplens/mcp-server`}
-              </pre>
-              <p className="mt-2">
-                Then set the environment variables. Edit{" "}
-                <code className="text-xrp-400 bg-slate-900 px-1 rounded text-[11px]">
-                  ~/.claude/settings.json
-                </code>{" "}
-                and add:
-              </p>
-              <pre className="text-[11px] font-mono text-emerald-300 bg-slate-950/60 border border-slate-800 rounded p-3 mt-2 overflow-x-auto whitespace-pre-wrap">
-{`{
-  "mcpServers": {
-    "xrplens": {
-      "command": "npx",
-      "args": ["@xrplens/mcp-server"],
-      "env": {
-        "XRPLENS_API_KEY": "xlens_paste-your-api-key-here",
-        "XRPLENS_API_URL": "https://api.xrplens.dev"
-      }
-    }
-  }
-}`}
+{`claude mcp add xrplens -- node /path/to/xrplens-mcp/server.js`}
               </pre>
             </div>
 
@@ -614,23 +581,24 @@ function McpDocsContent({ navigate }: { navigate: ReturnType<typeof useNavigate>
               </div>
               <p className="mb-2">
                 Open Claude Desktop &rarr; Settings &rarr; Developer &rarr; Edit Config.
-                Paste the same JSON block above into your{" "}
+                Add this to your{" "}
                 <code className="text-xrp-400 bg-slate-900 px-1 rounded text-[11px]">
                   claude_desktop_config.json
-                </code>
-                . Restart Claude Desktop.
+                </code>:
               </p>
-            </div>
-
-            <div className="bg-slate-900/60 border border-slate-700/50 rounded p-3">
-              <div className="text-[9px] font-bold uppercase tracking-widest text-amber-400 mb-1">
-                Local development
-              </div>
-              <p className="text-[11px] text-slate-400">
-                If you're running XRPLens locally, set{" "}
-                <code className="text-slate-300">XRPLENS_API_URL</code> to{" "}
-                <code className="text-slate-300">http://localhost:3001/api</code>{" "}
-                instead.
+              <pre className="text-[11px] font-mono text-emerald-300 bg-slate-950/60 border border-slate-800 rounded p-3 mt-2 overflow-x-auto whitespace-pre-wrap">
+{`{
+  "mcpServers": {
+    "xrplens": {
+      "command": "node",
+      "args": ["/path/to/xrplens-mcp/server.js"]
+    }
+  }
+}`}
+              </pre>
+              <p className="mt-2 text-slate-500">
+                Replace <code className="text-slate-400">/path/to/xrplens-mcp/</code>{" "}
+                with the actual folder path. Restart Claude Desktop after saving.
               </p>
             </div>
           </CardContent>
@@ -770,12 +738,93 @@ function ApiDocsContent({ navigate }: { navigate: ReturnType<typeof useNavigate>
           <strong className="text-slate-200">Corridor Atlas</strong>,{" "}
           <strong className="text-slate-200">Safe Path Agent</strong>, and{" "}
           <strong className="text-slate-200">Entity Audit</strong> — each with
-          their own endpoints. All public and rate-limited. Schemas mirror the{" "}
+          their own endpoints. Schemas mirror the{" "}
           <code className="text-xrp-400 bg-slate-900 px-1 rounded text-[11px]">
             @xrplens/core
           </code>{" "}
           TypeScript types.
         </p>
+
+        {/* Authentication */}
+        <Card className="mb-6 border-amber-500/20">
+          <CardHeader>
+            <CardTitle className="text-sm">Authentication</CardTitle>
+          </CardHeader>
+          <CardContent className="text-xs text-slate-400 space-y-3">
+            <p>
+              <strong className="text-slate-200">Corridor Atlas endpoints are public</strong> — no
+              authentication required. <strong className="text-slate-200">Safe Path Agent and Compliance
+              endpoints require a Premium account.</strong>
+            </p>
+            <p>Two authentication methods are supported:</p>
+            <div className="space-y-2">
+              <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-3">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-violet-400 mb-1">
+                  Option 1: API Key (recommended for scripts &amp; MCP)
+                </div>
+                <p className="mb-2">
+                  Generate a key from your{" "}
+                  <button onClick={() => navigate("/account")} className="text-xrp-400 hover:underline">
+                    Account page
+                  </button>
+                  . Send it as an <code className="text-slate-300">x-api-key</code> header:
+                </p>
+                <pre className="text-[11px] font-mono text-emerald-300 bg-slate-950/60 border border-slate-800 rounded p-2 overflow-x-auto whitespace-pre-wrap">
+{`curl http://localhost:3001/api/safe-path/history \\
+  -H "x-api-key: xlens_your-key-here"`}
+                </pre>
+              </div>
+              <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-3">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-violet-400 mb-1">
+                  Option 2: JWT Bearer Token (used by the web app)
+                </div>
+                <p className="mb-2">
+                  Call <code className="text-slate-300">POST /api/auth/connect</code> with your XRPL
+                  wallet address to get a 24h token. Send it as a Bearer header:
+                </p>
+                <pre className="text-[11px] font-mono text-emerald-300 bg-slate-950/60 border border-slate-800 rounded p-2 overflow-x-auto whitespace-pre-wrap">
+{`# 1. Get a JWT
+curl -X POST http://localhost:3001/api/auth/connect \\
+  -H "Content-Type: application/json" \\
+  -d '{"walletAddress":"rYourXRPLAddress..."}'
+
+# 2. Use it
+curl http://localhost:3001/api/safe-path/history \\
+  -H "Authorization: Bearer eyJhb..."`}
+                </pre>
+              </div>
+            </div>
+            <div className="bg-slate-900/60 border border-slate-700/50 rounded p-3 mt-2">
+              <div className="text-[9px] font-bold uppercase tracking-widest text-amber-400 mb-1">
+                Which endpoints need auth?
+              </div>
+              <table className="text-[11px] w-full">
+                <tbody>
+                  <tr className="border-b border-slate-800">
+                    <td className="py-1 text-slate-300 font-mono">/api/corridors/*</td>
+                    <td className="py-1 text-emerald-400">Public</td>
+                  </tr>
+                  <tr className="border-b border-slate-800">
+                    <td className="py-1 text-slate-300 font-mono">/api/analysis/*</td>
+                    <td className="py-1 text-emerald-400">Public (optional auth to save to account)</td>
+                  </tr>
+                  <tr className="border-b border-slate-800">
+                    <td className="py-1 text-slate-300 font-mono">/api/safe-path</td>
+                    <td className="py-1 text-amber-400">Premium (API key or JWT)</td>
+                  </tr>
+                  <tr className="border-b border-slate-800">
+                    <td className="py-1 text-slate-300 font-mono">/api/safe-path/history</td>
+                    <td className="py-1 text-amber-400">Auth required (API key or JWT)</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 text-slate-300 font-mono">/api/compliance/*</td>
+                    <td className="py-1 text-amber-400">Premium (API key or JWT)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="text-left bg-slate-900/50 border border-slate-800 rounded-lg p-4 group">
@@ -986,30 +1035,28 @@ function RoadmapContent() {
         </RoadmapCard>
 
         <RoadmapCard
-          status="LIVE"
-          statusColor="bg-emerald-500/15 text-emerald-300 border border-emerald-500/40"
+          status="VOTED"
+          statusColor="bg-amber-500/15 text-amber-300 border border-amber-500/40"
           title="XLS-80 Permissioned Domains"
         >
           <p>
-            Went live on mainnet{" "}
-            <strong className="text-slate-200">February 4, 2025</strong>.
+            In validator voting.
             Permissioned Domains let issuers define KYC/credential gates on
             trust lines. XRPLens detects and flags these in the Entity Audit
-            crawler -- the Safe Path Agent uses them to warn when a hop requires
+            crawler -- the Safe Path Agent will use them to warn when a hop requires
             credentials the sender may not hold.
           </p>
         </RoadmapCard>
 
         <RoadmapCard
-          status="LIVE"
-          statusColor="bg-emerald-500/15 text-emerald-300 border border-emerald-500/40"
+          status="VOTED"
+          statusColor="bg-amber-500/15 text-amber-300 border border-amber-500/40"
           title="XLS-81 Permissioned DEX"
         >
           <p>
-            Went live on mainnet{" "}
-            <strong className="text-slate-200">February 18, 2025</strong>.
+            In validator voting.
             Permissioned DEX restricts orderbook access to credentialed
-            accounts. XRPLens flags offers behind permissioned books so the Safe
+            accounts. XRPLens will flag offers behind permissioned books so the Safe
             Path Agent can route around them.
           </p>
         </RoadmapCard>

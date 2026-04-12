@@ -65,30 +65,27 @@ export function CorridorCard({ item, onClick }: CorridorCardProps) {
         )}
 
         <div className="grid grid-cols-3 gap-2 text-xs">
-          <Stat label="Paths" value={String(item.pathCount)} />
-          <Stat
-            label="Hops"
-            value={
-              item.recommendedHops != null ? String(item.recommendedHops) : "—"
-            }
-          />
-          <Stat
-            label="Risk"
-            value={
-              item.recommendedRiskScore != null
-                ? String(item.recommendedRiskScore)
-                : "—"
-            }
-            valueClass={
-              item.recommendedRiskScore != null &&
-              item.recommendedRiskScore > 20
-                ? "text-red-400"
-                : item.recommendedRiskScore != null &&
-                    item.recommendedRiskScore > 0
-                  ? "text-amber-400"
-                  : "text-emerald-400"
-            }
-          />
+          {item.category === "off-chain-bridge" ? (
+            <>
+              <Stat label="On-ramps" value={String(item.sourceActors?.length ?? 0)} />
+              <Stat label="Off-ramps" value={String(item.destActors?.length ?? 0)} />
+              <Stat label="Bridge" value={item.bridgeAsset ?? "RLUSD"} />
+            </>
+          ) : (() => {
+              const routes = item.routeResults ?? [];
+              const active = routes.filter((r) => r.status === "GREEN" || r.status === "AMBER").length;
+              return (
+                <>
+                  <Stat label="Routes" value={String(routes.length)} />
+                  <Stat
+                    label="Active"
+                    value={`${active}/${routes.length}`}
+                    valueClass={active > 0 ? "text-emerald-400" : "text-amber-400"}
+                  />
+                  <Stat label="On-ramps" value={String(item.sourceActors?.length ?? 0)} />
+                </>
+              );
+            })()}
         </div>
 
         {item.liquidity?.notes && item.liquidity.notes.length > 0 && (

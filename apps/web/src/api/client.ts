@@ -13,6 +13,10 @@ import type {
 
 const BASE_URL = "/api";
 
+// In-memory cache for the full corridor atlas (~15 MB, fetched once)
+let _corridorCache: { corridors: CorridorListItem[] } | null = null;
+export function invalidateCorridorCache() { _corridorCache = null; }
+
 function getAuthHeaders(): Record<string, string> {
   try {
     const raw = localStorage.getItem("xrplens_auth");
@@ -161,11 +165,17 @@ export const api = {
     });
   },
 
-  // ─── Corridor atlas (cached + filtered) ─────────────────────
+  // ─── Corridor atlas (cached in memory after first fetch) ────
 
-  /** GET /api/corridors — list every catalog corridor with cached state */
+  /** GET /api/corridors — list every catalog corridor with cached state.
+   *  The full atlas is ~15 MB so we cache it in memory after the first
+   *  successful fetch. Call `invalidateCorridorCache()` to force a refetch. */
   listCorridors(): Promise<{ corridors: CorridorListItem[] }> {
-    return fetchJSON("/corridors");
+    if (_corridorCache) return Promise.resolve(_corridorCache);
+    return fetchJSON<{ corridors: CorridorListItem[] }>("/corridors").then((data) => {
+      _corridorCache = data;
+      return data;
+    });
   },
 
   /** GET /api/corridors/:id — one corridor with full cached analysis */
@@ -235,6 +245,42 @@ export const api = {
     });
   },
 
+  // ─── Safe Path history ─────────────────────────────────────────
+
+  /** GET /api/safe-path/history — list user's SafePath runs */
+  getSafePathHistory(): Promise<
+    Array<{
+      id: string;
+      srcCcy: string;
+      dstCcy: string;
+      amount: string;
+      verdict: string;
+      reasoning: string;
+      corridorId?: string;
+      createdAt: string;
+    }>
+  > {
+    return fetchJSON("/safe-path/history");
+  },
+
+  /** GET /api/safe-path/:id — get a single SafePath run */
+  getSafePathRun(id: string): Promise<{
+    id: string;
+    srcCcy: string;
+    dstCcy: string;
+    amount: string;
+    maxRiskTolerance: string;
+    verdict: string;
+    reasoning: string;
+    resultJson: any;
+    reportMarkdown?: string;
+    corridorId?: string;
+    analysisIds?: string[];
+    createdAt: string;
+  }> {
+    return fetchJSON(`/safe-path/${id}`);
+  },
+
   // ─── Account ───────────────────────────────────────────────────
 
   /** GET /api/auth/profile — full account data */
@@ -242,6 +288,7 @@ export const api = {
     id: string;
     walletAddress: string;
     role: string;
+    apiKey: string | null;
     createdAt: string;
     updatedAt: string;
     subscriptions: Array<{
@@ -262,6 +309,16 @@ export const api = {
     }>;
   }> {
     return fetchJSON("/auth/profile");
+  },
+
+  /** POST /api/auth/api-key — generate or regenerate API key */
+  generateApiKey(force = false): Promise<{ apiKey: string }> {
+    return fetchJSON(`/auth/api-key${force ? "?force=true" : ""}`, { method: "POST" });
+  },
+
+  /** DELETE /api/auth/api-key — revoke API key */
+  revokeApiKey(): Promise<{ ok: boolean }> {
+    return fetchJSON("/auth/api-key", { method: "DELETE" });
   },
 
   // ─── Payment gate ──────────────────────────────────────────────

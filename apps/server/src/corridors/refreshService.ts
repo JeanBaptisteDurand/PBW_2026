@@ -409,12 +409,30 @@ export async function refreshCorridor(
     // corridors in a 100+ catalog will not produce a live path on the first
     // scan and OpenAI calls can otherwise dominate the refresh window.
     const existing = await prisma.corridor.findUnique({ where: { id: entry.id } });
-    // Never persist UNKNOWN — if the winner is still UNKNOWN after the
-    // depth-based fallback above, coerce to RED so every corridor has a
+    // Never persist UNKNOWN — coerce to RED so every corridor has a
     // decisive status on the board.
     const rawWinnerStatus = winner?.result.status ?? "RED";
-    const winnerStatus: CorridorStatus =
+    let winnerStatus: CorridorStatus =
       rawWinnerStatus === "UNKNOWN" ? "RED" : rawWinnerStatus;
+
+    // Grace rule: don't downgrade a corridor from GREEN/AMBER to RED on a
+    // single transient scan failure. path_find can intermittently return 0
+    // paths due to XRPL node load or rate limits. Only persist RED if the
+    // corridor was already RED/UNKNOWN, or if the last 3 scans were all RED.
+    if (winnerStatus === "RED" && existing?.status && existing.status !== "RED" && existing.status !== "UNKNOWN") {
+      const recentEvents = await prisma.corridorStatusEvent.findMany({
+        where: { corridorId: entry.id },
+        orderBy: { at: "desc" },
+        take: 3,
+        select: { status: true },
+      });
+      const allRecentRed = recentEvents.length >= 3 && recentEvents.every((e) => e.status === "RED");
+      if (!allRecentRed) {
+        // Keep the previous healthy status — this scan was likely a transient failure
+        winnerStatus = existing.status as CorridorStatus;
+        logger.info("[corridors] Grace rule: kept %s status for %s (transient RED scan)", existing.status, entry.id);
+      }
+    }
     const winnerHasPaths = (winner?.result.pathCount ?? 0) > 0;
     const importanceHighEnough = entry.importance >= AI_NOTE_IMPORTANCE_THRESHOLD;
     const aiWorthwhile = winnerHasPaths && importanceHighEnough;

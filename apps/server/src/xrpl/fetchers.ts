@@ -111,7 +111,7 @@ export async function fetchPaymentPaths(
   });
 }
 
-// ─── 7. Account Transactions ──────────────────────────────��─────────────────
+// ─── 7. Account Transactions ────────────────────────────────────────────────
 
 export async function fetchAccountTransactions(
   client: XRPLClientWrapper,

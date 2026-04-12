@@ -371,8 +371,6 @@ export default function GraphView() {
       <GraphHeader
         seedLabel={seedLabel}
         stats={stats}
-        onCompliance={() => navigate(`/compliance/${analysisId}`)}
-        onChat={() => navigate(`/chat/${analysisId}`)}
       >
         {minorCount > 0 && (
           <Button

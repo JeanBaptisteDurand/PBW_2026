@@ -104,11 +104,11 @@ export function startGlobalRun(params: {
           try {
             const event = JSON.parse(payload);
             if (activeRun?.id === runId) {
-              activeRun.events = [...activeRun.events, event];
+              activeRun.events.push(event);
               if (event.type === "result") activeRun.result = event.result;
               if (event.type === "report") activeRun.report = event.report;
               if (event.type === "error") activeRun.error = event.error;
-              // Create a new object reference so useSyncExternalStore detects the change
+              // New top-level ref so useSyncExternalStore triggers a re-render
               activeRun = { ...activeRun };
               notify();
             }

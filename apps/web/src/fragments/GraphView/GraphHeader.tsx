@@ -1,5 +1,4 @@
 import { Badge } from "../../components/ui/badge";
-import { Button } from "../../components/ui/button";
 
 interface GraphStats {
   totalNodes?: number;
@@ -13,16 +12,12 @@ interface GraphHeaderProps {
   seedLabel: string;
   analysisId?: string;
   stats?: GraphStats;
-  onCompliance: () => void;
-  onChat: () => void;
   children?: React.ReactNode;
 }
 
 export function GraphHeader({
   seedLabel,
   stats,
-  onCompliance,
-  onChat,
   children,
 }: GraphHeaderProps) {
   return (
@@ -45,13 +40,6 @@ export function GraphHeader({
       <div className="flex-1" />
 
       {children}
-
-      <Button variant="secondary" size="sm" onClick={onCompliance}>
-        Compliance Report
-      </Button>
-      <Button variant="secondary" size="sm" onClick={onChat}>
-        AI Chat
-      </Button>
     </div>
   );
 }

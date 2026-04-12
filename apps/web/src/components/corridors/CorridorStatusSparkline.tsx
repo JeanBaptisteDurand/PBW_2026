@@ -71,22 +71,28 @@ export function CorridorStatusSparkline({
       cells.push({ day: day.toISOString().slice(0, 10), status: "UNKNOWN" });
     }
     if (!events) return cells;
+    // Count statuses per day, then pick the most common one.
+    // This prevents a single transient RED scan from colouring
+    // an entire day that had 50+ GREEN scans.
+    const dayCounts: Record<string, Record<string, number>> = {};
     for (const e of events) {
       const day = e.at.slice(0, 10);
-      const cell = cells.find((c) => c.day === day);
-      if (cell) {
-        // Precedence: a RED/AMBER later in the day dominates an earlier
-        // GREEN; this is the conservative interpretation for monitoring.
-        const rank: Record<string, number> = {
-          UNKNOWN: 0,
-          GREEN: 1,
-          AMBER: 2,
-          RED: 3,
-        };
-        if ((rank[e.status] ?? 0) >= (rank[cell.status] ?? 0)) {
-          cell.status = e.status as keyof typeof COLORS;
+      if (!dayCounts[day]) dayCounts[day] = {};
+      dayCounts[day][e.status] = (dayCounts[day][e.status] ?? 0) + 1;
+    }
+    for (const cell of cells) {
+      const counts = dayCounts[cell.day];
+      if (!counts) continue;
+      // Pick status with highest count; tie-break: GREEN > AMBER > RED
+      let best: string = "UNKNOWN";
+      let bestCount = 0;
+      for (const [status, count] of Object.entries(counts)) {
+        if (count > bestCount || (count === bestCount && status === "GREEN")) {
+          best = status;
+          bestCount = count;
         }
       }
+      cell.status = best as keyof typeof COLORS;
     }
     return cells;
   }, [events, days]);

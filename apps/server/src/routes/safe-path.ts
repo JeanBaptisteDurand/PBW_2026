@@ -3,7 +3,7 @@ import { logger } from "../logger.js";
 import { prisma } from "../db/client.js";
 import { createXRPLClient } from "../xrpl/client.js";
 import { runSafePathAgent, type SafePathIntent, type SafePathEvent } from "../ai/safePathAgent.js";
-import { verifyJwt, requirePremium } from "../middleware/auth.js";
+import { verifyJwt, verifyApiKeyOrJwt, requirePremium } from "../middleware/auth.js";
 
 export const safePathRouter: IRouter = Router();
 
@@ -13,7 +13,7 @@ export const safePathRouter: IRouter = Router();
 // the catalog. Returns Server-Sent Events so the frontend can stream the
 // agent's tool calls, corridor context, partner depth, and reasoning in
 // real time. The final `result` event carries the full SafePathResult.
-safePathRouter.post("/", verifyJwt, requirePremium, async (req, res) => {
+safePathRouter.post("/", verifyApiKeyOrJwt, requirePremium, async (req, res) => {
   const body = req.body ?? {};
   const { srcCcy, dstCcy, amount, maxRiskTolerance } = body;
 
@@ -115,7 +115,7 @@ safePathRouter.post("/", verifyJwt, requirePremium, async (req, res) => {
 });
 
 // GET /api/safe-path/history — list user's SafePath runs
-safePathRouter.get("/history", verifyJwt, async (req, res) => {
+safePathRouter.get("/history", verifyApiKeyOrJwt, async (req, res) => {
   try {
     const runs = await prisma.safePathRun.findMany({
       where: { userId: req.user!.userId },
@@ -140,7 +140,7 @@ safePathRouter.get("/history", verifyJwt, async (req, res) => {
 });
 
 // GET /api/safe-path/:id — get a single SafePath run
-safePathRouter.get("/:id", verifyJwt, async (req, res) => {
+safePathRouter.get("/:id", verifyApiKeyOrJwt, async (req, res) => {
   try {
     const id = String(req.params.id);
     const run = await prisma.safePathRun.findUnique({

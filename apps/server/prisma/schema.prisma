@@ -246,6 +246,7 @@ model User {
   id            String   @id @default(uuid())
   walletAddress String   @unique
   role          String   @default("free") // "free" | "premium"
+  apiKey        String?  @unique // API key for MCP / programmatic access (premium only)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

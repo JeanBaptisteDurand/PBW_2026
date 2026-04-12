@@ -8,8 +8,7 @@ const NAV_LINKS = [
   { to: "/corridors", label: "Corridor Atlas" },
   { to: "/safe-path", label: "Safe Path Agent" },
   { to: "/analyze", label: "Entity Audit" },
-  { to: "/history", label: "History" },
-  { to: "/developers", label: "API" },
+  { to: "/developers", label: "Docs" },
 ];
 
 export function Navbar() {
@@ -89,7 +88,7 @@ export function Navbar() {
               </span>
             )}
             <button
-              onClick={() => navigate("/premium")}
+              onClick={() => navigate("/account")}
               className={cn(
                 "px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-150 border",
                 isPremium

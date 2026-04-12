@@ -19,7 +19,6 @@ export default function Chat() {
       <ChatHeader
         analysisId={analysisId}
         onBackToGraph={() => navigate(`/graph/${analysisId}`)}
-        onCompliance={() => navigate(`/compliance/${analysisId}`)}
       />
       <ChatViewport analysisId={analysisId} />
     </div>

@@ -87,8 +87,7 @@ function getPageTheme(pathname: string) {
   if (
     pathname.startsWith("/analyze") ||
     pathname.startsWith("/graph") ||
-    pathname.startsWith("/chat") ||
-    pathname.startsWith("/compliance")
+    pathname.startsWith("/chat")
   ) {
     return "analyze";
   }
@@ -101,7 +100,7 @@ function getPageTheme(pathname: string) {
     return "safe-path";
   }
 
-  if (pathname.startsWith("/premium")) {
+  if (pathname.startsWith("/premium") || pathname.startsWith("/account")) {
     return "home";
   }
 

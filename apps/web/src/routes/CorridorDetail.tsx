@@ -214,22 +214,29 @@ export default function CorridorDetail() {
                 );
                 const cost = winner?.recommendedCost;
                 if (!cost) return null;
+                const ratio = Number(cost) / Math.max(Number(corridor.amount), 1);
+                const isBadQuote = ratio > 5;
                 return (
                   <>
                     <Badge
                       variant="info"
-                      title="Amount the path_find call is asked to deliver on the destination side. Fixed per corridor; see the Route calculator for arbitrary amounts."
+                      title={`XRPL path_find target: deliver ${corridor.amount} ${corridor.dest.symbol} on the destination side via the best on-chain IOU route.`}
                     >
                       Deliver: {corridor.amount} {corridor.dest.symbol}
                     </Badge>
                     <Badge
-                      variant="info"
-                      title="Source-currency spend required by the winning route to deliver the quoted destination amount. From live XRPL path_find."
+                      variant={isBadQuote ? "med" : "info"}
+                      title={
+                        isBadQuote
+                          ? `On-chain IOU quote from live XRPL path_find. This rate is poor because the on-chain ${corridor.source.symbol}↔${corridor.dest.symbol} orderbooks are thin. Real-world payments on this corridor use the off-chain partner network (RLUSD bridge) at much better rates.`
+                          : `Source-side cost from live XRPL path_find via the winning on-chain IOU route (${winner?.label ?? ""}). This is a real on-ledger quote, not an estimate.`
+                      }
                     >
                       Quote: {Number(cost).toLocaleString(undefined, {
                         maximumFractionDigits: 2,
                       })}{" "}
                       {corridor.source.symbol}
+                      {isBadQuote && " ⚠️"}
                     </Badge>
                   </>
                 );
@@ -294,7 +301,7 @@ export default function CorridorDetail() {
             )}
             <div className="mt-3 text-[10px] uppercase tracking-widest text-slate-600">
               {corridor.lastRefreshedAt
-                ? `${corridorKind === "off-chain-bridge" ? "Last refreshed" : "Last scan"}: ${new Date(corridor.lastRefreshedAt).toLocaleString()}`
+                ? `${corridorKind === "off-chain-bridge" ? "Last refreshed" : "Last scan"}: ${new Date(corridor.lastRefreshedAt).toLocaleString("en-GB", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}`
                 : corridorKind === "off-chain-bridge"
                   ? "Never refreshed"
                   : "Never scanned"}

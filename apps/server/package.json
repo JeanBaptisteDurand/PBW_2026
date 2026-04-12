@@ -19,6 +19,7 @@
     "cors": "^2.8.5",
     "express": "^4.21.0",
     "ioredis": "^5.4.0",
+    "jsonwebtoken": "^9.0.3",
     "openai": "^4.70.0",
     "pdfkit": "^0.18.0",
     "winston": "^3.17.0",
@@ -28,6 +29,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.0.0",
     "@types/pdfkit": "^0.17.5",
     "prisma": "^6.1.0",

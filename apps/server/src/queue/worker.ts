@@ -4,6 +4,7 @@ import { logger } from "../logger.js";
 import { createXRPLClient } from "../xrpl/client.js";
 import { runBfsAnalysis } from "../analysis/bfsOrchestrator.js";
 import { computeRiskFlags } from "../analysis/riskEngine.js";
+import { generateNodeExplanations } from "../ai/explanations.js";
 import { getRedisConnection } from "./index.js";
 import type { AnalysisJobData, AnalysisJobResult } from "./index.js";
 
@@ -30,7 +31,10 @@ export async function processAnalysisJob(
     await client.connect();
     logger.info("[worker] XRPL client connected", { analysisId });
 
-    // Step 3 + 4: Run BFS orchestrator
+    // Step 3 + 4: Run BFS orchestrator. At depth=1 this is behaviourally
+    // identical to the old single-seed crawl+buildGraph path; at depth>=2
+    // it expands heavy neighbours into their own crawled hubs and merges
+    // every sub-graph into one GraphData.
     updateProgress("crawling", `Starting depth-${effectiveDepth} analysis for ${seedAddress}`);
     const bfsResult = await runBfsAnalysis(client, seedAddress, seedLabel, {
       depth: effectiveDepth,
@@ -47,18 +51,27 @@ export async function processAnalysisJob(
       truncated: bfsResult.crawlSummary.truncated,
     });
 
-    // Step 5: Compute risk flags
+    // Step 5: Compute risk flags (from the seed's crawl — same as before).
+    // Sub-crawls' own risk flags are already attached to their graph nodes
+    // inside buildGraph via the default empty array; the riskEngine only
+    // runs on the seed, which is the entity the user asked about.
     updateProgress("computing_risks", "Computing risk flags");
     const riskFlags = computeRiskFlags(crawlResult, seedAddress);
     logger.info("[worker] Risk flags computed", { analysisId, count: riskFlags.length });
 
     // Step 6: Attach risk flags to graph nodes
+    // - Pool flags (CONCENTRATED_LIQUIDITY, THIN_AMM_POOL) → ammPool node
+    // - Orderbook flags (LOW_DEPTH_ORDERBOOK) → orderBook node
+    // - Everything else → issuer node
     const ammPoolNode = graphData.nodes.find((n) => n.kind === "ammPool");
     const orderBookNode = graphData.nodes.find((n) => n.kind === "orderBook");
     const issuerNode = graphData.nodes.find((n) => n.kind === "issuer");
 
     const ammPoolFlags = ["CONCENTRATED_LIQUIDITY", "THIN_AMM_POOL", "AMM_CLAWBACK_EXPOSURE"];
     const orderBookFlags = ["LOW_DEPTH_ORDERBOOK"];
+    const signerListFlags = ["NO_MULTISIG"];
+    const checkFlags = ["ACTIVE_CHECKS"];
+    const noripppleFlags = ["NORIPPLE_MISCONFIGURED"];
 
     for (const flag of riskFlags) {
       if (ammPoolFlags.includes(flag.flag) && ammPoolNode) {
@@ -70,13 +83,18 @@ export async function processAnalysisJob(
       }
     }
 
-    // Step 7: Persist to DB
+    // Step 7: Persist to DB (idempotent — clean up any prior partial data from retries)
     updateProgress("persisting", "Saving results to database");
 
     await prisma.riskFlag.deleteMany({ where: { analysisId } });
     await prisma.edge.deleteMany({ where: { analysisId } });
     await prisma.node.deleteMany({ where: { analysisId } });
 
+    // Nodes. We stash BFS metadata (importance, isHub) inside the node's
+    // data JSON under a reserved `_meta` key, which lets us ship the feature
+    // without a Prisma migration. The graph route strips `_meta` off again
+    // and surfaces it on the top-level GraphNode fields so the frontend
+    // sees a clean shape.
     if (graphData.nodes.length > 0) {
       await prisma.node.createMany({
         data: graphData.nodes.map((node) => {
@@ -99,6 +117,7 @@ export async function processAnalysisJob(
       });
     }
 
+    // Edges
     if (graphData.edges.length > 0) {
       await prisma.edge.createMany({
         data: graphData.edges.map((edge) => ({
@@ -114,7 +133,9 @@ export async function processAnalysisJob(
       });
     }
 
+    // Risk flags
     if (riskFlags.length > 0) {
+      // Build nodeId lookup: flag → db node id
       const nodeRows = await prisma.node.findMany({
         where: { analysisId },
         select: { id: true, nodeId: true, kind: true },
@@ -130,6 +151,10 @@ export async function processAnalysisJob(
           targetNodeId = nodeByKind.get("ammPool")!;
         } else if (orderBookFlags.includes(flag.flag) && nodeByKind.has("orderBook")) {
           targetNodeId = nodeByKind.get("orderBook")!;
+        } else if (signerListFlags.includes(flag.flag) && nodeByKind.has("signerList")) {
+          targetNodeId = nodeByKind.get("signerList")!;
+        } else if (checkFlags.includes(flag.flag) && nodeByKind.has("check")) {
+          targetNodeId = nodeByKind.get("check")!;
         } else {
           targetNodeId = nodeByKind.get("issuer") ?? nodeRows[0]?.id ?? analysisId;
         }
@@ -149,7 +174,14 @@ export async function processAnalysisJob(
 
     logger.info("[worker] Data persisted", { analysisId });
 
-    // Step 8: Build summary and update status to "done"
+    // Step 8: Generate AI explanations for non-account nodes
+    try {
+      await generateNodeExplanations(analysisId, updateProgress);
+    } catch (err: any) {
+      logger.warn("[worker] AI explanation generation failed (non-fatal)", { error: err?.message });
+    }
+
+    // Step 9: Build summary and update status to "done"
     const highCount = riskFlags.filter((f) => f.severity === "HIGH").length;
     const medCount = riskFlags.filter((f) => f.severity === "MED").length;
     const lowCount = riskFlags.filter((f) => f.severity === "LOW").length;
@@ -175,8 +207,12 @@ export async function processAnalysisJob(
         askCount: crawlResult.asks.length,
         bidCount: crawlResult.bids.length,
         paymentPathCount: crawlResult.paths.length,
+        nftCount: crawlResult.nfts.length,
+        channelCount: crawlResult.channels.length,
         txTypeCount: crawlResult.txTypeSummary.length,
         accountObjectCount: crawlResult.accountObjects.length,
+        noripppleProblems: crawlResult.noripppleProblems.length,
+        nftOfferCount: crawlResult.nftOffers.length,
       },
     };
 
@@ -189,6 +225,7 @@ export async function processAnalysisJob(
     updateProgress("done", "Analysis complete");
   } catch (err: any) {
     logger.error("[worker] Analysis failed", { analysisId, error: err?.message });
+    // Only overwrite status if no successful data exists (avoids retry clobbering good results)
     const existingNodes = await prisma.node.count({ where: { analysisId } });
     if (existingNodes === 0) {
       await prisma.analysis.update({

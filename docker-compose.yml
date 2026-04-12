@@ -10,7 +10,9 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./docker/init-pgvector.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./docker/init-pgvector.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./docker/schema.sql:/docker-entrypoint-initdb.d/02-schema.sql
+      - ./docker/seed-data.sql:/docker-entrypoint-initdb.d/03-seed.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U xrplens"]
       interval: 5s
@@ -27,6 +29,41 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  server:
+    build:
+      context: .
+      target: server
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://xrplens:xrplens_dev@postgres:5432/xrplens
+      REDIS_URL: redis://redis:6379
+      PORT: "3001"
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3001/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  web:
+    build:
+      context: .
+      target: web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      server:
+        condition: service_healthy
 
 volumes:
   pgdata:

@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { prisma } from "../db/client.js";
 import { enqueueAnalysis } from "../queue/index.js";
 import { logger } from "../logger.js";
+import { optionalJwt } from "../middleware/auth.js";
 
 export const analysisRouter: IRouter = Router();
 
@@ -19,7 +20,7 @@ const PRESET_ADDRESSES = new Set([
 ]);
 
 // POST / — Create analysis and enqueue job
-analysisRouter.post("/", async (req, res) => {
+analysisRouter.post("/", optionalJwt, async (req, res) => {
   try {
     const { seedAddress, seedLabel, depth: depthRaw } = req.body ?? {};
 
@@ -69,6 +70,7 @@ analysisRouter.post("/", async (req, res) => {
         seedLabel: seedLabel ?? null,
         depth,
         status: "queued",
+        userId: req.user?.userId ?? null,
       },
     });
 
