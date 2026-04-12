@@ -25,7 +25,7 @@ A built-in **Safe Path AI Agent** can receive natural-language instructions (for
 
 ## Architecture Overview
 
-[![COR-Lens Architecture](./diagram-export-12-04-2026-09_01_33.png)](https://drive.google.com/file/d/1zyPOv8MCnVEvU_j-_nEHFRvGnzhnh6GV/view?usp=sharing)
+[![COR-Lens Architecture](./diagram.png)](https://drive.google.com/file/d/1zyPOv8MCnVEvU_j-_nEHFRvGnzhnh6GV/view?usp=sharing)
 > *Click the diagram to view full-size interactive version*
 
 **High-Level Flow**
