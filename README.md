@@ -1,4 +1,4 @@
-# CORLens (cor-lens.xyz)
+# CORLens ([cor-lens.xyz](https://cor-lens.xyz))
 
 ### AI-powered risk intelligence & autonomous compliance agent for XRPL DeFi
 
@@ -97,7 +97,7 @@ XRPL is the backbone of $15B/year in ODL cross-border payments serving 700M peop
 ## Submission
 
 - **Project Name:** CORLens
-- **Track:** Make Waves + Impact Finance
+- **Track:** Make Waves + Impact Finance + Quicknode bounty (1,000 EUR) + Pixel Meets Chain (1,000 EUR)
 - **Network:** XRP Ledger Mainnet
 - **Repository:** https://github.com/JeanBaptisteDurand/PBW
 - **Live Demo:** https://cor-lens.xyz
