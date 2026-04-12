@@ -1,0 +1,347 @@
+[
+  {
+    "address": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
+    "label": "Bitstamp USD/BTC Issuer (Gateway)",
+    "expected_features": ["token_issuer", "trust_lines", "high_trust_line_count"]
+  },
+  {
+    "address": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",
+    "label": "RLUSD Issuer (Ripple USD Stablecoin)",
+    "expected_features": ["token_issuer", "trust_lines", "stablecoin"]
+  },
+  {
+    "address": "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq",
+    "label": "GateHub USD/EUR Issuer",
+    "expected_features": ["token_issuer", "trust_lines", "multi_currency"]
+  },
+  {
+    "address": "rcA8X3TVMST1n3CJeAdGk1RdRCHii7N2h",
+    "label": "GateHub Fifth ETH Issuer",
+    "expected_features": ["token_issuer", "trust_lines"]
+  },
+  {
+    "address": "rchGBxcD1A1C2tdxF6papQYZ8kjRKMYcL",
+    "label": "GateHub BTC Issuer",
+    "expected_features": ["token_issuer", "trust_lines"]
+  },
+  {
+    "address": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz",
+    "label": "Sologenic (SOLO) Issuer",
+    "expected_features": ["token_issuer", "trust_lines", "dex_activity"]
+  },
+  {
+    "address": "rCSCManTZ8ME9EoLrSHHYKW8PPwWMgkwr",
+    "label": "CasinoCoin (CSC) Issuer",
+    "expected_features": ["token_issuer", "trust_lines"]
+  },
+  {
+    "address": "rKiCet8SdvWxPXnAgYarFUXMh1zCPz432Y",
+    "label": "Ripple Fox CNY/XLM Issuer",
+    "expected_features": ["token_issuer", "trust_lines", "multi_currency"]
+  },
+  {
+    "address": "rGm7WCVp9gb4jZHWTEtGUr4dd74z2XuWhE",
+    "label": "USDC Issuer on XRPL",
+    "expected_features": ["token_issuer", "trust_lines", "stablecoin"]
+  },
+  {
+    "address": "rM8hNqA3jRJ5Zgp3Xf3xzdZcx2G37guiZk",
+    "label": "XRP Healthcare (XRPH) Issuer",
+    "expected_features": ["token_issuer", "trust_lines"]
+  },
+  {
+    "address": "rhCAT4hRdi2Y9puNdkpMzxrdKa5wkppR62",
+    "label": "FUZZY Token Issuer",
+    "expected_features": ["token_issuer", "trust_lines"]
+  },
+  {
+    "address": "rDFXbW2ZZCG5WgPtqwNiA2xZokLMm9ivmN",
+    "label": "PHNIX Token Issuer",
+    "expected_features": ["token_issuer", "trust_lines"]
+  },
+  {
+    "address": "rszenFJoDdiGjyezQc8pME9KWDQH43Tswh",
+    "label": "DROP Token Issuer",
+    "expected_features": ["token_issuer", "trust_lines"]
+  },
+  {
+    "address": "rGG3wQ4kUzd7Jnmk1n5NWPZjjut62kCBfC",
+    "label": "ARMY Token Issuer",
+    "expected_features": ["token_issuer", "trust_lines"]
+  },
+  {
+    "address": "rHXuEaRYnnJHbDeuBH5w8yPh5uwNVh5zAg",
+    "label": "Elysian (ELS) Token Issuer",
+    "expected_features": ["token_issuer", "trust_lines"]
+  },
+  {
+    "address": "rhWTXC2m2gGGA9WozUaoMm6kLAVPb1tcS3",
+    "label": "AMM Pool: XRP/RLUSD",
+    "expected_features": ["amm_pool", "lp_tokens", "liquidity_pool"]
+  },
+  {
+    "address": "rHUpaqUPbwzKZdzQ8ZQCme18FrgW9pB4am",
+    "label": "AMM Pool: XRP/USD.Bitstamp",
+    "expected_features": ["amm_pool", "lp_tokens", "liquidity_pool"]
+  },
+  {
+    "address": "rMEJo9H5XvTe17UoAJzj8jtKVvTRcxwngo",
+    "label": "AMM Pool: XRP/SOLO",
+    "expected_features": ["amm_pool", "lp_tokens", "liquidity_pool"]
+  },
+  {
+    "address": "rs9ineLqrCzeAGS1bxsrW8x2n3bRJYAh3Q",
+    "label": "AMM Pool: XRP/USD.GateHub",
+    "expected_features": ["amm_pool", "lp_tokens", "liquidity_pool"]
+  },
+  {
+    "address": "rf7g4JWCxu9oE1MKsWTihL9whY75AphCaV",
+    "label": "AMM Pool: XRP/CSC",
+    "expected_features": ["amm_pool", "lp_tokens", "liquidity_pool"]
+  },
+  {
+    "address": "rB3bK9PnHueTTabMVHedKuBzG5RSFYAUEH",
+    "label": "AMM Pool: RLUSD/USD.Bitstamp",
+    "expected_features": ["amm_pool", "lp_tokens", "liquidity_pool"]
+  },
+  {
+    "address": "rPEPPER7kfTD9w2To4CQk6UCfuHM9c6GDY",
+    "label": "Ripple Escrow (XRP monthly release)",
+    "expected_features": ["escrow", "high_owner_count", "large_balance_history"]
+  },
+  {
+    "address": "rHhuUU6kb2DVaHYVkNjeH5NLuFPiVz98Pa",
+    "label": "Ripple Escrow Destination",
+    "expected_features": ["escrow_destination", "ripple_controlled"]
+  },
+  {
+    "address": "raDCC2GAMdM4bhAv4iQNQ7SVJQ5Z82yAnu",
+    "label": "Uphold XRP Army Badge (NFT Issuer)",
+    "expected_features": ["nft_issuer", "nftoken_page"]
+  },
+  {
+    "address": "rP24Lp7bcUHvEW7T7c8xkxtQKKd9fZyra7",
+    "label": "DIA Price Oracle (Mainnet)",
+    "expected_features": ["oracle", "price_data"]
+  },
+  {
+    "address": "rXUMMaPpZqPutoRszR29jtC8amWq3APkx",
+    "label": "XUMM/Xaman Oracle",
+    "expected_features": ["oracle_provider", "xumm_ecosystem"]
+  },
+  {
+    "address": "rBg2FuZT91C52Nny68houguJ4vt5x1o91m",
+    "label": "Ripple Operations Wallet 1 (Multisig)",
+    "expected_features": ["signer_list", "multisig", "trust_lines"]
+  },
+  {
+    "address": "r4w1LrneWZqX5RrgFPx2gto66dwo2Zymqy",
+    "label": "Allbridge (Cross-chain Bridge)",
+    "expected_features": ["cross_chain_bridge", "trust_lines"]
+  },
+  {
+    "address": "rEb8TK3gBgk5auZkwc6sHnwrGVJH8DuaLh",
+    "label": "Binance Hot Wallet 1",
+    "expected_features": ["exchange", "high_volume", "large_balance"]
+  },
+  {
+    "address": "rJb5KsHsDHF1YS5B5DU6QCkH5NsPaKQTcy",
+    "label": "Binance Hot Wallet 2",
+    "expected_features": ["exchange", "high_volume"]
+  },
+  {
+    "address": "rLNaPoKeeBjZe2qs6x52yVPZpZ8td4dc6w",
+    "label": "Coinbase Hot Wallet 1",
+    "expected_features": ["exchange", "high_volume", "large_balance"]
+  },
+  {
+    "address": "rw2ciyaNshpHe7bCHo4bRWq6pqqynnWKQg",
+    "label": "Coinbase Hot Wallet 2",
+    "expected_features": ["exchange", "high_volume"]
+  },
+  {
+    "address": "rLHzPsX6oXkzU2qL12kHCH8G8cnZv1rBJh",
+    "label": "Kraken Hot Wallet 1",
+    "expected_features": ["exchange", "high_volume"]
+  },
+  {
+    "address": "rDsbeomae4FXwgQTJp9Rs64Qg9vDiTCdBv",
+    "label": "Bitstamp Hot Wallet 1",
+    "expected_features": ["exchange", "high_volume"]
+  },
+  {
+    "address": "rGFuMiw48HdbnrUbkRYuitXTmfrDBNTCnX",
+    "label": "Bitstamp Hot Wallet (Hot)",
+    "expected_features": ["exchange", "high_volume", "trust_lines"]
+  },
+  {
+    "address": "rLW9gnQo7BQhU6igk5keqYnH3TVrCxGRzm",
+    "label": "Bitfinex Hot Wallet 1",
+    "expected_features": ["exchange", "high_volume"]
+  },
+  {
+    "address": "rPVMhWBsfF9iMXYj3aAzJVkPDTFNSyWdKy",
+    "label": "Bittrex Hot Wallet",
+    "expected_features": ["exchange", "high_volume"]
+  },
+  {
+    "address": "rMrgNBrkE6FdCjWih5VAWkGMrmerrWpiZt",
+    "label": "Bybit Hot Wallet 1",
+    "expected_features": ["exchange", "high_volume"]
+  },
+  {
+    "address": "rKV8HEL3vLc6q9waTiJcewdRdSFyx67QFb",
+    "label": "Crypto.com Exchange Hot Wallet",
+    "expected_features": ["exchange", "high_volume"]
+  },
+  {
+    "address": "rUW9toSjQkLY6EspdnBJP2paG4hWKmNbMh",
+    "label": "KuCoin Hot Wallet 1",
+    "expected_features": ["exchange", "high_volume"]
+  },
+  {
+    "address": "rMdG3ju8pgyVh29ELPWaDuA74CpWW6Fxns",
+    "label": "Uphold Hot Wallet 3",
+    "expected_features": ["exchange", "high_volume"]
+  },
+  {
+    "address": "rJ9p6JwpypXYpoUk33DDjEkHT5gtKLvsVw",
+    "label": "Huobi Hot Wallet",
+    "expected_features": ["exchange", "high_volume"]
+  },
+  {
+    "address": "rPdvC6ccq8hCdPKSPJkPmyZ4Mi1oG2FFkT",
+    "label": "Wietse Wind (XRPL Developer)",
+    "expected_features": ["developer", "diverse_activity"]
+  },
+  {
+    "address": "rpePPeRpC89vpCY3CDzhzMCs78nPoNnAKm",
+    "label": "Wietse Wind MultiProject Cold Storage",
+    "expected_features": ["cold_storage", "developer"]
+  },
+  {
+    "address": "rK2y8aaRdEFpr2GUrqs1iuTCUsWgS5mHHW",
+    "label": "XRP Ledger Foundation",
+    "expected_features": ["foundation", "governance"]
+  },
+  {
+    "address": "rXUMMrs3sGFfTQvJV3sYSJ83kdQy2QDzt",
+    "label": "XUMM Onramp",
+    "expected_features": ["xumm_ecosystem", "onramp"]
+  },
+  {
+    "address": "rxUMmcHjebM2cEXWrnvwHWn5NU9tZTxb8",
+    "label": "XUMM Charity",
+    "expected_features": ["xumm_ecosystem", "charity"]
+  },
+  {
+    "address": "r4LxkCUXYTCUgwquN3BnsUxFacoVLjGFyF",
+    "label": "Ripple Operations Wallet 2",
+    "expected_features": ["ripple_controlled", "operations"]
+  },
+  {
+    "address": "rNz6HfHBA3nReSbVPwM6YE39MQoeS5SqLU",
+    "label": "Ripple Operations Wallet 3",
+    "expected_features": ["ripple_controlled", "operations"]
+  },
+  {
+    "address": "rw2hzLZgiQ9q62KCuaTWuFHWfiX7JWg3wY",
+    "label": "Ripple Operations Wallet 24",
+    "expected_features": ["ripple_controlled", "operations"]
+  },
+  {
+    "address": "rrrrrrrrrrrrrrrrrrrrBZbvji",
+    "label": "XRPL Account One (Special Address)",
+    "expected_features": ["special_address", "black_hole"]
+  },
+  {
+    "address": "rrrrrrrrrrrrrrrrrrrrrhoLvTp",
+    "label": "XRPL Account Zero (Special Address)",
+    "expected_features": ["special_address", "black_hole"]
+  },
+  {
+    "address": "rcvxE9PS9YBwxtGg1qNeewV6ZB3wGubZq",
+    "label": "GateHub USDT Issuer",
+    "expected_features": ["token_issuer", "trust_lines", "stablecoin"]
+  },
+  {
+    "address": "rcEGREd8NmkKRE8GE424sksyt1tJVFZwu",
+    "label": "GateHub USDC Issuer",
+    "expected_features": ["token_issuer", "trust_lines", "stablecoin"]
+  },
+  {
+    "address": "rEa5QY8tdbjgitLyfKF1E5Qx3VGgvbUhB3",
+    "label": "GateHub WXRP Issuer",
+    "expected_features": ["token_issuer", "trust_lines", "wrapped_token"]
+  },
+  {
+    "address": "rswh1fvyLqHizBS2awu1vs6QcmwTBd9qiv",
+    "label": "GateHub XAH (Xahau) Issuer",
+    "expected_features": ["token_issuer", "trust_lines"]
+  },
+  {
+    "address": "rcxJwVnftZzXqyH9YheB8TgeiZUhNo1Eu",
+    "label": "GateHub FLR (Flare) Issuer",
+    "expected_features": ["token_issuer", "trust_lines"]
+  },
+  {
+    "address": "rf5YPb9y9P3fTjhxNaZqmrwaj5ar8PG1gM",
+    "label": "GateHub GALA Issuer",
+    "expected_features": ["token_issuer", "trust_lines"]
+  },
+  {
+    "address": "rCULtAKrKbQjk1Tpmg5hkw4dpcf9S9KCs",
+    "label": "CULT Token Issuer",
+    "expected_features": ["token_issuer", "trust_lines"]
+  },
+  {
+    "address": "rNNfA8skJdYTJBEewgquswU6vDSpehoD2Y",
+    "label": "4Tell Issuer",
+    "expected_features": ["token_issuer", "trust_lines"]
+  },
+  {
+    "address": "rjpj1Mv21gJzsbsVnkp1U4nqchZbmZ9pM5",
+    "label": "Binance XRP-BF2 Reserve (Cold Storage)",
+    "expected_features": ["exchange", "cold_storage", "large_balance"]
+  },
+  {
+    "address": "rKK8QagCxiiDTaiXQFmpCxZViUonPYfUHR",
+    "label": "Binance Charity 1",
+    "expected_features": ["charity", "exchange_affiliated"]
+  },
+  {
+    "address": "rbKoFeFtQr2cRMK2jRwhgTa1US9KU6v4L",
+    "label": "Adopt a Node (XRPL Infrastructure)",
+    "expected_features": ["infrastructure", "community"]
+  },
+  {
+    "address": "r9UUEXn3cx2seufBkDa8F86usfjWM6HiYp",
+    "label": "Ripple Operations Wallet 10",
+    "expected_features": ["ripple_controlled", "operations"]
+  },
+  {
+    "address": "rjhTSRHRCvxEXHcKzZtJTU5rQngpqHip7",
+    "label": "AMW Fund (Charity/Foundation)",
+    "expected_features": ["charity", "foundation"]
+  },
+  {
+    "address": "r4uKh2rHuarMZdAgSBYqqicX7MxPBegttw",
+    "label": "AMM Auction Slot Holder (XRP/RLUSD pool)",
+    "expected_features": ["dex_market_maker", "amm_trader"]
+  },
+  {
+    "address": "rL8vvW4Zbo7HZwmsue5ucPHk2MwmqVeMGm",
+    "label": "AMM Auction Slot Holder (XRP/SOLO pool)",
+    "expected_features": ["dex_market_maker", "amm_trader"]
+  },
+  {
+    "address": "rUN5Zxt3K1AnMRJgEWywDJT8QDMMeLH5ok",
+    "label": "AUDD (Australian Dollar Digital) Issuer",
+    "expected_features": ["token_issuer", "trust_lines", "stablecoin"]
+  },
+  {
+    "address": "r1E7ErLAj4XfbkjUV3E1C57Tgb1TThzW4",
+    "label": "ATOM Token Issuer (XRPL)",
+    "expected_features": ["token_issuer", "trust_lines"]
+  }
+]
