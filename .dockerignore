@@ -1,0 +1,9 @@
+node_modules
+*/node_modules
+**/node_modules
+.git
+.env
+*.md
+apps/server/dist
+apps/web/dist
+docker/seed-data.sql
