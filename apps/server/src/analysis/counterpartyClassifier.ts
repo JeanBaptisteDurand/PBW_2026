@@ -1,12 +1,11 @@
 // xrplens/apps/server/src/analysis/counterpartyClassifier.ts
 import type { XRPLAsset } from "@xrplens/core";
-
-export type HeavyKind =
-  | "issuer"
-  | "escrow_dest"
-  | "check_dest"
-  | "channel_dest"
-  | "multisig_member";
+import type {
+  HeavyKind,
+  HistoryEdge,
+  PendingAmmPair,
+  TxTypeSummary,
+} from "./historyTypes.js";
 
 interface LightEntry {
   address: string;
@@ -18,39 +17,12 @@ interface HeavyEntry {
   txCount: number;
 }
 
-export interface TxTypeSummary {
-  type: string;
-  count: number;
-  lastLedger?: number;
-}
-
-export interface HistoryEdge {
-  id: string;
-  from: string;
-  to: string;
-  txType: string;
-  count: number;
-  lastLedger?: number;
-  lastDate?: string;
-}
-
-export interface PendingAmmPair {
-  asset1: XRPLAsset;
-  asset2: XRPLAsset;
-  txCount: number;
-}
-
 export interface ClassifierResult {
   light: Map<string, LightEntry>;
   heavy: Map<string, HeavyEntry>;
   pendingAmmPairs: PendingAmmPair[];
   edges: HistoryEdge[];
   txTypeSummary: TxTypeSummary[];
-}
-
-function amountIssuer(raw: any): string | null {
-  if (raw && typeof raw === "object" && raw.issuer) return raw.issuer;
-  return null;
 }
 
 function toAsset(raw: any): XRPLAsset | null {
@@ -62,6 +34,11 @@ function toAsset(raw: any): XRPLAsset | null {
   if (raw.currency && raw.issuer) {
     return { currency: raw.currency, issuer: raw.issuer } as XRPLAsset;
   }
+  return null;
+}
+
+function amountIssuer(raw: any): string | null {
+  if (raw && typeof raw === "object" && raw.issuer) return raw.issuer;
   return null;
 }
 
@@ -216,6 +193,7 @@ export function classifyCounterparties(
         }
         break;
       }
+      // NFT* and others: counted in summary only, no graph contribution
       default:
         break;
     }
