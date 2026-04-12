@@ -2,6 +2,8 @@
 
 ### AI-powered risk intelligence & autonomous compliance agent for XRPL DeFi
 
+[![Demo Video](https://img.shields.io/badge/Demo-YouTube-red?logo=youtube)](https://youtu.be/JYIxANpQtms)
+
 CORLens is a full-stack platform for mapping, understanding, and auditing the infrastructure behind cross-border payments on the XRP Ledger.
 
 The system automatically catalogues 2,436 live fiat corridors, classifies how each one settles on XRPL, and exposes an interactive knowledge graph of every entity touching a corridor -- issuers, AMM pools, liquidity providers, trust lines, escrows, and payment paths.
