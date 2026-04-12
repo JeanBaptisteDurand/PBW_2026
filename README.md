@@ -18,7 +18,7 @@ A built-in Safe Path AI Agent can receive natural-language instructions (for exa
 | Safe Path AI Agent | Multi-step AI agent that analyzes cross-border payment compliance by calling 7 tools against live XRPL data, proposes split routing for large amounts, and generates downloadable compliance reports |
 | Entity Audit Graph | Crawl any XRPL address and visualize the trust line network, AMM pools, risk flags, and dependencies as an interactive knowledge graph (18 node types, 19 edge types) |
 | RAG Chat | Natural language queries over crawled XRPL data -- ask questions grounded in actual on-chain state, not hallucinated |
-| MCP Server | Let Claude talk to CORLens directly via the Model Context Protocol -- [full MCP documentation](https://cor-lens.xyz/api-docs) |
+| MCP Server | Let Claude talk to CORLens directly via the Model Context Protocol -- [full MCP documentation](https://cor-lens.xyz/developers) |
 | Wallet Auth & Premium | Crossmark wallet-based authentication with XRP payment for premium access |
 
 ---
@@ -49,7 +49,7 @@ A built-in Safe Path AI Agent can receive natural-language instructions (for exa
 
 **AI & Data Layer:** OpenAI (chat + embeddings), PostgreSQL, pgvector, Redis, BullMQ, RAG system, SSE streaming
 
-**MCP Integration:** Standalone MCP server (7 tools) for Claude Desktop / Claude Code -- [documentation](https://cor-lens.xyz/api-docs)
+**MCP Integration:** Standalone MCP server (7 tools) for Claude Desktop / Claude Code -- [documentation](https://cor-lens.xyz/developers)
 
 **Infra & Runtime:** Docker, Docker Compose, Express, Prisma, Caddy
 
