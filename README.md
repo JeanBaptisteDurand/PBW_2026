@@ -101,7 +101,7 @@ XRPL is the backbone of $15B/year in ODL cross-border payments serving 700M peop
 - **Project Name:** CORLens
 - **Track:** Make Waves + Impact Finance + Quicknode bounty (1,000 EUR) + Pixel Meets Chain (1,000 EUR)
 - **Network:** XRP Ledger Mainnet
-- **Repository:** https://github.com/JeanBaptisteDurand/PBW
+- **Repository:** https://github.com/JeanBaptisteDurand/PBW_2026
 - **Live Demo:** https://cor-lens.xyz
 
 ---
