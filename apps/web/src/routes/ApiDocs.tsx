@@ -44,7 +44,7 @@ const CORRIDOR_ENDPOINTS: Endpoint[] = [
     response: `{
   corridors: CorridorListItem[]  // 2,436 entries
 }`,
-    curl: `curl http://localhost:3001/api/corridors`,
+    curl: `curl https://cor-lens.xyz/api/corridors`,
   },
   {
     method: "GET",
@@ -64,7 +64,7 @@ const CORRIDOR_ENDPOINTS: Endpoint[] = [
   // includes: status, aiNote, routeResults[],
   // sourceActors[], destActors[], highlights, ...
 }`,
-    curl: `curl http://localhost:3001/api/corridors/usd-mxn`,
+    curl: `curl https://cor-lens.xyz/api/corridors/usd-mxn`,
   },
   {
     method: "GET",
@@ -95,7 +95,7 @@ const CORRIDOR_ENDPOINTS: Endpoint[] = [
     at: string  // ISO timestamp
   }>
 }`,
-    curl: `curl http://localhost:3001/api/corridors/usd-eur/history?days=7`,
+    curl: `curl https://cor-lens.xyz/api/corridors/usd-eur/history?days=7`,
   },
   {
     method: "GET",
@@ -127,7 +127,7 @@ const CORRIDOR_ENDPOINTS: Endpoint[] = [
     fetchedAt, ttlSeconds
   }
 }`,
-    curl: `curl http://localhost:3001/api/corridors/eur-xrp/partner-depth?actor=xrpl-dex`,
+    curl: `curl https://cor-lens.xyz/api/corridors/eur-xrp/partner-depth?actor=xrpl-dex`,
   },
   {
     method: "POST",
@@ -146,7 +146,7 @@ const CORRIDOR_ENDPOINTS: Endpoint[] = [
   refresh: RefreshResult,
   corridor: CorridorDetailResponse
 }`,
-    curl: `curl -X POST http://localhost:3001/api/corridors/refresh/usd-eur`,
+    curl: `curl -X POST https://cor-lens.xyz/api/corridors/refresh/usd-eur`,
   },
   {
     method: "POST",
@@ -178,7 +178,7 @@ const CORRIDOR_ENDPOINTS: Endpoint[] = [
   message: { role: "assistant", content: string },
   sources: CorridorChatSource[]
 }`,
-    curl: `curl -X POST http://localhost:3001/api/corridors/chat \\
+    curl: `curl -X POST https://cor-lens.xyz/api/corridors/chat \\
   -H "Content-Type: application/json" \\
   -d '{"message":"Which GCC corridors have RLUSD on both sides?"}'`,
   },
@@ -231,7 +231,7 @@ const SAFE_PATH_ENDPOINTS: Endpoint[] = [
 { type: "result", result: SafePathResult }
 // Final frame:
 data: [DONE]`,
-    curl: `curl -N -X POST http://localhost:3001/api/safe-path \\
+    curl: `curl -N -X POST https://cor-lens.xyz/api/safe-path \\
   -H "Content-Type: application/json" \\
   -d '{
     "srcCcy": "USD",
@@ -282,7 +282,7 @@ const ENTITY_AUDIT_ENDPOINTS: Endpoint[] = [
   id: string,       // analysis job ID
   status: "queued"   // or "done" if cached
 }`,
-    curl: `curl -X POST http://localhost:3001/api/analysis \\
+    curl: `curl -X POST https://cor-lens.xyz/api/analysis \\
   -H "Content-Type: application/json" \\
   -d '{
     "seedAddress": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B",
@@ -313,7 +313,7 @@ const ENTITY_AUDIT_ENDPOINTS: Endpoint[] = [
   createdAt: string,
   updatedAt: string
 }`,
-    curl: `curl http://localhost:3001/api/analysis/{id}/status`,
+    curl: `curl https://cor-lens.xyz/api/analysis/{id}/status`,
   },
   {
     method: "GET",
@@ -336,7 +336,7 @@ const ENTITY_AUDIT_ENDPOINTS: Endpoint[] = [
     highRiskCount, medRiskCount, lowRiskCount
   }
 }`,
-    curl: `curl http://localhost:3001/api/graph/{analysisId}`,
+    curl: `curl https://cor-lens.xyz/api/graph/{analysisId}`,
   },
 ];
 
@@ -770,7 +770,7 @@ function ApiDocsContent({ navigate }: { navigate: ReturnType<typeof useNavigate>
                   . Send it as an <code className="text-slate-300">x-api-key</code> header:
                 </p>
                 <pre className="text-[11px] font-mono text-emerald-300 bg-slate-950/60 border border-slate-800 rounded p-2 overflow-x-auto whitespace-pre-wrap">
-{`curl http://localhost:3001/api/safe-path/history \\
+{`curl https://cor-lens.xyz/api/safe-path/history \\
   -H "x-api-key: xlens_your-key-here"`}
                 </pre>
               </div>
@@ -784,12 +784,12 @@ function ApiDocsContent({ navigate }: { navigate: ReturnType<typeof useNavigate>
                 </p>
                 <pre className="text-[11px] font-mono text-emerald-300 bg-slate-950/60 border border-slate-800 rounded p-2 overflow-x-auto whitespace-pre-wrap">
 {`# 1. Get a JWT
-curl -X POST http://localhost:3001/api/auth/connect \\
+curl -X POST https://cor-lens.xyz/api/auth/connect \\
   -H "Content-Type: application/json" \\
   -d '{"walletAddress":"rYourXRPLAddress..."}'
 
 # 2. Use it
-curl http://localhost:3001/api/safe-path/history \\
+curl https://cor-lens.xyz/api/safe-path/history \\
   -H "Authorization: Bearer eyJhb..."`}
                 </pre>
               </div>

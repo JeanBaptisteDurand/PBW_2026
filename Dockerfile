@@ -26,9 +26,10 @@ RUN pnpm --filter @xrplens/web run build
 
 # ─── Stage 4: Production server ──────────────────────────────
 FROM base AS server
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/server/node_modules ./apps/server/node_modules
-COPY --from=deps /app/packages/core ./packages/core
+COPY --from=build /app/packages/core ./packages/core
 COPY --from=build /app/apps/server/dist ./apps/server/dist
 COPY --from=build /app/apps/server/prisma ./apps/server/prisma
 COPY --from=build /app/apps/server/package.json ./apps/server/

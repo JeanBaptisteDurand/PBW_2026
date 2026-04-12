@@ -26,7 +26,7 @@ export default function Premium() {
   const navigate = useNavigate();
   const { user, token, connect, refresh, isPremium } = useAuth();
   const [step, setStep] = useState<PaymentStep>("choose");
-  const [currency, setCurrency] = useState<"XRP" | "RLUSD">("XRP");
+  const currency = "XRP" as const;
   const [paymentId, setPaymentId] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -192,40 +192,12 @@ export default function Premium() {
           </div>
         )}
 
-        {/* Currency selection */}
-        <div className="mb-8 grid grid-cols-2 gap-4">
-          <button
-            type="button"
-            onClick={() => setCurrency("XRP")}
-            className={`app-glass-surface rounded-xl p-5 text-left transition-all duration-150 cursor-pointer ${
-              currency === "XRP"
-                ? "border-[color:var(--page-accent-400)] bg-[color:color-mix(in_srgb,var(--page-accent-500)_8%,transparent)]"
-                : "hover:border-slate-600/60"
-            }`}
-          >
-            <h3 className="text-lg font-semibold text-slate-100">10 XRP</h3>
-            <p className="mt-1 text-xs text-slate-400">Native XRPL currency</p>
-            {currency === "XRP" && (
-              <Badge variant="info" className="mt-3">
-                Recommended
-              </Badge>
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setCurrency("RLUSD")}
-            className={`app-glass-surface rounded-xl p-5 text-left transition-all duration-150 cursor-pointer ${
-              currency === "RLUSD"
-                ? "border-[color:var(--page-accent-400)] bg-[color:color-mix(in_srgb,var(--page-accent-500)_8%,transparent)]"
-                : "hover:border-slate-600/60"
-            }`}
-          >
-            <h3 className="text-lg font-semibold text-slate-100">5 RLUSD</h3>
-            <p className="mt-1 text-xs text-slate-400">
-              Ripple USD stablecoin
-            </p>
-          </button>
+        {/* Price */}
+        <div className="mb-8">
+          <div className="app-glass-surface rounded-xl p-5 text-center border-[color:var(--page-accent-400)] bg-[color:color-mix(in_srgb,var(--page-accent-500)_8%,transparent)]">
+            <h3 className="text-2xl font-bold text-slate-100">10 XRP</h3>
+            <p className="mt-1 text-sm text-slate-400">One-time payment on XRPL Testnet</p>
+          </div>
         </div>
 
         {/* Payment buttons */}

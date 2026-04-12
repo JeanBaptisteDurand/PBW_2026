@@ -465,153 +465,256 @@ function generateReport(
   ragInsights: Map<string, string>,
 ): string {
   const L: string[] = [];
-
-  // 1. Executive summary
-  L.push("# XRPLens Safe Path Report");
-  L.push(`\n## 1. Executive summary`);
-  L.push(`\n**Date:** ${new Date().toISOString()}`);
-  L.push(`**Corridor:** ${intent.srcCcy} → ${intent.dstCcy}`);
-  L.push(`**Amount:** ${intent.amount} ${intent.srcCcy}`);
-  L.push(`**Risk tolerance:** ${intent.maxRiskTolerance ?? "MED"}`);
-  L.push(`**Verdict:** ${result.verdict}`);
   const corridorType = corridor?.category === "off-chain-bridge" ? "Off-chain bridge (RLUSD)" : "XRPL-native";
-  L.push(`**Corridor type:** ${corridorType}`);
-  L.push(`**Bridge asset:** ${corridor?.bridgeAsset ?? "RLUSD"}`);
+  const corridorStatus = corridor?.category === "off-chain-bridge" ? classifyOffChainBridgeStatus(corridor).status : "see scan";
+  const topSrc = rankActors(srcActors).slice(0, 3);
+  const topDst = rankActors(dstActors).slice(0, 3);
+  const verdictLabel: Record<string, string> = {
+    SAFE: "SAFE — On-chain path approved",
+    OFF_CHAIN_ROUTED: "APPROVED — Off-chain route via " + (corridor?.bridgeAsset ?? "RLUSD"),
+    REJECTED: "REJECTED — All paths exceed risk tolerance",
+    NO_PATHS: "NO PATHS — No viable route found",
+  };
+  let sectionNum = 0;
+  const sec = () => ++sectionNum;
 
-  // 2. Corridor classification
-  if (corridor) {
-    L.push(`\n## 2. Corridor classification`);
-    L.push(`**Type:** ${corridorType} · **Bridge:** ${corridor.bridgeAsset ?? "RLUSD"} · **Status:** ${corridor.category === "off-chain-bridge" ? classifyOffChainBridgeStatus(corridor).status : "see scan"}`);
-    L.push(`**Source actors:** ${srcActors.length} · **Dest actors:** ${dstActors.length}`);
-  }
+  // ── Title ──
+  L.push("# Corlens Safe Path Report");
+  L.push(`\n> **${intent.srcCcy} → ${intent.dstCcy}** · ${intent.amount} ${intent.srcCcy} · ${new Date().toISOString().split("T")[0]}`);
 
-  // 3. Recommended paths
-  L.push(`\n## 3. Recommended path(s)`);
+  // ── 1. Executive summary ──
+  L.push(`\n## ${sec()}. Executive summary`);
+  L.push(``);
+  L.push(`| Field | Value |`);
+  L.push(`|-------|-------|`);
+  L.push(`| Corridor | ${intent.srcCcy} → ${intent.dstCcy} |`);
+  L.push(`| Amount | ${intent.amount} ${intent.srcCcy} |`);
+  L.push(`| Risk tolerance | ${intent.maxRiskTolerance ?? "MED"} |`);
+  L.push(`| Verdict | **${verdictLabel[result.verdict] ?? result.verdict}** |`);
+  L.push(`| Corridor type | ${corridorType} |`);
+  L.push(`| Bridge asset | ${corridor?.bridgeAsset ?? "RLUSD"} |`);
+  L.push(`| Status | ${corridorStatus} |`);
+
+  // ── 2. Recommended route ──
+  L.push(`\n## ${sec()}. Recommended route`);
   if (result.winningPath) {
-    L.push(`\n### Winner: Path #${result.winningPath.index}`);
-    L.push(`- **Hops:** ${result.winningPath.hops.length}`);
-    L.push(`- **Risk score:** ${result.winningPath.riskScore}`);
-    L.push(`- **Source amount:** ${result.winningPath.sourceAmount}`);
-    L.push(`- **Justification:** Lowest risk score among surviving paths with acceptable cost.`);
+    L.push(`\n**Selected: Path #${result.winningPath.index}** — ${result.winningPath.hops.length} hops, risk score ${result.winningPath.riskScore}, source amount ${result.winningPath.sourceAmount}`);
+    L.push(``);
     for (const hop of result.winningPath.hops) {
-      const hopFlags = hop.riskFlags.map((f) => `${f.flag}(${f.severity})`).join(", ");
-      L.push(`  - ${hop.type}: ${hop.currency ?? "XRP"}${hop.account ? ` via ${hop.account.slice(0, 10)}…` : ""}${hopFlags ? ` [flags: ${hopFlags}]` : ""}`);
+      const hopFlags = hop.riskFlags.map((f) => `\`${f.flag}\`(${f.severity})`).join(" ");
+      L.push(`- **${hop.type}:** ${hop.currency ?? "XRP"}${hop.account ? ` via \`${hop.account.slice(0, 12)}…\`` : ""}${hopFlags ? ` — ${hopFlags}` : ""}`);
     }
+    L.push(`\n*Justification:* Lowest risk score among surviving paths with acceptable cost.`);
   } else if (result.verdict === "OFF_CHAIN_ROUTED") {
-    L.push(`Off-chain route via ${corridor?.bridgeAsset ?? "RLUSD"} — no on-chain paths needed.`);
+    const bestSrc = topSrc[0];
+    const bestDst = topDst[0];
+    L.push(``);
+    L.push(`This corridor settles **off-chain** via **${corridor?.bridgeAsset ?? "RLUSD"}**. No on-chain IOU path is needed — funds move through licensed exchange partners.`);
+    L.push(``);
+    if (bestSrc && bestDst) {
+      L.push(`**Primary recommended flow:**`);
+      L.push(``);
+      L.push(`\`\`\``);
+      L.push(`${intent.srcCcy} (fiat) → ${bestSrc.name} → ${corridor?.bridgeAsset ?? "RLUSD"} (XRPL) → ${bestDst.name} → ${intent.dstCcy} (fiat)`);
+      L.push(`\`\`\``);
+      L.push(``);
+      const srcTags = [bestSrc.odl ? "ODL partner" : null, bestSrc.supportsRlusd ? "RLUSD" : null].filter(Boolean).join(", ");
+      const dstTags = [bestDst.odl ? "ODL partner" : null, bestDst.supportsRlusd ? "RLUSD" : null].filter(Boolean).join(", ");
+      L.push(`| Leg | Actor | Role | Why |`);
+      L.push(`|-----|-------|------|-----|`);
+      L.push(`| On-ramp | **${bestSrc.name}** | ${intent.srcCcy} → ${corridor?.bridgeAsset ?? "RLUSD"} | ${srcTags}${bestSrc.note ? `. ${bestSrc.note}` : ""} |`);
+      L.push(`| Off-ramp | **${bestDst.name}** | ${corridor?.bridgeAsset ?? "RLUSD"} → ${intent.dstCcy} | ${dstTags}${bestDst.note ? `. ${bestDst.note}` : ""} |`);
+    }
+    if (topSrc.length > 1 || topDst.length > 1) {
+      L.push(`\n**Alternative actors:**`);
+      if (topSrc.length > 1) L.push(`- On-ramp alternatives: ${topSrc.slice(1).map(a => a.name).join(", ")}`);
+      if (topDst.length > 1) L.push(`- Off-ramp alternatives: ${topDst.slice(1).map(a => a.name).join(", ")}`);
+    }
   } else {
-    L.push(`No viable paths found.`);
+    L.push(`\nNo viable route found for this corridor and risk tolerance.`);
   }
   if (result.rejected.length > 0) {
-    L.push(`\n### Rejected paths (${result.rejected.length})`);
+    L.push(`\n**Rejected paths (${result.rejected.length}):**`);
     for (const r of result.rejected) {
-      L.push(`- **Path #${r.pathIndex}:** ${r.reason} — flags: ${r.flags.join(", ")}`);
+      L.push(`- Path #${r.pathIndex}: ${r.reason}`);
     }
   }
 
-  // 4. Actor research
-  L.push(`\n## 4. Actor research`);
-  L.push(`\n### ${intent.srcCcy} on-ramps (${srcActors.length})`);
-  for (const a of rankActors(srcActors).slice(0, 5)) {
-    const tags = [a.odl ? "ODL" : null, a.supportsRlusd ? "RLUSD" : null, a.supportsXrp ? "XRP" : null].filter(Boolean).join(", ");
-    L.push(`- **${a.name}** (${a.type}${a.country ? `, ${a.country}` : ""}) — ${tags}${a.note ? ` — ${a.note}` : ""}`);
-    const research = actorResearch.get(a.key);
-    if (research && research.length > 0) {
-      for (const bullet of research.slice(0, 3)) {
-        L.push(`  - ${bullet}`);
-      }
-    }
-  }
-  L.push(`\n### ${intent.dstCcy} off-ramps (${dstActors.length})`);
-  for (const a of rankActors(dstActors).slice(0, 5)) {
-    const tags = [a.odl ? "ODL" : null, a.supportsRlusd ? "RLUSD" : null, a.supportsXrp ? "XRP" : null].filter(Boolean).join(", ");
-    L.push(`- **${a.name}** (${a.type}${a.country ? `, ${a.country}` : ""}) — ${tags}${a.note ? ` — ${a.note}` : ""}`);
-    const research = actorResearch.get(a.key);
-    if (research && research.length > 0) {
-      for (const bullet of research.slice(0, 3)) {
-        L.push(`  - ${bullet}`);
-      }
-    }
+  // ── 3. Corridor classification ──
+  if (corridor) {
+    L.push(`\n## ${sec()}. Corridor classification`);
+    L.push(``);
+    L.push(`| Property | Value |`);
+    L.push(`|----------|-------|`);
+    L.push(`| Type | ${corridorType} |`);
+    L.push(`| Bridge | ${corridor.bridgeAsset ?? "RLUSD"} |`);
+    L.push(`| Status | ${corridorStatus} |`);
+    L.push(`| Source actors | ${srcActors.length} |`);
+    L.push(`| Dest actors | ${dstActors.length} |`);
   }
 
-  // 5. Deep analysis findings
-  if (deepAnalyses.size > 0) {
-    L.push(`\n## 5. Deep analysis findings`);
-    for (const [addr, data] of deepAnalyses) {
-      L.push(`\n### ${data.label} — ${addr.slice(0, 12)}… (${data.nodeCount} nodes, ${data.edgeCount} edges)`);
-      if (data.ragInsight) L.push(data.ragInsight);
-      const extra = ragInsights.get(addr);
-      if (extra && extra !== data.ragInsight) L.push(`\n**Additional RAG insight:** ${extra}`);
-    }
-  }
-
-  // 6. Risk flags summary
-  L.push(`\n## 6. Risk flags summary`);
-  L.push(`\n| Entity | Flag | Severity | Detail |`);
-  L.push(`|--------|------|----------|--------|`);
-  let flagCount = 0;
+  // ── 4. Risk flags summary ──
+  L.push(`\n## ${sec()}. Risk flags summary`);
+  L.push(``);
+  const riskRows: string[] = [];
+  // Extract flags from deep analyses
+  const riskKeywords = [
+    { keyword: "GLOBAL_FREEZE", flag: "GLOBAL_FREEZE", severity: "HIGH" },
+    { keyword: "CLAWBACK", flag: "CLAWBACK_ENABLED", severity: "HIGH" },
+    { keyword: "Frozen Trust Line", flag: "FROZEN_TRUST_LINE", severity: "MED" },
+    { keyword: "Single Gateway", flag: "SINGLE_GATEWAY", severity: "HIGH" },
+    { keyword: "Low Depth", flag: "LOW_DEPTH_ORDERBOOK", severity: "MED" },
+    { keyword: "Concentrated Liquidity", flag: "CONCENTRATED_LIQUIDITY", severity: "MED" },
+    { keyword: "Unverified Issuer", flag: "UNVERIFIED_ISSUER", severity: "MED" },
+    { keyword: "Deposit Restricted", flag: "DEPOSIT_AUTH", severity: "LOW" },
+    { keyword: "No Multi-Signature", flag: "NO_MULTISIG", severity: "LOW" },
+  ];
+  const seenFlags = new Set<string>();
   for (const [addr, data] of deepAnalyses) {
-    if (data.ragInsight.includes("GLOBAL_FREEZE")) {
-      L.push(`| ${addr.slice(0, 10)}… | GLOBAL_FREEZE | HIGH | Detected via deep analysis |`);
-      flagCount++;
-    }
-    if (data.ragInsight.includes("CLAWBACK")) {
-      L.push(`| ${addr.slice(0, 10)}… | CLAWBACK_ENABLED | HIGH | Detected via deep analysis |`);
-      flagCount++;
+    for (const { keyword, flag, severity } of riskKeywords) {
+      if (data.ragInsight.includes(keyword)) {
+        const key = `${addr}-${flag}`;
+        if (!seenFlags.has(key)) {
+          seenFlags.add(key);
+          riskRows.push(`| ${data.label} | ${flag} | ${severity} | Detected in entity audit |`);
+        }
+      }
     }
   }
   if (result.corridorAnalysis) {
     for (const p of result.corridorAnalysis.paths) {
       for (const hop of p.hops) {
         for (const f of hop.riskFlags) {
-          L.push(`| ${(hop.account ?? hop.issuer ?? "XRP").slice(0, 10)}… | ${f.flag} | ${f.severity} | ${f.detail ?? ""} |`);
-          flagCount++;
+          const entity = hop.account ?? hop.issuer ?? "XRP";
+          riskRows.push(`| ${entity.slice(0, 12)}… | ${f.flag} | ${f.severity} | ${f.detail ?? "On-chain path flag"} |`);
         }
       }
     }
   }
-  if (flagCount === 0) L.push(`| — | No flags found | — | — |`);
-
-  // 7. Partner depth
-  if (result.partnerDepth) {
-    const d = result.partnerDepth;
-    L.push(`\n## 7. Partner depth (live)`);
-    L.push(`**Venue:** ${d.venue} · ${d.book} · **Bid:** ${d.bidDepthBase} XRP (${d.bidCount} levels) · **Ask:** ${d.askDepthBase} XRP (${d.askCount} levels) · **Spread:** ${d.spreadBps?.toFixed(1)} bps · **Fetched:** ${d.fetchedAt}`);
+  if (riskRows.length > 0) {
+    L.push(`| Entity | Flag | Severity | Detail |`);
+    L.push(`|--------|------|----------|--------|`);
+    for (const row of riskRows) L.push(row);
+  } else {
+    L.push(`No risk flags detected across all analyzed entities.`);
   }
 
-  // 8. Split plan
+  // ── 5. Partner depth (live) ──
+  if (result.partnerDepth) {
+    const d = result.partnerDepth;
+    L.push(`\n## ${sec()}. Partner depth (live)`);
+    L.push(``);
+    L.push(`| Metric | Value |`);
+    L.push(`|--------|-------|`);
+    L.push(`| Venue | ${d.venue} |`);
+    L.push(`| Book | ${d.book} |`);
+    L.push(`| Bid depth | ${d.bidDepthBase} XRP (${d.bidCount} levels) |`);
+    L.push(`| Ask depth | ${d.askDepthBase} XRP (${d.askCount} levels) |`);
+    L.push(`| Spread | ${d.spreadBps?.toFixed(1)} bps |`);
+    L.push(`| Fetched | ${d.fetchedAt} |`);
+  }
+
+  // ── 6. Split plan ──
   if (result.splitPlan) {
-    L.push(`\n## 8. Recommended split plan`);
+    L.push(`\n## ${sec()}. Recommended split plan`);
+    L.push(``);
+    L.push(`| Allocation | Route | Reason |`);
+    L.push(`|------------|-------|--------|`);
     for (const leg of result.splitPlan) {
-      L.push(`- **${leg.percentage}%** — ${leg.description}: ${leg.reason}`);
+      L.push(`| ${leg.percentage}% | ${leg.description} | ${leg.reason} |`);
     }
   }
 
-  // 9. Historical corridor status
-  L.push(`\n## 9. Historical corridor status`);
-  L.push(`30-day sparkline data is available on the corridor detail page for ${intent.srcCcy} → ${intent.dstCcy}. ` +
-    `Check the corridor health dashboard for trend information on liquidity depth, spread, and volume.`);
+  // ── 7. Actor research ──
+  L.push(`\n## ${sec()}. Actor research`);
 
-  // 10. Compliance justification
-  L.push(`\n## 10. Compliance justification`);
-  L.push(result.reasoning);
+  const formatActorSection = (actors: CorridorActor[], label: string, limit: number) => {
+    L.push(`\n### ${label} (${actors.length} total, top ${Math.min(limit, actors.length)} shown)`);
+    L.push(``);
+    for (const a of rankActors(actors).slice(0, limit)) {
+      const tags = [a.odl ? "ODL" : null, a.supportsRlusd ? "RLUSD" : null, a.supportsXrp ? "XRP" : null].filter(Boolean).join(", ");
+      L.push(`**${a.name}** · ${a.type}${a.country ? ` · ${a.country}` : ""} · ${tags}`);
+      if (a.note) L.push(`> ${a.note}`);
+      const research = actorResearch.get(a.key);
+      if (research && research.length > 0) {
+        // Filter out generic "As of my last knowledge" filler
+        const useful = research.filter(b =>
+          !b.includes("As of my last knowledge") &&
+          !b.includes("I do not have specific") &&
+          !b.includes("Here are some") &&
+          !b.includes("here are some") &&
+          b.trim().length > 10
+        ).slice(0, 3);
+        if (useful.length > 0) {
+          for (const bullet of useful) {
+            L.push(`${bullet}`);
+          }
+        }
+      }
+      L.push(``);
+    }
+  };
 
-  // Corridor RAG answer
+  formatActorSection(srcActors, `${intent.srcCcy} on-ramps`, 5);
+  formatActorSection(dstActors, `${intent.dstCcy} off-ramps`, 5);
+
+  // ── 8. Deep analysis findings ──
+  if (deepAnalyses.size > 0) {
+    L.push(`\n## ${sec()}. Entity audit findings`);
+    L.push(`\n${deepAnalyses.size} XRPL accounts analyzed on mainnet.\n`);
+    for (const [addr, data] of deepAnalyses) {
+      L.push(`### ${data.label}`);
+      L.push(`\`${addr}\` · ${data.nodeCount} nodes · ${data.edgeCount} edges\n`);
+      if (data.ragInsight) {
+        // Extract only the key findings, skip verbose preambles
+        const lines = data.ragInsight.split("\n").filter(l => l.trim().length > 0);
+        // Take structured content (numbered items, bullets, key findings)
+        const keyLines = lines.filter(l =>
+          /^\d+\./.test(l.trim()) ||
+          l.trim().startsWith("-") ||
+          l.trim().startsWith("*") ||
+          l.includes("Risk") ||
+          l.includes("Concern") ||
+          l.includes("Recommend")
+        );
+        if (keyLines.length > 0) {
+          for (const line of keyLines.slice(0, 8)) L.push(line);
+        } else {
+          // Fallback: take first 5 lines
+          for (const line of lines.slice(0, 5)) L.push(line);
+        }
+      }
+      L.push(``);
+    }
+  }
+
+  // ── 9. Corridor intelligence ──
   if (corridorRagAnswer) {
-    L.push(`\n### Corridor intelligence (RAG)`);
+    L.push(`\n## ${sec()}. Corridor intelligence`);
+    L.push(``);
     L.push(corridorRagAnswer);
   }
 
-  // 11. Disclaimer
-  L.push(`\n## 11. Disclaimer`);
-  L.push(`This report is generated by the XRPLens Safe Path Agent for informational purposes only. ` +
+  // ── 10. Compliance justification ──
+  L.push(`\n## ${sec()}. Compliance justification`);
+  L.push(``);
+  L.push(result.reasoning);
+
+  // ── 11. Historical corridor status ──
+  L.push(`\n## ${sec()}. Historical corridor status`);
+  L.push(``);
+  L.push(`30-day sparkline data is available on the [corridor detail page](/corridors/${intent.srcCcy.toLowerCase()}-${intent.dstCcy.toLowerCase()}) for ${intent.srcCcy} → ${intent.dstCcy}. Check the corridor health dashboard for trend information on liquidity depth, spread, and volume.`);
+
+  // ── 12. Disclaimer ──
+  L.push(`\n## ${sec()}. Disclaimer`);
+  L.push(``);
+  L.push(`This report is generated by the Corlens Safe Path Agent for informational purposes only. ` +
     `It does not constitute financial, legal, or compliance advice. On-chain data may change between ` +
     `the time of analysis and execution. Off-chain actor information is sourced from public records ` +
     `and may not reflect the most current regulatory status. Always verify critical information ` +
-    `independently before executing large-value transfers. XRPLens makes no guarantees about the ` +
-    `accuracy, completeness, or timeliness of this analysis.`);
+    `independently before executing large-value transfers.`);
 
-  L.push(`\n---\n*Generated by XRPLens Safe Path Agent · ${new Date().toISOString()}*`);
+  L.push(`\n---\n*Generated by Corlens Safe Path Agent · ${new Date().toISOString()}*`);
   return L.join("\n");
 }
 

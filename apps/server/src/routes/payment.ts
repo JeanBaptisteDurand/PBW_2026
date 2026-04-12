@@ -15,7 +15,6 @@ paymentRouter.get("/info", (_req, res) => {
   res.json({
     options: [
       { currency: "XRP", amount: "10", label: "10 XRP" },
-      { currency: "RLUSD", amount: "5", label: "5 RLUSD" },
     ],
     demoWalletAddress: getDemoWalletAddress(),
   });
@@ -24,7 +23,7 @@ paymentRouter.get("/info", (_req, res) => {
 // POST /api/payment/create — create a payment request
 paymentRouter.post("/create", verifyJwt, async (req, res) => {
   try {
-    const currency = req.body?.currency === "RLUSD" ? "RLUSD" : "XRP";
+    const currency = "XRP" as const;
     const result = await createPaymentRequest(req.user!.userId, currency);
     res.json(result);
   } catch (err: any) {

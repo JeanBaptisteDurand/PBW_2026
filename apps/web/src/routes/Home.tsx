@@ -703,11 +703,28 @@ export default function Home() {
         <p className="text-xs text-slate-600 mb-3">
           Open source. Built for Hack the Block — Paris Blockchain Week 2026.
         </p>
-        <div className="flex justify-center gap-2">
+        <div className="flex justify-center gap-2 mb-8">
           <Badge variant="default">RLUSD</Badge>
           <Badge variant="default">ODL Corridors</Badge>
           <Badge variant="default">AI Agent</Badge>
           <Badge variant="default">Compliance</Badge>
+        </div>
+        <div className="flex items-center justify-center gap-6 opacity-60">
+          <a href="https://www.quicknode.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:opacity-100 transition-opacity">
+            <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14S23.732 2 16 2z" fill="#0B3BF4"/>
+              <path d="M22.5 18.5l-3 5.196a1 1 0 01-.866.5h-6a1 1 0 01-.866-.5l-3-5.196a1 1 0 010-1l3-5.196a1 1 0 01.866-.5h6a1 1 0 01.866.5l3 5.196a1 1 0 010 1z" fill="white"/>
+            </svg>
+            <span className="text-xs font-semibold text-slate-400">QuickNode</span>
+          </a>
+          <div className="w-px h-5 bg-slate-700" />
+          <div className="flex items-center gap-2">
+            <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="16" cy="16" r="14" fill="#23292F"/>
+              <path d="M23.07 11.49l-1.43-.83-1.42-.82-1.43-.83-1.42-.82L16 7.37l-1.37.82-1.43.82-1.42.83-1.43.82-1.42.83v1.64l1.42.82V15.6l-1.42.82v1.65l1.42.82 1.43.83 1.42.82 1.43.83L16 22.19l1.37-.82 1.43-.83 1.42-.82 1.43-.83 1.42-.82v-1.65l-1.42-.82v-1.65l1.42-.82zm-8.5 7.45l-1.42-.82-1.43-.83v-1.64l1.43.82 1.42.82 1.43.83v1.64zm5.68-3.28l-1.43.83-1.42.82-1.43.82v-1.64l1.43-.82 1.42-.83 1.43-.82z" fill="white"/>
+            </svg>
+            <span className="text-xs font-semibold text-slate-400">XRP Ledger</span>
+          </div>
         </div>
       </section>
     </div>

@@ -98,7 +98,7 @@ The server reads two env vars (from `.env` file or process environment):
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `XRPLENS_API_KEY` | (empty) | `xlens_...` API key or JWT token |
-| `XRPLENS_API_URL` | `https://api.xrplens.dev` | API base URL (use `http://localhost:3001/api` for local dev) |
+| `XRPLENS_API_URL` | `https://cor-lens.xyz/api` | API base URL (use `http://localhost:3001/api` for local dev) |
 
 Process env always takes precedence over `.env` file values.
 

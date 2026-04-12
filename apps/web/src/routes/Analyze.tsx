@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { RLUSD_ISSUER } from "@xrplens/core";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { useStartAnalysis, useAnalysisStatus } from "../hooks/useAnalysis";
+import { useStartAnalysis, useAnalysisStatus, useAnalysisHistory } from "../hooks/useAnalysis";
 import { AnalyzeIntro } from "../fragments/Analyze/AnalyzeIntro";
 import { QuickStartPresets } from "../fragments/Analyze/QuickStartPresets";
 import { AnalysisStatusCard } from "../fragments/Analyze/AnalysisStatusCard";
@@ -59,7 +59,47 @@ export default function Analyze() {
         initialAddress={searchParams.get("address") ?? ""}
         initialLabel={searchParams.get("label") ?? ""}
       />
+
+      <RecentAudits />
     </div>
+  );
+}
+
+function RecentAudits() {
+  const { data: analyses } = useAnalysisHistory();
+  const done = analyses?.filter((a) => a.status === "done") ?? [];
+
+  if (done.length === 0) return null;
+
+  return (
+    <Card className="mt-8">
+      <CardHeader>
+        <CardTitle className="text-sm">Recent Audits</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          {done.slice(0, 10).map((a) => (
+            <Link
+              key={a.id}
+              to={`/graph/${a.id}`}
+              className="flex items-center justify-between px-3 py-2 rounded-lg border border-slate-800 hover:border-slate-600 hover:bg-slate-900/50 transition-colors group"
+            >
+              <div className="min-w-0">
+                <div className="text-sm font-medium text-white group-hover:text-xrp-400 transition-colors truncate">
+                  {a.seedLabel || a.seedAddress.slice(0, 20) + "…"}
+                </div>
+                <div className="text-[11px] text-slate-500 font-mono truncate">
+                  {a.seedAddress}
+                </div>
+              </div>
+              <div className="text-[10px] text-slate-500 flex-shrink-0 ml-3">
+                {new Date(a.createdAt).toLocaleDateString()}
+              </div>
+            </Link>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 

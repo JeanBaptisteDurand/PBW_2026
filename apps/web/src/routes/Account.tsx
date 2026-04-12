@@ -347,7 +347,7 @@ function ProfileTab({
               </div>
             ) : (
               <Button
-                onClick={handleGenerateApiKey}
+                onClick={() => handleGenerateApiKey()}
                 disabled={apiKeyLoading}
                 size="sm"
               >

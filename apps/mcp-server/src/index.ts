@@ -6,7 +6,7 @@
 // .claude/settings.json to use with Claude Code / Claude Desktop.
 //
 // Env vars:
-//   XRPLENS_API_URL  — Base URL of the XRPLens API (default: https://api.xrplens.dev)
+//   XRPLENS_API_URL  — Base URL of the XRPLens API (default: https://cor-lens.xyz/api)
 //   XRPLENS_API_KEY  — JWT token from your XRPLens account (required for premium features)
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -41,7 +41,7 @@ function loadEnv() {
 }
 loadEnv();
 
-const API_BASE = process.env.XRPLENS_API_URL ?? "https://api.xrplens.dev";
+const API_BASE = process.env.XRPLENS_API_URL ?? "https://cor-lens.xyz/api";
 const API_KEY = process.env.XRPLENS_API_KEY ?? "";
 
 async function apiFetch(path: string, options?: RequestInit): Promise<any> {
