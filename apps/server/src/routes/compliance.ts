@@ -4,13 +4,14 @@ import { logger } from "../logger.js";
 import { generateComplianceReport } from "../ai/compliance.js";
 import { renderCompliancePdf } from "../ai/pdfRenderer.js";
 import type { ComplianceReportData } from "@xrplens/core";
+import { verifyApiKeyOrJwt, requirePremium } from "../middleware/auth.js";
 
 export const complianceRouter: IRouter = Router();
 
 // POST /:analysisId — Generate compliance report
-complianceRouter.post("/:analysisId", async (req, res) => {
+complianceRouter.post("/:analysisId", verifyApiKeyOrJwt, requirePremium, async (req, res) => {
   try {
-    const { analysisId } = req.params;
+    const analysisId = String(req.params.analysisId);
 
     const analysis = await prisma.analysis.findUnique({
       where: { id: analysisId },
@@ -54,9 +55,13 @@ complianceRouter.post("/:analysisId", async (req, res) => {
 });
 
 // GET /:analysisId/pdf — Render a compliance report as a signable PDF.
-complianceRouter.get("/:analysisId/pdf", async (req, res) => {
+// Generates (or re-uses the latest) report for the analysis, then pipes a
+// pdfkit-rendered A4 document back to the client. The Safe Path Agent
+// justification is accepted as an optional query param so the same route
+// serves both the raw compliance artifact and the post-agent signed version.
+complianceRouter.get("/:analysisId/pdf", verifyApiKeyOrJwt, requirePremium, async (req, res) => {
   try {
-    const { analysisId } = req.params;
+    const analysisId = String(req.params.analysisId);
     const justification = typeof req.query.justification === "string"
       ? req.query.justification
       : undefined;
@@ -73,6 +78,8 @@ complianceRouter.get("/:analysisId/pdf", async (req, res) => {
       return;
     }
 
+    // Prefer the most recent saved report so repeated PDF downloads are
+    // consistent with the one already shown in the UI.
     let report: ComplianceReportData | null = null;
     const existing = await prisma.complianceReport.findFirst({
       where: { analysisId },
