@@ -369,7 +369,7 @@ Internal calls are **not** routed through Caddy — services call each other dir
 
 This is a greenfield rebuild but ~30k LOC of v1 logic must be ported. Doing it as one big bang fails. Suggested order — each step is its own spec + plan + PR.
 
-1. **Foundation (shared packages first).**
+1. **Foundation (shared packages first).** ✓ Implemented per [`docs/superpowers/plans/2026-05-08-foundation-shared-packages.md`](../plans/2026-05-08-foundation-shared-packages.md).
    - `@corlens/contracts` — initial Zod schemas mirroring v1's API surface.
    - `@corlens/db` — Prisma schemas split by service (carve from v1's `schema.prisma`).
    - `@corlens/events` — interface only, noop implementation.
