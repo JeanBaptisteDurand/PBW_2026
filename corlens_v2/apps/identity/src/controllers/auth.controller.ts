@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import type { FastifyInstance } from "fastify";
+import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { identity } from "@corlens/contracts";
 import { createUserRepo } from "../repositories/user.repo.js";
@@ -7,7 +8,10 @@ import { createAuthService } from "../services/auth.service.js";
 import { RippleKeypairsWalletVerifier } from "../connectors/wallet-verifier.js";
 import type { IdentityEnv } from "../env.js";
 
+const ErrorResponse = z.object({ error: z.string() });
+
 export async function registerAuthRoutes(app: FastifyInstance, env: IdentityEnv): Promise<void> {
+  const typed = app.withTypeProvider<ZodTypeProvider>();
   const users = createUserRepo(app.db);
   const verifier = new RippleKeypairsWalletVerifier();
   const auth = createAuthService({
@@ -18,7 +22,7 @@ export async function registerAuthRoutes(app: FastifyInstance, env: IdentityEnv)
     challengeTtlSeconds: env.CHALLENGE_TTL_SECONDS,
   });
 
-  app.post("/api/auth/login/challenge", {
+  typed.post("/api/auth/login/challenge", {
     schema: {
       body: identity.LoginChallengeRequest,
       response: { 200: identity.LoginChallengeResponse },
@@ -29,10 +33,10 @@ export async function registerAuthRoutes(app: FastifyInstance, env: IdentityEnv)
     return result;
   });
 
-  app.post("/api/auth/login/verify", {
+  typed.post("/api/auth/login/verify", {
     schema: {
       body: identity.LoginVerifyRequest,
-      response: { 200: identity.LoginVerifyResponse },
+      response: { 200: identity.LoginVerifyResponse, 401: ErrorResponse },
       tags: ["auth"],
     },
   }, async (req, reply) => {
@@ -45,9 +49,9 @@ export async function registerAuthRoutes(app: FastifyInstance, env: IdentityEnv)
     }
   });
 
-  app.post("/api/auth/refresh", {
+  typed.post("/api/auth/refresh", {
     schema: {
-      response: { 200: identity.LoginVerifyResponse },
+      response: { 200: identity.LoginVerifyResponse, 401: ErrorResponse, 404: ErrorResponse },
       tags: ["auth"],
     },
   }, async (req, reply) => {
@@ -96,8 +100,8 @@ export async function registerAuthRoutes(app: FastifyInstance, env: IdentityEnv)
     })),
   });
 
-  app.get("/api/auth/profile", {
-    schema: { response: { 200: ProfileResponse }, tags: ["auth"] },
+  typed.get("/api/auth/profile", {
+    schema: { response: { 200: ProfileResponse, 401: ErrorResponse, 404: ErrorResponse }, tags: ["auth"] },
   }, async (req, reply) => {
     const a = req.headers.authorization;
     const token = a?.startsWith("Bearer ") ? a.slice(7) : undefined;
@@ -134,9 +138,9 @@ export async function registerAuthRoutes(app: FastifyInstance, env: IdentityEnv)
     };
   });
 
-  app.post("/api/auth/api-key", {
+  typed.post("/api/auth/api-key", {
     schema: {
-      response: { 200: z.object({ apiKey: z.string() }) },
+      response: { 200: z.object({ apiKey: z.string() }), 401: ErrorResponse, 403: ErrorResponse },
       tags: ["auth"],
     },
   }, async (req, reply) => {
@@ -167,9 +171,9 @@ export async function registerAuthRoutes(app: FastifyInstance, env: IdentityEnv)
     return { apiKey };
   });
 
-  app.delete("/api/auth/api-key", {
+  typed.delete("/api/auth/api-key", {
     schema: {
-      response: { 200: z.object({ ok: z.boolean() }) },
+      response: { 200: z.object({ ok: z.boolean() }), 401: ErrorResponse },
       tags: ["auth"],
     },
   }, async (req, reply) => {
