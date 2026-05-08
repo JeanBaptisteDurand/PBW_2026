@@ -7,6 +7,7 @@ import { registerErrorHandler } from "./plugins/error-handler.js";
 import { registerSwagger } from "./plugins/swagger.js";
 import { createJwtService, type JwtService } from "./services/jwt.service.js";
 import { registerVerifyRoutes } from "./controllers/verify.controller.js";
+import { registerAuthRoutes } from "./controllers/auth.controller.js";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -31,6 +32,7 @@ export async function buildApp(env: IdentityEnv): Promise<FastifyInstance> {
   await registerSwagger(app);
 
   await registerVerifyRoutes(app);
+  await registerAuthRoutes(app, env);
 
   app.get("/health", { schema: { hide: true } }, async () => ({
     status: "ok",
