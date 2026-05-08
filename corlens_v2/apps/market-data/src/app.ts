@@ -8,6 +8,8 @@ import { xrplPlugin } from "./plugins/xrpl.js";
 import { createCacheService } from "./services/cache.service.js";
 import { createXrplService } from "./services/xrpl.service.js";
 import { registerXrplRoutes } from "./controllers/xrpl.controller.js";
+import { createPartnerDepthService } from "./services/partner-depth.service.js";
+import { registerPartnerDepthRoutes } from "./controllers/partner-depth.controller.js";
 
 const FALLBACK_ENDPOINTS = [
   "wss://xrplcluster.com",
@@ -47,6 +49,13 @@ export async function buildApp(env: MarketDataEnv): Promise<FastifyInstance> {
   });
 
   await registerXrplRoutes(app, xrplService);
+
+  const partnerDepthService = createPartnerDepthService({
+    cache,
+    xrpl: app.xrpl,
+    ttlSeconds: env.PARTNER_DEPTH_TTL_SECONDS,
+  });
+  await registerPartnerDepthRoutes(app, partnerDepthService);
 
   app.get("/health", { schema: { hide: true } }, async () => ({
     status: "ok",
