@@ -71,9 +71,7 @@
 
     # ─── market-data (Step 4) — XRPL + partner depth ───────────────
     handle_path /api/market-data/* {
-        respond `{"error":"not_implemented","service":"market-data","step":4}` 503 {
-            close
-        }
+        reverse_proxy market-data:3002
     }
 
     # ─── ai-service (Step 5) — completions, embeddings, web search ─
