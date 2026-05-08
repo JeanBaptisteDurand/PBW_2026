@@ -32,6 +32,8 @@ describe("auth routes", () => {
   afterAll(async () => { await app.close(); });
 
   afterEach(async () => {
+    await app.prisma.paymentRequest.deleteMany({});
+    await app.prisma.premiumSubscription.deleteMany({});
     await app.prisma.user.deleteMany({});
     const keys = await app.redis.keys("auth:challenge:*");
     if (keys.length > 0) await app.redis.del(...keys);
