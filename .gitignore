@@ -10,3 +10,4 @@ dist/
 pnpm-lock.yaml
 screen
 .superpowers/
+!/corlens_v2/pnpm-lock.yaml
