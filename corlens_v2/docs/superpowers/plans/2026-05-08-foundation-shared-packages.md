@@ -367,6 +367,8 @@ git commit -m "feat(v2): vitest workspace config"
 - Create: `corlens_v2/docker-compose.yml`
 - Create: `corlens_v2/docker/init-pgvector.sql`
 
+> Host ports moved to 5435/6381 to avoid conflicts with other projects already using 5432/6379 on this machine. Container-internal ports remain 5432/6379. Update the Prisma `DATABASE_URL` in Task E2 accordingly (it uses `localhost:5435`).
+
 - [ ] **Step 1: Write `corlens_v2/docker-compose.yml`**
 
 ```yaml
@@ -380,7 +382,7 @@ services:
       POSTGRES_PASSWORD: corlens_dev
       POSTGRES_DB: corlens
     ports:
-      - "5432:5432"
+      - "5435:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./docker/init-pgvector.sql:/docker-entrypoint-initdb.d/01-init.sql
@@ -395,7 +397,7 @@ services:
     container_name: corlens-v2-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "6381:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -1460,7 +1462,7 @@ model XrplCacheMetadata {
 Run:
 ```bash
 cat > /Users/beorlor/Documents/PBW_2026/corlens_v2/packages/db/.env <<'EOF'
-DATABASE_URL=postgresql://corlens:corlens_dev@localhost:5432/corlens
+DATABASE_URL=postgresql://corlens:corlens_dev@localhost:5435/corlens
 EOF
 ```
 
