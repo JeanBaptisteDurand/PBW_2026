@@ -1,0 +1,117 @@
+{
+    # Disable Caddy's automatic admin API listener — we don't need it in dev,
+    # and it spams the logs. Re-enable with `admin :2019` when needed.
+    admin off
+
+    # Auto-TLS is off because dev listens on plain HTTP. Production will get
+    # a separate site block for cor-lens.xyz once Step 12 (cutover) lands.
+    auto_https off
+}
+
+# ─── Dev gateway (:8080) ───────────────────────────────────────────
+:8080 {
+    log {
+        output stdout
+        format console
+        level INFO
+    }
+
+    # Health endpoint for the gateway itself. Useful for docker healthcheck
+    # and for confirming the gateway is up before any service has shipped.
+    handle /health {
+        respond `{"status":"ok","gateway":"caddy","stage":"dev"}` 200 {
+            close
+        }
+    }
+
+    # ─── identity (Step 3) — auth + JWT + payment ──────────────────
+    handle_path /api/auth/* {
+        respond `{"error":"not_implemented","service":"identity","step":3}` 503 {
+            close
+        }
+    }
+    handle_path /api/payment/* {
+        respond `{"error":"not_implemented","service":"identity","step":3}` 503 {
+            close
+        }
+    }
+
+    # ─── market-data (Step 4) — XRPL + partner depth ───────────────
+    handle_path /api/market-data/* {
+        respond `{"error":"not_implemented","service":"market-data","step":4}` 503 {
+            close
+        }
+    }
+
+    # ─── ai-service (Step 5) — completions, embeddings, web search ─
+    handle_path /api/ai/* {
+        respond `{"error":"not_implemented","service":"ai-service","step":5}` 503 {
+            close
+        }
+    }
+
+    # ─── corridor (Step 6) — catalog, scanner, RAG ─────────────────
+    handle_path /api/corridors/* {
+        respond `{"error":"not_implemented","service":"corridor","step":6}` 503 {
+            close
+        }
+    }
+    handle_path /api/corridor/* {
+        respond `{"error":"not_implemented","service":"corridor","step":6}` 503 {
+            close
+        }
+    }
+
+    # ─── path (Step 7) — entity audit ──────────────────────────────
+    handle_path /api/analyze* {
+        respond `{"error":"not_implemented","service":"path","step":7}` 503 {
+            close
+        }
+    }
+    handle_path /api/analysis/* {
+        respond `{"error":"not_implemented","service":"path","step":7}` 503 {
+            close
+        }
+    }
+    handle_path /api/graph/* {
+        respond `{"error":"not_implemented","service":"path","step":7}` 503 {
+            close
+        }
+    }
+    handle_path /api/history/* {
+        respond `{"error":"not_implemented","service":"path","step":7}` 503 {
+            close
+        }
+    }
+
+    # ─── agent (Step 8) — Safe Path orchestrator + reports ─────────
+    handle_path /api/safe-path* {
+        respond `{"error":"not_implemented","service":"agent","step":8}` 503 {
+            close
+        }
+    }
+    handle_path /api/compliance/* {
+        respond `{"error":"not_implemented","service":"agent","step":8}` 503 {
+            close
+        }
+    }
+    handle_path /api/chat* {
+        respond `{"error":"not_implemented","service":"agent","step":8}` 503 {
+            close
+        }
+    }
+
+    # ─── Aggregated docs (Step 11+) — Swagger UI fan-out ───────────
+    handle /docs* {
+        respond `{"error":"not_implemented","service":"docs","step":11}` 503 {
+            close
+        }
+    }
+
+    # ─── Catch-all: minimal landing for the gateway itself ─────────
+    handle {
+        respond `{"name":"corlens-v2-gateway","stage":"foundation","docs":"/docs","health":"/health"}` 200 {
+            close
+        }
+    }
+}
