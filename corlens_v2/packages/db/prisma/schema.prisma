@@ -1,0 +1,341 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema", "postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  schemas    = ["identity", "corridor", "path", "agent", "ai", "market_data"]
+  extensions = [pgvector(map: "vector")]
+}
+
+// ─── identity ────────────────────────────────────────────────
+model User {
+  id            String   @id @default(uuid())
+  walletAddress String   @unique
+  role          String   @default("free")
+  apiKey        String?  @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  subscriptions   PremiumSubscription[]
+  paymentRequests PaymentRequest[]
+
+  @@schema("identity")
+}
+
+model PremiumSubscription {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  txHash        String   @unique
+  amount        String
+  currency      String
+  walletAddress String
+  memo          String   @unique
+  paidAt        DateTime @default(now())
+
+  @@index([userId])
+  @@index([walletAddress])
+  @@schema("identity")
+}
+
+model PaymentRequest {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  amount      String
+  currency    String
+  destination String
+  memo        String   @unique
+  status      String   @default("pending")
+  txHash      String?
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+
+  @@index([memo])
+  @@index([status])
+  @@schema("identity")
+}
+
+// ─── corridor ────────────────────────────────────────────────
+model Corridor {
+  id              String    @id
+  label           String
+  shortLabel      String
+  flag            String
+  tier            Int
+  importance      Int
+  region          String
+  category        String
+  description     String
+  useCase         String
+  highlights      Json
+  relatedIds      Json?
+  amount          String?
+  sourceJson      Json?
+  destJson        Json?
+  requestJson     Json?
+  status          String    @default("UNKNOWN")
+  bestRouteId     String?
+  pathCount       Int       @default(0)
+  recRiskScore    Int?
+  recHops         Int?
+  recCost         String?
+  flagsJson       Json?
+  analysisJson    Json?
+  liquidityJson   Json?
+  routesJson      Json?
+  aiNote          String?
+  liquidityHash   String?
+  aiNoteHash      String?
+  lastRefreshedAt DateTime?
+  lastError       String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  ragDocuments CorridorRagDocument[]
+  ragChats     CorridorRagChat[]
+  statusEvents CorridorStatusEvent[]
+
+  @@index([tier])
+  @@index([importance])
+  @@schema("corridor")
+}
+
+model CorridorStatusEvent {
+  id         String   @id @default(uuid())
+  corridorId String
+  corridor   Corridor @relation(fields: [corridorId], references: [id], onDelete: Cascade)
+  status     String
+  pathCount  Int      @default(0)
+  recCost    String?
+  source     String   @default("scan")
+  at         DateTime @default(now())
+
+  @@index([corridorId, at])
+  @@index([at])
+  @@schema("corridor")
+}
+
+model CorridorRagDocument {
+  id         String                       @id @default(uuid())
+  corridorId String
+  corridor   Corridor                     @relation(fields: [corridorId], references: [id], onDelete: Cascade)
+  content    String
+  metadata   Json?
+  embedding  Unsupported("vector(1536)")?
+  createdAt  DateTime                     @default(now())
+
+  @@index([corridorId])
+  @@schema("corridor")
+}
+
+model CorridorRagChat {
+  id         String    @id @default(uuid())
+  corridorId String?
+  corridor   Corridor? @relation(fields: [corridorId], references: [id], onDelete: SetNull)
+  createdAt  DateTime  @default(now())
+
+  messages CorridorRagMessage[]
+
+  @@schema("corridor")
+}
+
+model CorridorRagMessage {
+  id        String          @id @default(uuid())
+  chatId    String
+  chat      CorridorRagChat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  role      String
+  content   String
+  sources   Json?
+  createdAt DateTime        @default(now())
+
+  @@index([chatId])
+  @@schema("corridor")
+}
+
+// ─── path (entity audit) ─────────────────────────────────────
+model Analysis {
+  id          String   @id @default(uuid())
+  status      String   @default("queued")
+  seedAddress String
+  seedLabel   String?
+  depth       Int      @default(1)
+  error       String?
+  summaryJson Json?
+  userId      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  nodes             Node[]
+  edges             Edge[]
+  riskFlags         RiskFlag[]
+  ragDocuments      RagDocument[]
+  ragChats          RagChat[]
+  complianceReports ComplianceReport[]
+
+  @@index([seedAddress, depth, status])
+  @@index([userId])
+  @@schema("path")
+}
+
+model Node {
+  id            String   @id @default(uuid())
+  analysisId    String
+  analysis      Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  nodeId        String
+  kind          String
+  label         String
+  data          Json
+  aiExplanation String?
+  createdAt     DateTime @default(now())
+
+  @@unique([analysisId, nodeId])
+  @@index([analysisId])
+  @@schema("path")
+}
+
+model Edge {
+  id         String   @id @default(uuid())
+  analysisId String
+  analysis   Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  edgeId     String
+  source     String
+  target     String
+  kind       String
+  label      String?
+  data       Json?
+  createdAt  DateTime @default(now())
+
+  @@unique([analysisId, edgeId])
+  @@index([analysisId])
+  @@schema("path")
+}
+
+model RiskFlag {
+  id         String   @id @default(uuid())
+  analysisId String
+  analysis   Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  nodeId     String
+  flag       String
+  severity   String
+  detail     String
+  data       Json?
+  createdAt  DateTime @default(now())
+
+  @@index([analysisId])
+  @@schema("path")
+}
+
+model RagDocument {
+  id         String                       @id @default(uuid())
+  analysisId String
+  analysis   Analysis                     @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  content    String
+  metadata   Json?
+  embedding  Unsupported("vector(1536)")?
+  createdAt  DateTime                     @default(now())
+
+  @@index([analysisId])
+  @@schema("path")
+}
+
+model RagChat {
+  id         String   @id @default(uuid())
+  analysisId String
+  analysis   Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  messages RagMessage[]
+
+  @@schema("path")
+}
+
+model RagMessage {
+  id        String   @id @default(uuid())
+  chatId    String
+  chat      RagChat  @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  role      String
+  content   String
+  sources   Json?
+  createdAt DateTime @default(now())
+
+  @@schema("path")
+}
+
+model ComplianceReport {
+  id         String   @id @default(uuid())
+  analysisId String
+  analysis   Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  title      String
+  content    Json
+  createdAt  DateTime @default(now())
+
+  @@schema("path")
+}
+
+// ─── agent ───────────────────────────────────────────────────
+model SafePathRun {
+  id               String   @id @default(uuid())
+  userId           String?
+  srcCcy           String
+  dstCcy           String
+  amount           String
+  maxRiskTolerance String   @default("MED")
+  verdict          String
+  reasoning        String
+  resultJson       Json
+  reportMarkdown   String?
+  corridorId       String?
+  analysisIds      Json?
+  createdAt        DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@schema("agent")
+}
+
+// ─── ai ──────────────────────────────────────────────────────
+model PromptLog {
+  id         String   @id @default(uuid())
+  purpose    String
+  model      String
+  promptHash String
+  prompt     Json
+  response   Json?
+  tokensIn   Int?
+  tokensOut  Int?
+  latencyMs  Int?
+  error      String?
+  createdAt  DateTime @default(now())
+
+  @@index([purpose, createdAt])
+  @@index([promptHash])
+  @@schema("ai")
+}
+
+model WebSearchCache {
+  id        String   @id @default(uuid())
+  query     String   @unique
+  provider  String
+  results   Json
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([expiresAt])
+  @@schema("ai")
+}
+
+// ─── market_data ─────────────────────────────────────────────
+model XrplCacheMetadata {
+  id        String   @id @default(uuid())
+  cacheKey  String   @unique
+  source    String
+  fetchedAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([expiresAt])
+  @@schema("market_data")
+}
