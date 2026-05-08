@@ -57,6 +57,19 @@ importers:
         specifier: 2.1.8
         version: 2.1.8(@types/node@25.6.2)
 
+  packages/events:
+    dependencies:
+      '@corlens/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      typescript:
+        specifier: 5.7.2
+        version: 5.7.2
+      vitest:
+        specifier: 2.1.8
+        version: 2.1.8(@types/node@25.6.2)
+
 packages:
 
   '@biomejs/biome@1.9.4':
