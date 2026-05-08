@@ -48,8 +48,8 @@ importers:
         specifier: 5.0.1
         version: 5.0.1
       fastify-type-provider-zod:
-        specifier: 2.0.0
-        version: 2.0.0(fastify@5.1.0)(zod@3.23.8)
+        specifier: 4.0.2
+        version: 4.0.2(fastify@5.1.0)(zod@3.23.8)
       ioredis:
         specifier: 5.4.2
         version: 5.4.2
@@ -899,10 +899,10 @@ packages:
   fastify-plugin@5.0.1:
     resolution: {integrity: sha512-HCxs+YnRaWzCl+cWRYFnHmeRFyR5GVnJTAaCJQiYzQSDwK9MgJdyAsuL3nh0EWRCYMgQ5MeziymvmAhUHYHDUQ==}
 
-  fastify-type-provider-zod@2.0.0:
-    resolution: {integrity: sha512-LSbz6DikD9BcQmSDFn7uXFmrFS2gRMiSkwiQeIeAH3XEGOyjokJKsH4DRRuxSn7fTz1UNTNiujib4+MTNw+nOg==}
+  fastify-type-provider-zod@4.0.2:
+    resolution: {integrity: sha512-FDRzSL3ZuoZ+4YDevR1YOinmDKkxOdy3QB9dDR845sK+bQvDroPKhHAXLEAOObDxL7SMA0OZN/A4osrNBTdDTQ==}
     peerDependencies:
-      fastify: ^4.0.0
+      fastify: ^5.0.0
       zod: ^3.14.2
 
   fastify@5.1.0:
@@ -1747,14 +1747,6 @@ snapshots:
       chai: 5.3.3
       tinyrainbow: 1.2.0
 
-  '@vitest/mocker@2.1.8(vite@5.4.21(@types/node@20.19.40))':
-    dependencies:
-      '@vitest/spy': 2.1.8
-      estree-walker: 3.0.3
-      magic-string: 0.30.21
-    optionalDependencies:
-      vite: 5.4.21(@types/node@20.19.40)
-
   '@vitest/mocker@2.1.8(vite@5.4.21(@types/node@25.6.2))':
     dependencies:
       '@vitest/spy': 2.1.8
@@ -1971,8 +1963,9 @@ snapshots:
 
   fastify-plugin@5.0.1: {}
 
-  fastify-type-provider-zod@2.0.0(fastify@5.1.0)(zod@3.23.8):
+  fastify-type-provider-zod@4.0.2(fastify@5.1.0)(zod@3.23.8):
     dependencies:
+      '@fastify/error': 4.2.0
       fastify: 5.1.0
       zod: 3.23.8
       zod-to-json-schema: 3.25.2(zod@3.23.8)
@@ -2416,7 +2409,7 @@ snapshots:
   vitest@2.1.8(@types/node@20.19.40):
     dependencies:
       '@vitest/expect': 2.1.8
-      '@vitest/mocker': 2.1.8(vite@5.4.21(@types/node@20.19.40))
+      '@vitest/mocker': 2.1.8(vite@5.4.21(@types/node@25.6.2))
       '@vitest/pretty-format': 2.1.9
       '@vitest/runner': 2.1.8
       '@vitest/snapshot': 2.1.8

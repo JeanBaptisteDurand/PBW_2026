@@ -131,7 +131,7 @@ corlens_v2/
     "@fastify/swagger": "9.4.0",
     "@fastify/swagger-ui": "5.2.0",
     "fastify": "5.1.0",
-    "fastify-type-provider-zod": "2.0.0",
+    "fastify-type-provider-zod": "4.0.2",
     "ioredis": "5.4.2",
     "jsonwebtoken": "9.0.2",
     "ripple-keypairs": "2.0.0",
