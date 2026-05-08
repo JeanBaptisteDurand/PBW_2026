@@ -18,7 +18,9 @@ function compute(secret: string, ts: string, body: string): string {
   return createHmac("sha256", secret).update(`${ts}\n${body}`).digest("hex");
 }
 
-export function hmacSigner(opts: HmacSignerOptions): (body: string | undefined) => Record<string, string> {
+export function hmacSigner(
+  opts: HmacSignerOptions,
+): (body: string | undefined) => Record<string, string> {
   const now = opts.nowSeconds ?? (() => Math.floor(Date.now() / 1000));
   return (body) => {
     const ts = String(now());
