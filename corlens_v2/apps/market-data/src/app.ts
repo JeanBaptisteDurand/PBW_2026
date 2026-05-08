@@ -10,7 +10,7 @@ import { createXrplService } from "./services/xrpl.service.js";
 import { registerXrplRoutes } from "./controllers/xrpl.controller.js";
 import { createPartnerDepthService } from "./services/partner-depth.service.js";
 import { registerPartnerDepthRoutes } from "./controllers/partner-depth.controller.js";
-import { startPrewarm, type PrewarmHandle } from "./crons/prewarm.js";
+import { startPrewarm } from "./crons/prewarm.js";
 import { registerAdminRoutes } from "./controllers/admin.controller.js";
 
 const FALLBACK_ENDPOINTS = [
@@ -62,7 +62,7 @@ export async function buildApp(env: MarketDataEnv): Promise<FastifyInstance> {
   await registerAdminRoutes(app);
 
   const prewarm = await startPrewarm({
-    redis: app.redis,
+    redisUrl: env.REDIS_URL,
     xrplService,
     cron: env.PREWARM_CRON,
     enabled: env.PREWARM_ENABLED,
