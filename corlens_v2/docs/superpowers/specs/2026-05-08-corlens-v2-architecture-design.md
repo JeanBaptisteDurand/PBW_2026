@@ -376,7 +376,7 @@ This is a greenfield rebuild but ~30k LOC of v1 logic must be ported. Doing it a
    - `@corlens/clients` — empty scaffold, will populate as services come online.
    - Root: pnpm workspace, Biome (lint + format), Vitest, tsconfig base, env validation utility.
 2. **gateway (Caddy)** — Caddyfile with all routes stubbed to a placeholder, TLS in dev via local CA, docker-compose. ✓ Implemented per [`docs/superpowers/plans/2026-05-08-caddy-gateway.md`](../plans/2026-05-08-caddy-gateway.md). (TLS deferred to step 12 cutover; dev listens plain HTTP on `:8080`. `forward_auth` to identity is wired in step 3 when `/verify` ships.)
-3. **identity** — first service, smallest scope. Implement Crossmark SIWE-style verified login (fix v1's flaw). Caddy `forward_auth` wired.
+3. **identity** — first service, smallest scope. Implement Crossmark SIWE-style verified login (fix v1's flaw). Caddy `forward_auth` wired. ✓ Implemented per [`docs/superpowers/plans/2026-05-08-identity-service.md`](../plans/2026-05-08-identity-service.md). Two-step login (challenge → verify), `/verify` endpoint backs Caddy `forward_auth`, payment polling + atomic confirm publishes `payment.confirmed` and `user.role_upgraded`. 35 tests green.
 4. **market-data** — biggest leverage. Port `xrpl/`, `partnerDepth.ts`, the hourly refresh and pre-warm crons. Add Bitstamp + Kraken + Binance fetchers (v1 ROADMAP P0 #3) while the boundary is fresh.
 5. **ai-service** — port OpenAI usage + the prompt templates. Replace v1's `webSearch` with Brave or Tavily (P0 #2).
 6. **corridor** — port catalog (move to JSON seed), scanner, RAG. All XRPL calls now go through market-data; all LLM calls go through ai-service.
