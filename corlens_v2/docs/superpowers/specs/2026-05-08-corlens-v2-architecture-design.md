@@ -375,7 +375,7 @@ This is a greenfield rebuild but ~30k LOC of v1 logic must be ported. Doing it a
    - `@corlens/events` — interface only, noop implementation.
    - `@corlens/clients` — empty scaffold, will populate as services come online.
    - Root: pnpm workspace, Biome (lint + format), Vitest, tsconfig base, env validation utility.
-2. **gateway (Caddy)** — Caddyfile with all routes stubbed to a placeholder, TLS in dev via local CA, docker-compose.
+2. **gateway (Caddy)** — Caddyfile with all routes stubbed to a placeholder, TLS in dev via local CA, docker-compose. ✓ Implemented per [`docs/superpowers/plans/2026-05-08-caddy-gateway.md`](../plans/2026-05-08-caddy-gateway.md). (TLS deferred to step 12 cutover; dev listens plain HTTP on `:8080`. `forward_auth` to identity is wired in step 3 when `/verify` ships.)
 3. **identity** — first service, smallest scope. Implement Crossmark SIWE-style verified login (fix v1's flaw). Caddy `forward_auth` wired.
 4. **market-data** — biggest leverage. Port `xrpl/`, `partnerDepth.ts`, the hourly refresh and pre-warm crons. Add Bitstamp + Kraken + Binance fetchers (v1 ROADMAP P0 #3) while the boundary is fresh.
 5. **ai-service** — port OpenAI usage + the prompt templates. Replace v1's `webSearch` with Brave or Tavily (P0 #2).
