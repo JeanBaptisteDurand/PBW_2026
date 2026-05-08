@@ -1,24 +1,20 @@
 import { events as eventContracts } from "@corlens/contracts";
 import type { EventBus, EventHandler, EventName, EventPayload } from "./index.js";
 
-type FetchInit = { method?: string; headers?: Record<string, string>; body?: string };
-type FetchFn = (url: string, init?: FetchInit) => Promise<{ ok: boolean; status?: number }>;
-
 export interface HttpFanoutOptions {
   subscribers: Partial<Record<EventName, string[]>>;
-  fetch?: FetchFn;
+  fetch?: typeof fetch;
   signal?: (body: string) => Record<string, string>;
 }
 
 export class HttpFanoutEventBus implements EventBus {
   private readonly subscribers: Partial<Record<EventName, string[]>>;
-  private readonly fetchImpl: FetchFn;
+  private readonly fetchImpl: typeof fetch;
   private readonly signal?: (body: string) => Record<string, string>;
 
   constructor(opts: HttpFanoutOptions) {
     this.subscribers = opts.subscribers;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.fetchImpl = opts.fetch ?? ((globalThis as any)["fetch"] as FetchFn);
+    this.fetchImpl = opts.fetch ?? fetch;
     this.signal = opts.signal;
   }
 
