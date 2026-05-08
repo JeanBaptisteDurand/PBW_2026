@@ -23,13 +23,14 @@ RUN pnpm --filter @corlens/env run build
 RUN pnpm --filter @corlens/events run build
 RUN pnpm --filter @corlens/clients run build
 RUN pnpm --filter @corlens/identity run build
+RUN pnpm deploy --filter @corlens/identity --prod /deploy
+# Copy the generated Prisma engine (created by prisma generate, not in pnpm store)
+RUN cp -r /app/node_modules/.pnpm/@prisma+client@6.1.0_prisma@6.1.0/node_modules/.prisma \
+         /deploy/node_modules/.pnpm/@prisma+client@6.1.0_prisma@6.1.0/node_modules/
 
 FROM base AS runtime
 ENV NODE_ENV=production
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/packages ./packages
-COPY --from=build /app/apps/identity/dist ./apps/identity/dist
-COPY --from=build /app/apps/identity/package.json ./apps/identity/
-WORKDIR /app/apps/identity
+COPY --from=build /deploy ./
+WORKDIR /app
 EXPOSE 3001
 CMD ["node", "dist/index.js"]
