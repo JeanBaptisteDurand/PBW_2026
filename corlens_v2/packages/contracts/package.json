@@ -9,6 +9,10 @@
     ".": {
       "types": "./src/index.ts",
       "default": "./dist/index.js"
+    },
+    "./dist/market-data.js": {
+      "types": "./dist/market-data.d.ts",
+      "default": "./dist/market-data.js"
     }
   },
   "scripts": {
