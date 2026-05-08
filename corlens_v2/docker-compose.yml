@@ -46,6 +46,39 @@ services:
       timeout: 5s
       retries: 5
 
+  identity:
+    build:
+      context: .
+      dockerfile: apps/identity/Dockerfile
+    container_name: corlens-v2-identity
+    restart: unless-stopped
+    environment:
+      PORT: "3001"
+      HOST: "0.0.0.0"
+      DATABASE_URL: postgresql://corlens:corlens_dev@postgres:5432/corlens
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me-must-be-at-least-32-chars}
+      XRPL_PAYMENT_WALLET_ADDRESS: ${XRPL_PAYMENT_WALLET_ADDRESS:-rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh}
+      XRPL_TESTNET_RPC: wss://s.altnet.rippletest.net:51233
+      XRPL_DEMO_WALLET_SECRET: ${XRPL_DEMO_WALLET_SECRET:-}
+      CHALLENGE_TTL_SECONDS: "300"
+      PAYMENT_EXPIRY_MINUTES: "15"
+      XRP_PRICE: "10"
+      RLUSD_PRICE: "5"
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://127.0.0.1:3001/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
 volumes:
   pgdata:
   caddy_data:
