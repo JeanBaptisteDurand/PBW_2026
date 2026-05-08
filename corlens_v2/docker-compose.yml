@@ -30,5 +30,23 @@ services:
       timeout: 5s
       retries: 5
 
+  gateway:
+    image: caddy:2
+    container_name: corlens-v2-gateway
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost:8080/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 volumes:
   pgdata:
+  caddy_data:
+  caddy_config:
