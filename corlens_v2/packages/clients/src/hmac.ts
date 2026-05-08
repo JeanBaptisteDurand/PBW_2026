@@ -1,15 +1,15 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
-export interface HmacSignerOptions {
+export type HmacSignerOptions = {
   secret: string;
   nowSeconds?: () => number;
-}
+};
 
-export interface HmacVerifierOptions {
+export type HmacVerifierOptions = {
   secret: string;
   maxAgeSeconds: number;
   nowSeconds?: () => number;
-}
+};
 
 const TS_HEADER = "x-corlens-ts";
 const SIG_HEADER = "x-corlens-sig";

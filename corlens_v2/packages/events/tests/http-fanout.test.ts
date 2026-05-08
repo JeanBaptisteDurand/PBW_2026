@@ -74,6 +74,22 @@ describe("HttpFanoutEventBus", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
+  it("swallows fetch rejections so other subscribers still run", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("ECONNREFUSED"))
+      .mockResolvedValueOnce({ ok: true, status: 200 });
+    const bus = new HttpFanoutEventBus({
+      subscribers: {
+        "payment.confirmed": ["http://offline/events", "http://ok/events"],
+      },
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+
+    await expect(bus.publish("payment.confirmed", validPayload)).resolves.toBeUndefined();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
   it("subscribe is a noop in fanout mode (cross-process delivery is HTTP)", () => {
     const bus = new HttpFanoutEventBus({
       subscribers: { "payment.confirmed": [] },

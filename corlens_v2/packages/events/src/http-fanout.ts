@@ -1,11 +1,11 @@
 import { events as eventContracts } from "@corlens/contracts";
 import type { EventBus, EventHandler, EventName, EventPayload } from "./index.js";
 
-export interface HttpFanoutOptions {
+export type HttpFanoutOptions = {
   subscribers: Partial<Record<EventName, string[]>>;
   fetch?: typeof fetch;
   signal?: (body: string) => Record<string, string>;
-}
+};
 
 export class HttpFanoutEventBus implements EventBus {
   private readonly subscribers: Partial<Record<EventName, string[]>>;
