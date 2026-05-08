@@ -140,6 +140,7 @@ model CorridorRagChat {
 
   messages CorridorRagMessage[]
 
+  @@index([corridorId])
   @@schema("corridor")
 }
 
@@ -250,6 +251,7 @@ model RagChat {
 
   messages RagMessage[]
 
+  @@index([analysisId])
   @@schema("path")
 }
 
