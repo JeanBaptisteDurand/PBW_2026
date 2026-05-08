@@ -1,14 +1,15 @@
 {
-    # Disable Caddy's automatic admin API listener — we don't need it in dev,
-    # and it spams the logs. Re-enable with `admin :2019` when needed.
     admin off
-
-    # Auto-TLS is off because dev listens on plain HTTP. Production will get
-    # a separate site block for cor-lens.xyz once Step 12 (cutover) lands.
     auto_https off
 }
 
-# ─── Dev gateway (:8080) ───────────────────────────────────────────
+(jwt_required) {
+    forward_auth identity:3001 {
+        uri /verify
+        copy_headers X-User-Id X-User-Wallet X-User-Role
+    }
+}
+
 :8080 {
     log {
         output stdout
@@ -16,8 +17,6 @@
         level INFO
     }
 
-    # Health endpoint for the gateway itself. Useful for docker healthcheck
-    # and for confirming the gateway is up before any service has shipped.
     handle /health {
         respond `{"status":"ok","gateway":"caddy","stage":"dev"}` 200 {
             close
@@ -25,15 +24,49 @@
     }
 
     # ─── identity (Step 3) — auth + JWT + payment ──────────────────
+    # Public endpoints (no forward_auth):
+    handle /api/auth/login/challenge {
+        reverse_proxy identity:3001
+    }
+    handle /api/auth/login/verify {
+        reverse_proxy identity:3001
+    }
+    handle /api/payment/info {
+        reverse_proxy identity:3001
+    }
+
+    # Protected endpoints (forward_auth → identity:/verify):
+    handle /api/auth/refresh {
+        import jwt_required
+        reverse_proxy identity:3001
+    }
+    handle /api/auth/profile {
+        import jwt_required
+        reverse_proxy identity:3001
+    }
+    handle /api/auth/api-key {
+        import jwt_required
+        reverse_proxy identity:3001
+    }
     handle_path /api/auth/* {
-        respond `{"error":"not_implemented","service":"identity","step":3}` 503 {
-            close
-        }
+        import jwt_required
+        reverse_proxy identity:3001
+    }
+    handle /api/payment/create {
+        import jwt_required
+        reverse_proxy identity:3001
+    }
+    handle_path /api/payment/status/* {
+        import jwt_required
+        reverse_proxy identity:3001
+    }
+    handle /api/payment/demo-pay {
+        import jwt_required
+        reverse_proxy identity:3001
     }
     handle_path /api/payment/* {
-        respond `{"error":"not_implemented","service":"identity","step":3}` 503 {
-            close
-        }
+        import jwt_required
+        reverse_proxy identity:3001
     }
 
     # ─── market-data (Step 4) — XRPL + partner depth ───────────────
