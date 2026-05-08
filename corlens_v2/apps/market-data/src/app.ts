@@ -5,6 +5,9 @@ import { redisPlugin } from "./plugins/redis.js";
 import { registerErrorHandler } from "./plugins/error-handler.js";
 import { registerSwagger } from "./plugins/swagger.js";
 import { xrplPlugin } from "./plugins/xrpl.js";
+import { createCacheService } from "./services/cache.service.js";
+import { createXrplService } from "./services/xrpl.service.js";
+import { registerXrplRoutes } from "./controllers/xrpl.controller.js";
 
 const FALLBACK_ENDPOINTS = [
   "wss://xrplcluster.com",
@@ -29,6 +32,21 @@ export async function buildApp(env: MarketDataEnv): Promise<FastifyInstance> {
     rateLimitIntervalMs: env.XRPL_RATE_LIMIT_INTERVAL_MS,
   });
   await registerSwagger(app);
+
+  const cache = createCacheService({ redis: app.redis, prefix: "md:" });
+  const xrplService = createXrplService({
+    client: app.xrpl,
+    cache,
+    ttl: {
+      account: env.ACCOUNT_CACHE_TTL_SECONDS,
+      book: env.BOOK_CACHE_TTL_SECONDS,
+      amm: env.ACCOUNT_CACHE_TTL_SECONDS,
+      tx: 5,
+      nft: 30,
+    },
+  });
+
+  await registerXrplRoutes(app, xrplService);
 
   app.get("/health", { schema: { hide: true } }, async () => ({
     status: "ok",
