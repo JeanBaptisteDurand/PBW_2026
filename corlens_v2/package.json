@@ -12,8 +12,9 @@
     "test:watch": "vitest",
     "build": "pnpm -r run build",
     "dev:db": "docker compose up -d postgres redis",
-    "dev:db:down": "docker compose down",
-    "dev:db:reset": "docker compose down -v && docker compose up -d postgres redis"
+    "dev:up": "docker compose up -d",
+    "dev:down": "docker compose down",
+    "dev:reset": "docker compose down -v && docker compose up -d"
   },
   "engines": {
     "node": ">=20.0.0",
