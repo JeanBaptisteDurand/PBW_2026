@@ -1,5 +1,5 @@
 import { Queue, Worker, type Job } from "bullmq";
-import type { Redis } from "ioredis";
+import IORedis from "ioredis";
 import type { XrplService } from "../services/xrpl.service.js";
 
 const HOT_ACCOUNTS = [
@@ -10,10 +10,10 @@ const HOT_ACCOUNTS = [
   "rNDoUODjMCRWokWisgnoqs5SEnDP3fkjvY", // Sologenic gateway
 ];
 
-const QUEUE_NAME = "market-data:prewarm";
+const QUEUE_NAME = "market-data-prewarm";
 
 export type PrewarmOptions = {
-  redis: Redis;
+  redisUrl: string;
   xrplService: XrplService;
   cron: string;
   enabled: boolean;
@@ -28,7 +28,10 @@ export async function startPrewarm(opts: PrewarmOptions): Promise<PrewarmHandle>
     return { stop: async () => {} };
   }
 
-  const queue = new Queue(QUEUE_NAME, { connection: opts.redis });
+  // BullMQ requires maxRetriesPerRequest: null on blocking connections
+  const connection = new IORedis(opts.redisUrl, { maxRetriesPerRequest: null });
+
+  const queue = new Queue(QUEUE_NAME, { connection });
   await queue.upsertJobScheduler(
     "prewarm-hot-accounts",
     { pattern: opts.cron },
@@ -46,13 +49,14 @@ export async function startPrewarm(opts: PrewarmOptions): Promise<PrewarmHandle>
       }
       return { count: HOT_ACCOUNTS.length };
     },
-    { connection: opts.redis },
+    { connection },
   );
 
   return {
     async stop() {
       await worker.close();
       await queue.close();
+      connection.disconnect();
     },
   };
 }
