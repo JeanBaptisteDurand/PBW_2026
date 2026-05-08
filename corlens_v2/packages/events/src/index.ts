@@ -1,4 +1,4 @@
-import { events as eventContracts } from "@corlens/contracts";
+import type { events as eventContracts } from "@corlens/contracts";
 
 export type EventName = eventContracts.EventName;
 export type EventPayload<E extends EventName> = eventContracts.EventPayload<E>;

@@ -40,11 +40,7 @@ export function createHttpClient(opts: HttpClientOptions) {
     const text = await res.text();
     const parsed = text.length > 0 ? JSON.parse(text) : undefined;
     if (!res.ok) {
-      throw new ServiceHttpError(
-        `${method} ${url} failed with ${res.status}`,
-        res.status,
-        parsed,
-      );
+      throw new ServiceHttpError(`${method} ${url} failed with ${res.status}`, res.status, parsed);
     }
     const result = responseSchema.safeParse(parsed);
     if (!result.success) {
