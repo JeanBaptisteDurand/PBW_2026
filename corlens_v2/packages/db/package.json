@@ -1,0 +1,54 @@
+{
+  "name": "@corlens/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./identity": {
+      "types": "./src/identity.ts",
+      "default": "./dist/identity.js"
+    },
+    "./corridor": {
+      "types": "./src/corridor.ts",
+      "default": "./dist/corridor.js"
+    },
+    "./path": {
+      "types": "./src/path.ts",
+      "default": "./dist/path.js"
+    },
+    "./agent": {
+      "types": "./src/agent.ts",
+      "default": "./dist/agent.js"
+    },
+    "./ai": {
+      "types": "./src/ai.ts",
+      "default": "./dist/ai.js"
+    },
+    "./market-data": {
+      "types": "./src/market-data.ts",
+      "default": "./dist/market-data.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsc --watch",
+    "prisma:generate": "prisma generate --schema=prisma/schema.prisma",
+    "prisma:push": "prisma db push --schema=prisma/schema.prisma",
+    "prisma:migrate": "prisma migrate dev --schema=prisma/schema.prisma",
+    "prisma:studio": "prisma studio --schema=prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "6.1.0"
+  },
+  "devDependencies": {
+    "prisma": "6.1.0",
+    "typescript": "5.7.2"
+  }
+}
