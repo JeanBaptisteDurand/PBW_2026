@@ -51,12 +51,12 @@
     }
 
     # ─── corridor (Step 6) — catalog, scanner, RAG ─────────────────
-    handle_path /api/corridors/* {
+    handle_path /api/corridors* {
         respond `{"error":"not_implemented","service":"corridor","step":6}` 503 {
             close
         }
     }
-    handle_path /api/corridor/* {
+    handle_path /api/corridor* {
         respond `{"error":"not_implemented","service":"corridor","step":6}` 503 {
             close
         }
