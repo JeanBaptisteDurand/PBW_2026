@@ -292,6 +292,8 @@ model SafePathRun {
   reportMarkdown   String?
   corridorId       String?
   analysisIds      Json?
+  riskScore        Float?
+  auditHash        String?  @unique
   createdAt        DateTime @default(now())
 
   @@index([userId])

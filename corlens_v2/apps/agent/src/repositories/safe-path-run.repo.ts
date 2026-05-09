@@ -14,6 +14,8 @@ export type SafePathRunRow = {
   reportMarkdown: string | null;
   corridorId: string | null;
   analysisIds: unknown;
+  riskScore: number | null;
+  auditHash: string | null;
   createdAt: Date;
 };
 
@@ -32,6 +34,8 @@ export function createSafePathRunRepo(prisma: Prisma) {
       reportMarkdown: string | null;
       corridorId: string | null;
       analysisIds: string[];
+      riskScore?: number | null;
+      auditHash?: string | null;
     }): Promise<SafePathRunRow> {
       return db.safePathRun.create({
         data: {
@@ -46,12 +50,20 @@ export function createSafePathRunRepo(prisma: Prisma) {
           reportMarkdown: input.reportMarkdown,
           corridorId: input.corridorId,
           analysisIds: input.analysisIds as never,
+          riskScore: input.riskScore ?? null,
+          auditHash: input.auditHash ?? null,
         },
       }) as unknown as SafePathRunRow;
     },
 
     async findById(id: string): Promise<SafePathRunRow | null> {
       return db.safePathRun.findUnique({ where: { id } }) as unknown as SafePathRunRow | null;
+    },
+
+    async findByAuditHash(hash: string): Promise<SafePathRunRow | null> {
+      return db.safePathRun.findUnique({
+        where: { auditHash: hash },
+      }) as unknown as SafePathRunRow | null;
     },
 
     async listForUser(userId: string | null, limit: number): Promise<SafePathRunRow[]> {
