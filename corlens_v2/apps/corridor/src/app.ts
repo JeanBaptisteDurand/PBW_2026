@@ -21,6 +21,7 @@ import { registerCorridorRoutes } from "./controllers/corridor.controller.js";
 import { registerChatRoutes } from "./controllers/chat.controller.js";
 import { registerPartnerDepthRoutes } from "./controllers/partner-depth.controller.js";
 import { registerAdminRoutes } from "./controllers/admin.controller.js";
+import { startRefreshCron } from "./crons/refresh.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -54,6 +55,17 @@ export async function buildApp(env: CorridorEnv): Promise<FastifyInstance> {
   await registerChatRoutes(app, chat);
   await registerPartnerDepthRoutes(app, marketData);
   await registerAdminRoutes(app, corridors, events, scanner);
+
+  const refresh = await startRefreshCron({
+    redisUrl: env.REDIS_URL,
+    cron: env.REFRESH_CRON,
+    enabled: env.REFRESH_ENABLED,
+    concurrency: env.SCAN_CONCURRENCY,
+    corridors,
+    events,
+    scanner,
+  });
+  app.addHook("onClose", async () => { await refresh.stop(); });
 
   app.get("/health", { schema: { hide: true } }, async () => ({ status: "ok", service: "corridor" }));
 

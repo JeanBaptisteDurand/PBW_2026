@@ -136,6 +136,38 @@ services:
       retries: 5
       start_period: 30s
 
+  corridor:
+    build:
+      context: .
+      dockerfile: apps/corridor/Dockerfile
+    container_name: corlens-v2-corridor
+    restart: unless-stopped
+    environment:
+      PORT: "3004"
+      HOST: "0.0.0.0"
+      DATABASE_URL: postgresql://corlens:corlens_dev@postgres:5432/corlens
+      REDIS_URL: redis://redis:6379
+      MARKET_DATA_BASE_URL: http://market-data:3002
+      AI_SERVICE_BASE_URL: http://ai-service:3003
+      INTERNAL_HMAC_SECRET: ${INTERNAL_HMAC_SECRET:-dev-secret-must-be-at-least-32-chars-long}
+      SCAN_CONCURRENCY: "4"
+      SCAN_TIMEOUT_MS: "20000"
+      REFRESH_CRON: "0 * * * *"
+      REFRESH_ENABLED: "false"
+    ports:
+      - "3004:3004"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://127.0.0.1:3004/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
 volumes:
   pgdata:
   caddy_data:

@@ -80,15 +80,11 @@
     }
 
     # ─── corridor (Step 6) — catalog, scanner, RAG ─────────────────
-    handle_path /api/corridors* {
-        respond `{"error":"not_implemented","service":"corridor","step":6}` 503 {
-            close
-        }
+    handle /api/corridors* {
+        reverse_proxy corridor:3004
     }
-    handle_path /api/corridor* {
-        respond `{"error":"not_implemented","service":"corridor","step":6}` 503 {
-            close
-        }
+    handle /api/corridor* {
+        reverse_proxy corridor:3004
     }
 
     # ─── path (Step 7) — entity audit ──────────────────────────────
