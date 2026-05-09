@@ -17,6 +17,10 @@
     "./dist/ai.js": {
       "types": "./dist/ai.d.ts",
       "default": "./dist/ai.js"
+    },
+    "./dist/corridor.js": {
+      "types": "./dist/corridor.d.ts",
+      "default": "./dist/corridor.js"
     }
   },
   "scripts": {
