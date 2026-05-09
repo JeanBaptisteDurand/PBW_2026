@@ -6,6 +6,7 @@ const Schema = z.object({
   DATABASE_URL: z.string().url(),
   REDIS_URL: z.string().url(),
   JWT_SECRET: z.string().min(32),
+  INTERNAL_HMAC_SECRET: z.string().min(32),
   XRPL_PAYMENT_WALLET_ADDRESS: z.string().regex(/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/),
   XRPL_TESTNET_RPC: z.string().url(),
   XRPL_DEMO_WALLET_SECRET: z.preprocess(

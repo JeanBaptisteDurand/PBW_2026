@@ -7,6 +7,7 @@ import {
 } from "fastify-type-provider-zod";
 import { type XrplPaymentClient, createXrplPaymentClient } from "./connectors/xrpl.js";
 import { registerAuthRoutes } from "./controllers/auth.controller.js";
+import { registerInternalRoutes } from "./controllers/internal.controller.js";
 import { registerPaymentRoutes } from "./controllers/payment.controller.js";
 import { registerVerifyRoutes } from "./controllers/verify.controller.js";
 import type { IdentityEnv } from "./env.js";
@@ -61,6 +62,7 @@ export async function buildApp(env: IdentityEnv): Promise<FastifyInstance> {
   await registerVerifyRoutes(app);
   await registerAuthRoutes(app, env);
   await registerPaymentRoutes(app, paymentService, env);
+  await registerInternalRoutes(app, env);
 
   registerEventHandlers(app);
 

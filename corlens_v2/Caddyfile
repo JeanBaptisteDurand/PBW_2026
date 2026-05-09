@@ -23,6 +23,11 @@
         }
     }
 
+    # Internal-only (HMAC-protected) routes are NOT reachable via the public gateway.
+    handle /internal/* {
+        respond 404
+    }
+
     # ─── identity (Step 3) — auth + JWT + payment ──────────────────
     # Public endpoints (no forward_auth):
     handle /api/auth/login/challenge {

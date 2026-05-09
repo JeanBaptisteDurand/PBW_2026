@@ -8,6 +8,7 @@ const env = loadIdentityEnv({
   DATABASE_URL: "postgresql://corlens:corlens_dev@localhost:5435/corlens",
   REDIS_URL: "redis://localhost:6381",
   JWT_SECRET: "test-secret-must-be-at-least-32-characters-long",
+  INTERNAL_HMAC_SECRET: "test-internal-hmac-secret-must-be-at-least-32-chars",
   XRPL_PAYMENT_WALLET_ADDRESS: "rPaymentDestinationABCDEFGHJKMNPQRS",
   XRPL_TESTNET_RPC: "wss://s.altnet.rippletest.net:51233",
   CHALLENGE_TTL_SECONDS: "300",

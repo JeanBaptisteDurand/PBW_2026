@@ -58,6 +58,7 @@ services:
       DATABASE_URL: postgresql://corlens:corlens_dev@postgres:5432/corlens
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me-must-be-at-least-32-chars}
+      INTERNAL_HMAC_SECRET: ${INTERNAL_HMAC_SECRET:-dev-internal-hmac-secret-do-not-use-in-prod-aaaaaaa}
       XRPL_PAYMENT_WALLET_ADDRESS: ${XRPL_PAYMENT_WALLET_ADDRESS:-rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh}
       XRPL_TESTNET_RPC: wss://s.altnet.rippletest.net:51233
       XRPL_DEMO_WALLET_SECRET: ${XRPL_DEMO_WALLET_SECRET:-}

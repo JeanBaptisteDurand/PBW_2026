@@ -6,6 +6,7 @@ const validEnv = {
   DATABASE_URL: "postgresql://corlens:corlens_dev@localhost:5435/corlens",
   REDIS_URL: "redis://localhost:6381",
   JWT_SECRET: "x".repeat(32),
+  INTERNAL_HMAC_SECRET: "y".repeat(32),
   XRPL_PAYMENT_WALLET_ADDRESS: "rPaymentDestinationABCDEFGHJKMNPQRS",
   XRPL_TESTNET_RPC: "wss://s.altnet.rippletest.net:51233",
   CHALLENGE_TTL_SECONDS: "300",
