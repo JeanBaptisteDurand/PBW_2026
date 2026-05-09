@@ -16,31 +16,19 @@ import {
   type Phase,
   type PhaseContext,
   type SafePathEvent,
-  type SafePathPhase,
   type SharedState,
+  errMessage,
   makeInitialState,
   nowIso,
 } from "./phases/types.js";
 
 export type OrchestratorEvent = SafePathEvent;
 
-export type OrchestratorContext = {
-  corridorId: string | null;
-  corridorLabel: string | null;
-  corridorStatus: string | null;
-  reasoning: string;
-  verdict: SharedState["verdict"];
-  riskScore: number | null;
-  analysisIds: string[];
-  reportMarkdown: string | null;
-  resultJson: Record<string, unknown>;
-};
-
 export type OrchestratorService = {
   run(
     input: ag.SafePathRequest,
     signal?: AbortSignal,
-  ): AsyncGenerator<OrchestratorEvent, OrchestratorContext, void>;
+  ): AsyncGenerator<SafePathEvent, SharedState, void>;
 };
 
 export type OrchestratorOptions = {
@@ -83,75 +71,50 @@ export function createOrchestrator(opts: OrchestratorOptions): OrchestratorServi
         },
         signal,
       };
-      const buf: SafePathEvent[] = [];
-      const emit = (e: SafePathEvent) => {
-        buf.push(e);
-      };
-
-      const drain = function* (): Generator<SafePathEvent> {
-        while (buf.length > 0) {
-          const next = buf.shift();
-          if (next) yield next;
-        }
-      };
 
       let aborted = false;
       for (const phase of phases) {
         if (signal?.aborted) {
+          yield { kind: "error", phase: phase.name, message: "aborted", at: nowIso() };
           aborted = true;
           break;
         }
         const started = Date.now();
-        emit({ kind: "phase-start", phase: phase.name, at: nowIso() });
-        for (const ev of drain()) yield ev;
-
+        yield { kind: "phase-start", phase: phase.name, at: nowIso() };
         try {
-          await phase.run(ctx, emit);
-          for (const ev of drain()) yield ev;
+          for await (const ev of phase.run(ctx)) {
+            yield ev;
+          }
         } catch (err) {
-          emit({
+          yield {
             kind: "error",
-            phase: phase.name as SafePathPhase,
-            message: (err as Error).message,
+            phase: phase.name,
+            message: errMessage(err),
             at: nowIso(),
-          });
-          for (const ev of drain()) yield ev;
+          };
           aborted = true;
           break;
         }
-
-        emit({
+        yield {
           kind: "phase-complete",
           phase: phase.name,
           durationMs: Date.now() - started,
           at: nowIso(),
-        });
-        for (const ev of drain()) yield ev;
+        };
       }
 
       if (!aborted) {
-        emit({
+        yield {
           kind: "result",
-          runId: "00000000-0000-0000-0000-000000000000",
+          runId: state.runId,
           verdict: state.verdict,
           riskScore: state.riskScore,
           reasoning: state.reasoning.slice(0, 4000),
           at: nowIso(),
-        });
-        for (const ev of drain()) yield ev;
+        };
       }
 
-      return {
-        corridorId: state.corridor.id,
-        corridorLabel: state.corridor.label,
-        corridorStatus: state.corridor.status,
-        reasoning: state.reasoning,
-        verdict: state.verdict,
-        riskScore: state.riskScore,
-        analysisIds: state.analysisIds,
-        reportMarkdown: state.reportMarkdown,
-        resultJson: state.resultJson,
-      };
+      return state;
     },
   };
 }

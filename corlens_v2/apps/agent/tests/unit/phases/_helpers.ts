@@ -1,7 +1,7 @@
 import { vi } from "vitest";
 import type {
+  Phase,
   PhaseContext,
-  PhaseEmit,
   SafePathEvent,
   SafePathRequest,
 } from "../../../src/services/phases/types.js";
@@ -65,12 +65,10 @@ export function makeCtx(
   };
 }
 
-export function captureEmit(): { emit: PhaseEmit; events: SafePathEvent[] } {
+export async function collectEvents(phase: Phase, ctx: PhaseContext): Promise<SafePathEvent[]> {
   const events: SafePathEvent[] = [];
-  return {
-    emit: (e) => {
-      events.push(e);
-    },
-    events,
-  };
+  for await (const e of phase.run(ctx)) {
+    events.push(e);
+  }
+  return events;
 }

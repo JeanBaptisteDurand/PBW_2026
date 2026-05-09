@@ -1,4 +1,10 @@
-import { type Phase, type PhaseContext, type PhaseEmit, type SplitLeg, nowIso } from "./types.js";
+import {
+  type Phase,
+  type PhaseContext,
+  type SafePathEvent,
+  type SplitLeg,
+  nowIso,
+} from "./types.js";
 
 export function computeSplitPlan(
   amount: number,
@@ -48,7 +54,7 @@ export function computeSplitPlan(
 export class SplitPlanPhase implements Phase {
   readonly name = "split-plan" as const;
 
-  async run(ctx: PhaseContext, emit: PhaseEmit): Promise<void> {
+  async *run(ctx: PhaseContext): AsyncGenerator<SafePathEvent> {
     const { input, state } = ctx;
     const amount = Number(input.amount) || 0;
     const surviving = state.paths.length - state.rejected.length;
@@ -56,11 +62,11 @@ export class SplitPlanPhase implements Phase {
     if (!plan) return;
 
     state.splitPlan = plan;
-    emit({ kind: "split-plan", legs: plan, at: nowIso() });
-    emit({
+    yield { kind: "split-plan", legs: plan, at: nowIso() };
+    yield {
       kind: "reasoning",
       text: `Amount ${input.amount} ${input.srcCcy} is large. Recommending split: ${plan.map((l) => `${l.percentage}%`).join(" / ")}.`,
       at: nowIso(),
-    });
+    };
   }
 }

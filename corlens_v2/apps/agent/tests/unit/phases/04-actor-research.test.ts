@@ -1,7 +1,7 @@
 import { describe, expect, it, type vi } from "vitest";
+import { ACTORS_BY_CURRENCY } from "../../../src/data/currency-meta.js";
 import { ActorResearchPhase } from "../../../src/services/phases/04-actor-research.js";
-import { ACTORS_BY_CURRENCY } from "../../../src/services/phases/_currency-meta.js";
-import { captureEmit, makeCtx, makeMockDeps } from "./_helpers.js";
+import { collectEvents, makeCtx, makeMockDeps } from "./_helpers.js";
 
 describe("ActorResearchPhase", () => {
   it("emits a web-search event per top actor", async () => {
@@ -14,9 +14,8 @@ describe("ActorResearchPhase", () => {
     const ctx = makeCtx({ srcCcy: "USD", dstCcy: "MXN" }, deps);
     ctx.state.srcActors = ACTORS_BY_CURRENCY.USD ?? [];
     ctx.state.dstActors = ACTORS_BY_CURRENCY.MXN ?? [];
-    const { emit, events } = captureEmit();
 
-    await new ActorResearchPhase().run(ctx, emit);
+    const events = await collectEvents(new ActorResearchPhase(), ctx);
 
     const searches = events.filter((e) => e.kind === "web-search");
     expect(searches.length).toBeGreaterThan(0);
@@ -28,9 +27,8 @@ describe("ActorResearchPhase", () => {
     ctx.state.corridor.id = "usd-mxn";
     ctx.state.srcActors = ACTORS_BY_CURRENCY.USD ?? [];
     ctx.state.dstActors = ACTORS_BY_CURRENCY.MXN ?? [];
-    const { emit, events } = captureEmit();
 
-    await new ActorResearchPhase().run(ctx, emit);
+    const events = await collectEvents(new ActorResearchPhase(), ctx);
 
     expect(deps.marketData.partnerDepth).toHaveBeenCalled();
     expect(events.find((e) => e.kind === "partner-depth")).toBeDefined();
@@ -41,8 +39,7 @@ describe("ActorResearchPhase", () => {
     const ctx = makeCtx({ srcCcy: "USD", dstCcy: "MXN" }, deps);
     ctx.state.srcActors = ACTORS_BY_CURRENCY.USD ?? [];
     ctx.state.dstActors = ACTORS_BY_CURRENCY.MXN ?? [];
-    const { emit } = captureEmit();
-    await new ActorResearchPhase().run(ctx, emit);
+    await collectEvents(new ActorResearchPhase(), ctx);
     expect(deps.marketData.partnerDepth).not.toHaveBeenCalled();
   });
 
@@ -55,9 +52,8 @@ describe("ActorResearchPhase", () => {
     ctx.state.corridor.id = "usd-mxn";
     ctx.state.srcActors = ACTORS_BY_CURRENCY.USD ?? [];
     ctx.state.dstActors = ACTORS_BY_CURRENCY.MXN ?? [];
-    const { emit, events } = captureEmit();
 
-    await new ActorResearchPhase().run(ctx, emit);
+    const events = await collectEvents(new ActorResearchPhase(), ctx);
     const tr = events.find((e) => e.kind === "tool-result" && e.name === "fetchPartnerDepth");
     expect(tr).toBeDefined();
     expect(ctx.state.partnerDepth).toBeNull();

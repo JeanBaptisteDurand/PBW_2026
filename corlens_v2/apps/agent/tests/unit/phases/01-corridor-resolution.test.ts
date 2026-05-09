@@ -1,6 +1,6 @@
 import { describe, expect, it, type vi } from "vitest";
 import { CorridorResolutionPhase } from "../../../src/services/phases/01-corridor-resolution.js";
-import { captureEmit, makeCtx, makeMockDeps } from "./_helpers.js";
+import { collectEvents, makeCtx, makeMockDeps } from "./_helpers.js";
 
 describe("CorridorResolutionPhase", () => {
   it("emits corridor-context with the resolved corridor", async () => {
@@ -12,9 +12,8 @@ describe("CorridorResolutionPhase", () => {
       category: "off-chain-bridge",
     });
     const ctx = makeCtx({}, deps);
-    const { emit, events } = captureEmit();
 
-    await new CorridorResolutionPhase().run(ctx, emit);
+    const events = await collectEvents(new CorridorResolutionPhase(), ctx);
 
     const ctxEvent = events.find((e) => e.kind === "corridor-context");
     expect(ctxEvent).toBeDefined();
@@ -27,9 +26,8 @@ describe("CorridorResolutionPhase", () => {
     const deps = makeMockDeps();
     (deps.corridor.getById as ReturnType<typeof vi.fn>).mockResolvedValue(null);
     const ctx = makeCtx({ srcCcy: "ZZZ", dstCcy: "AAA" }, deps);
-    const { emit, events } = captureEmit();
 
-    await new CorridorResolutionPhase().run(ctx, emit);
+    const events = await collectEvents(new CorridorResolutionPhase(), ctx);
 
     const ctxEvent = events.find((e) => e.kind === "corridor-context");
     expect(ctxEvent).toBeDefined();
@@ -42,17 +40,15 @@ describe("CorridorResolutionPhase", () => {
     const deps = makeMockDeps();
     (deps.corridor.getById as ReturnType<typeof vi.fn>).mockRejectedValue(new Error("boom"));
     const ctx = makeCtx({}, deps);
-    const { emit, events } = captureEmit();
 
-    await new CorridorResolutionPhase().run(ctx, emit);
+    const events = await collectEvents(new CorridorResolutionPhase(), ctx);
     expect(events.find((e) => e.kind === "corridor-context")).toBeDefined();
     expect(ctx.state.corridor.id).toBeNull();
   });
 
   it("populates issuer/actor lists from currency-meta", async () => {
     const ctx = makeCtx({ srcCcy: "USD", dstCcy: "EUR" });
-    const { emit } = captureEmit();
-    await new CorridorResolutionPhase().run(ctx, emit);
+    await collectEvents(new CorridorResolutionPhase(), ctx);
     expect(ctx.state.srcIssuers.length).toBeGreaterThan(0);
     expect(ctx.state.dstIssuers.length).toBeGreaterThan(0);
     expect(ctx.state.isOnChain).toBe(true);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ReportPhase } from "../../../src/services/phases/09-report.js";
-import { captureEmit, makeCtx } from "./_helpers.js";
+import { collectEvents, makeCtx } from "./_helpers.js";
 
 describe("ReportPhase", () => {
   it("emits a report event with markdown containing required sections", async () => {
@@ -12,8 +12,7 @@ describe("ReportPhase", () => {
     ctx.state.verdict = "OFF_CHAIN_ROUTED";
     ctx.state.riskScore = 0.3;
 
-    const { emit, events } = captureEmit();
-    await new ReportPhase().run(ctx, emit);
+    const events = await collectEvents(new ReportPhase(), ctx);
 
     const ev = events.find((e) => e.kind === "report");
     expect(ev).toBeDefined();
@@ -30,8 +29,7 @@ describe("ReportPhase", () => {
     const ctx = makeCtx();
     ctx.state.verdict = "SAFE";
     ctx.state.riskScore = 0.2;
-    const { emit } = captureEmit();
-    await new ReportPhase().run(ctx, emit);
+    await collectEvents(new ReportPhase(), ctx);
     expect(ctx.state.resultJson).toMatchObject({ verdict: "SAFE", riskScore: 0.2 });
   });
 
@@ -40,8 +38,7 @@ describe("ReportPhase", () => {
     ctx.state.corridor.id = "usd-mxn";
     ctx.state.isOnChain = false;
     ctx.state.verdict = "NO_PATHS";
-    const { emit } = captureEmit();
-    await new ReportPhase().run(ctx, emit);
+    await collectEvents(new ReportPhase(), ctx);
     expect(ctx.state.verdict).toBe("OFF_CHAIN_ROUTED");
   });
 
@@ -51,8 +48,7 @@ describe("ReportPhase", () => {
     ctx.deps.ai.complete = async () => {
       throw new Error("ai down");
     };
-    const { emit } = captureEmit();
-    await new ReportPhase().run(ctx, emit);
+    await collectEvents(new ReportPhase(), ctx);
     expect(ctx.state.reasoning.length).toBeGreaterThan(0);
     expect(ctx.state.reportMarkdown).not.toBeNull();
   });

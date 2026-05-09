@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import type { agent as ag } from "@corlens/contracts";
 import type { AIServiceClient } from "../../connectors/ai-service.js";
 import type { CorridorClient } from "../../connectors/corridor.js";
@@ -40,6 +41,7 @@ export type PartnerDepthSnapshot = {
 };
 
 export type SharedState = {
+  runId: string;
   corridor: {
     id: string | null;
     label: string | null;
@@ -94,15 +96,14 @@ export type PhaseContext = {
   signal?: AbortSignal;
 };
 
-export type PhaseEmit = (e: SafePathEvent) => void;
-
 export interface Phase {
   readonly name: SafePathPhase;
-  run(ctx: PhaseContext, emit: PhaseEmit): Promise<void>;
+  run(ctx: PhaseContext): AsyncGenerator<SafePathEvent, void, void>;
 }
 
 export function makeInitialState(): SharedState {
   return {
+    runId: randomUUID(),
     corridor: { id: null, label: null, status: null, category: null, bridgeAsset: null },
     isOnChain: false,
     srcIssuers: [],
@@ -131,4 +132,14 @@ export function makeInitialState(): SharedState {
 
 export function nowIso(): string {
   return new Date().toISOString();
+}
+
+export function errMessage(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  if (typeof err === "string") return err;
+  try {
+    return JSON.stringify(err);
+  } catch {
+    return "unknown error";
+  }
 }

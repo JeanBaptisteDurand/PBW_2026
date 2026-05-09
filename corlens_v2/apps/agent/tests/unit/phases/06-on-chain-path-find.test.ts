@@ -1,14 +1,13 @@
 import { describe, expect, it, type vi } from "vitest";
+import { ISSUERS_BY_CURRENCY } from "../../../src/data/currency-meta.js";
 import { OnChainPathFindPhase } from "../../../src/services/phases/06-on-chain-path-find.js";
-import { ISSUERS_BY_CURRENCY } from "../../../src/services/phases/_currency-meta.js";
-import { captureEmit, makeCtx, makeMockDeps } from "./_helpers.js";
+import { collectEvents, makeCtx, makeMockDeps } from "./_helpers.js";
 
 describe("OnChainPathFindPhase", () => {
   it("skips when no on-chain issuers", async () => {
     const ctx = makeCtx({ srcCcy: "USD", dstCcy: "MXN" });
     ctx.state.isOnChain = false;
-    const { emit, events } = captureEmit();
-    await new OnChainPathFindPhase().run(ctx, emit);
+    const events = await collectEvents(new OnChainPathFindPhase(), ctx);
     expect(events.find((e) => e.kind === "reasoning")).toBeDefined();
     expect(events.find((e) => e.kind === "tool-call")).toBeUndefined();
   });
@@ -27,8 +26,7 @@ describe("OnChainPathFindPhase", () => {
     ctx.state.srcIssuers = ISSUERS_BY_CURRENCY.USD ?? [];
     ctx.state.dstIssuers = ISSUERS_BY_CURRENCY.EUR ?? [];
     ctx.state.isOnChain = true;
-    const { emit, events } = captureEmit();
-    await new OnChainPathFindPhase().run(ctx, emit);
+    const events = await collectEvents(new OnChainPathFindPhase(), ctx);
 
     expect(events.filter((e) => e.kind === "path-active").length).toBeGreaterThan(0);
     expect(ctx.state.verdict).toBe("SAFE");
@@ -44,8 +42,7 @@ describe("OnChainPathFindPhase", () => {
     ctx.state.dstIssuers = ISSUERS_BY_CURRENCY.EUR ?? [];
     ctx.state.isOnChain = true;
     ctx.state.corridor.status = "RED";
-    const { emit, events } = captureEmit();
-    await new OnChainPathFindPhase().run(ctx, emit);
+    const events = await collectEvents(new OnChainPathFindPhase(), ctx);
 
     expect(events.find((e) => e.kind === "path-rejected")).toBeDefined();
     expect(ctx.state.verdict).toBe("REJECTED");
@@ -60,8 +57,7 @@ describe("OnChainPathFindPhase", () => {
     ctx.state.srcIssuers = ISSUERS_BY_CURRENCY.USD ?? [];
     ctx.state.dstIssuers = ISSUERS_BY_CURRENCY.EUR ?? [];
     ctx.state.isOnChain = true;
-    const { emit, events } = captureEmit();
-    await new OnChainPathFindPhase().run(ctx, emit);
+    const events = await collectEvents(new OnChainPathFindPhase(), ctx);
     const tr = events.find(
       (e) => e.kind === "tool-result" && e.summary.includes("Path find failed"),
     );

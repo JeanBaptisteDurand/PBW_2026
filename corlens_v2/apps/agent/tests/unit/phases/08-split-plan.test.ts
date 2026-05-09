@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { SplitPlanPhase, computeSplitPlan } from "../../../src/services/phases/08-split-plan.js";
-import { captureEmit, makeCtx } from "./_helpers.js";
+import { collectEvents, makeCtx } from "./_helpers.js";
 
 describe("computeSplitPlan", () => {
   it("returns null for small amounts", () => {
@@ -34,15 +34,13 @@ describe("SplitPlanPhase", () => {
     const ctx = makeCtx({ amount: "200000" });
     ctx.state.paths = [{}, {}, {}];
     ctx.state.rejected = [];
-    const { emit, events } = captureEmit();
-    await new SplitPlanPhase().run(ctx, emit);
+    const events = await collectEvents(new SplitPlanPhase(), ctx);
     expect(events.find((e) => e.kind === "split-plan")).toBeDefined();
   });
 
   it("does not emit when amount is small", async () => {
     const ctx = makeCtx({ amount: "100" });
-    const { emit, events } = captureEmit();
-    await new SplitPlanPhase().run(ctx, emit);
+    const events = await collectEvents(new SplitPlanPhase(), ctx);
     expect(events.find((e) => e.kind === "split-plan")).toBeUndefined();
   });
 });

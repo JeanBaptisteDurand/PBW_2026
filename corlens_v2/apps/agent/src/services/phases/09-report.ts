@@ -1,8 +1,12 @@
-import { type ActorEntry, classifyOffChainBridgeStatus, rankActors } from "./_currency-meta.js";
+import {
+  type ActorEntry,
+  classifyOffChainBridgeStatus,
+  rankActors,
+} from "../../data/currency-meta.js";
 import {
   type Phase,
   type PhaseContext,
-  type PhaseEmit,
+  type SafePathEvent,
   type SharedState,
   type SplitLeg,
   nowIso,
@@ -79,7 +83,6 @@ function generateReportMarkdown(
     `\n> **${intent.srcCcy} → ${intent.dstCcy}** · ${intent.amount} ${intent.srcCcy} · ${new Date().toISOString().split("T")[0]}`,
   );
 
-  // 1. Executive Summary
   L.push("\n## 1. Executive Summary");
   L.push("");
   L.push("| Field | Value |");
@@ -92,7 +95,6 @@ function generateReportMarkdown(
   L.push(`| Bridge asset | ${bridgeAsset} |`);
   L.push(`| Status | ${corridorStatus} |`);
 
-  // 2. Recommended Route
   L.push("\n## 2. Route");
   if (state.verdict === "SAFE") {
     L.push(
@@ -121,7 +123,6 @@ function generateReportMarkdown(
     for (const r of state.rejected) L.push(`- ${r.pathId}: ${r.reason}`);
   }
 
-  // 3. Corridor Classification
   L.push("\n## 3. Corridor Classification");
   L.push("");
   L.push("| Property | Value |");
@@ -132,7 +133,6 @@ function generateReportMarkdown(
   L.push(`| Source actors | ${state.srcActors.length} |`);
   L.push(`| Dest actors | ${state.dstActors.length} |`);
 
-  // 4. Risk Flags
   L.push("\n## 4. Risk Flags");
   L.push("");
   if (state.deepAnalyses.size === 0) {
@@ -166,7 +166,6 @@ function generateReportMarkdown(
 
   if (state.splitPlan) formatSplit(L, state.splitPlan);
 
-  // Actor research
   L.push("\n## Actor Research");
   formatActorSection(L, state.srcActors, `${intent.srcCcy} on-ramps`, 5, state.actorResearch);
   formatActorSection(L, state.dstActors, `${intent.dstCcy} off-ramps`, 5, state.actorResearch);
@@ -191,12 +190,10 @@ function generateReportMarkdown(
     L.push(state.corridorRagAnswer);
   }
 
-  // Compliance Justification
   L.push("\n## Compliance Justification");
   L.push("");
   L.push(state.reasoning || "(no reasoning collected)");
 
-  // Historical Status
   L.push("\n## Historical Status");
   L.push("");
   L.push(
@@ -208,7 +205,6 @@ function generateReportMarkdown(
     L.push(`\n*Off-chain bridge status: ${cls.status}. ${cls.reason}*`);
   }
 
-  // Disclaimer
   L.push("\n## Disclaimer");
   L.push("");
   L.push(
@@ -222,16 +218,15 @@ function generateReportMarkdown(
 export class ReportPhase implements Phase {
   readonly name = "report" as const;
 
-  async run(ctx: PhaseContext, emit: PhaseEmit): Promise<void> {
+  async *run(ctx: PhaseContext): AsyncGenerator<SafePathEvent> {
     const { input, state, deps } = ctx;
-    emit({
+    yield {
       kind: "step",
       step: "verdict",
       detail: "Computing final verdict and justification",
       at: nowIso(),
-    });
+    };
 
-    // Promote verdict if still NO_PATHS but corridor exists & off-chain bridge ran
     if (state.verdict === "NO_PATHS" && state.corridor.id && !state.isOnChain) {
       state.verdict = "OFF_CHAIN_ROUTED";
       state.riskScore = state.riskScore ?? 0.4;
@@ -289,7 +284,7 @@ export class ReportPhase implements Phase {
     state.reasoning = `${state.reasoning}\n${polished}`.trim();
     const md = generateReportMarkdown(state, input);
     state.reportMarkdown = md;
-    emit({ kind: "report", markdown: md, at: nowIso() });
+    yield { kind: "report", markdown: md, at: nowIso() };
 
     state.resultJson = {
       corridorId: state.corridor.id,

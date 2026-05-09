@@ -1,10 +1,10 @@
-import { ACTORS_BY_CURRENCY, ISSUERS_BY_CURRENCY, rankActors } from "./_currency-meta.js";
-import { type Phase, type PhaseContext, type PhaseEmit, nowIso } from "./types.js";
+import { ACTORS_BY_CURRENCY, ISSUERS_BY_CURRENCY, rankActors } from "../../data/currency-meta.js";
+import { type Phase, type PhaseContext, type SafePathEvent, nowIso } from "./types.js";
 
 export class CorridorResolutionPhase implements Phase {
   readonly name = "corridor-resolution" as const;
 
-  async run(ctx: PhaseContext, emit: PhaseEmit): Promise<void> {
+  async *run(ctx: PhaseContext): AsyncGenerator<SafePathEvent> {
     const { input, state, deps } = ctx;
     const corridorId = `${input.srcCcy.toLowerCase()}-${input.dstCcy.toLowerCase()}`;
 
@@ -14,25 +14,41 @@ export class CorridorResolutionPhase implements Phase {
     state.dstActors = ACTORS_BY_CURRENCY[input.dstCcy] ?? [];
     state.isOnChain = state.srcIssuers.length > 0 && state.dstIssuers.length > 0;
 
-    emit({
+    yield {
       kind: "step",
       step: "corridor_resolution",
       detail: `Looking up ${input.srcCcy} → ${input.dstCcy} in the corridor atlas`,
       at: nowIso(),
-    });
-    emit({
+    };
+    yield {
       kind: "tool-call",
       name: "corridorLookup",
       args: { corridorId },
       at: nowIso(),
-    });
+    };
 
-    type CorridorDetail = { id: string; label: string; status: string; category?: string };
-    let detail: CorridorDetail | null = null;
+    let detail: { id: string; label: string; status: string; category?: string } | null = null;
     try {
       const found = await deps.corridor.getById(corridorId);
       if (found && typeof found === "object") {
-        detail = found as CorridorDetail;
+        const r = found as {
+          id?: unknown;
+          label?: unknown;
+          status?: unknown;
+          category?: unknown;
+        };
+        if (
+          typeof r.id === "string" &&
+          typeof r.label === "string" &&
+          typeof r.status === "string"
+        ) {
+          detail = {
+            id: r.id,
+            label: r.label,
+            status: r.status,
+            category: typeof r.category === "string" ? r.category : undefined,
+          };
+        }
       }
     } catch {
       // Non-fatal: corridor service unreachable. Fall back to no-corridor mode.
@@ -45,37 +61,37 @@ export class CorridorResolutionPhase implements Phase {
       state.corridor.category = detail.category ?? null;
       state.corridor.bridgeAsset = detail.category === "off-chain-bridge" ? "RLUSD" : null;
 
-      emit({
+      yield {
         kind: "corridor-context",
         corridorId: detail.id,
         label: detail.label,
         status: detail.status,
         at: nowIso(),
-      });
+      };
 
       const odlCount = [...state.srcActors, ...state.dstActors].filter((a) => a.odl).length;
       const rlusdCount = [...state.srcActors, ...state.dstActors].filter(
         (a) => a.supportsRlusd,
       ).length;
-      emit({
+      yield {
         kind: "tool-result",
         name: "corridorLookup",
         summary: `${corridorId}: ${detail.category ?? "n/a"}, ${state.srcActors.length} src + ${state.dstActors.length} dst actors, ${odlCount} ODL, ${rlusdCount} RLUSD.`,
         at: nowIso(),
-      });
+      };
     } else {
-      emit({
+      yield {
         kind: "corridor-context",
         corridorId: null,
         label: null,
         status: null,
         at: nowIso(),
-      });
-      emit({
+      };
+      yield {
         kind: "reasoning",
         text: `No corridor found for ${input.srcCcy} → ${input.dstCcy}. Will attempt direct XRPL path_find.`,
         at: nowIso(),
-      });
+      };
     }
 
     if (state.srcActors.length > 0 || state.dstActors.length > 0) {

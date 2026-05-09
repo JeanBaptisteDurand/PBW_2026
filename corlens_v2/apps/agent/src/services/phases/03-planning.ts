@@ -1,10 +1,10 @@
-import { rankActors } from "./_currency-meta.js";
-import { type Phase, type PhaseContext, type PhaseEmit, nowIso } from "./types.js";
+import { rankActors } from "../../data/currency-meta.js";
+import { type Phase, type PhaseContext, type SafePathEvent, errMessage, nowIso } from "./types.js";
 
 export class PlanningPhase implements Phase {
   readonly name = "planning" as const;
 
-  async run(ctx: PhaseContext, emit: PhaseEmit): Promise<void> {
+  async *run(ctx: PhaseContext): AsyncGenerator<SafePathEvent> {
     const { input, state, deps } = ctx;
     const tolerance = input.maxRiskTolerance ?? "MED";
     const corridorCtx = state.corridor.id
@@ -22,12 +22,12 @@ export class PlanningPhase implements Phase {
       ? `\nCorridor intelligence:\n${state.corridorRagAnswer}`
       : "";
 
-    emit({
+    yield {
       kind: "step",
       step: "planning",
       detail: "Drafting routing plan",
       at: nowIso(),
-    });
+    };
 
     try {
       const plan = await deps.ai.complete({
@@ -48,14 +48,14 @@ export class PlanningPhase implements Phase {
       });
       state.plan = plan.content.trim();
       state.reasoning += `${state.plan}\n\n`;
-      emit({ kind: "reasoning", text: state.plan, at: nowIso() });
+      yield { kind: "reasoning", text: state.plan, at: nowIso() };
     } catch (err) {
-      emit({
+      yield {
         kind: "tool-result",
         name: "planning",
-        summary: `Planning AI call failed: ${(err as Error).message}`,
+        summary: `Planning AI call failed: ${errMessage(err)}`,
         at: nowIso(),
-      });
+      };
     }
   }
 }

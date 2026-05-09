@@ -23,6 +23,7 @@ export function createSafePathRunRepo(prisma: Prisma) {
   const db = agentDb(prisma);
   return {
     async create(input: {
+      id?: string;
       userId: string | null;
       srcCcy: string;
       dstCcy: string;
@@ -39,6 +40,7 @@ export function createSafePathRunRepo(prisma: Prisma) {
     }): Promise<SafePathRunRow> {
       return db.safePathRun.create({
         data: {
+          ...(input.id ? { id: input.id } : {}),
           userId: input.userId,
           srcCcy: input.srcCcy,
           dstCcy: input.dstCcy,

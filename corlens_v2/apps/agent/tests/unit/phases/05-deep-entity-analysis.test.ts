@@ -1,7 +1,7 @@
 import { describe, expect, it, type vi } from "vitest";
+import { ISSUERS_BY_CURRENCY } from "../../../src/data/currency-meta.js";
 import { DeepEntityAnalysisPhase } from "../../../src/services/phases/05-deep-entity-analysis.js";
-import { ISSUERS_BY_CURRENCY } from "../../../src/services/phases/_currency-meta.js";
-import { captureEmit, makeCtx, makeMockDeps } from "./_helpers.js";
+import { collectEvents, makeCtx, makeMockDeps } from "./_helpers.js";
 
 describe("DeepEntityAnalysisPhase", () => {
   it("emits analysis-started/complete for each target", async () => {
@@ -19,9 +19,8 @@ describe("DeepEntityAnalysisPhase", () => {
     ctx.state.srcIssuers = ISSUERS_BY_CURRENCY.USD ?? [];
     ctx.state.dstIssuers = ISSUERS_BY_CURRENCY.EUR ?? [];
     ctx.state.isOnChain = true;
-    const { emit, events } = captureEmit();
 
-    await new DeepEntityAnalysisPhase().run(ctx, emit);
+    const events = await collectEvents(new DeepEntityAnalysisPhase(), ctx);
 
     expect(events.some((e) => e.kind === "analysis-started")).toBe(true);
     expect(events.some((e) => e.kind === "analysis-complete")).toBe(true);
@@ -34,8 +33,7 @@ describe("DeepEntityAnalysisPhase", () => {
     ctx.state.isOnChain = false;
     ctx.state.srcIssuers = ISSUERS_BY_CURRENCY.USD ?? [];
     ctx.state.dstIssuers = [];
-    const { emit } = captureEmit();
-    await new DeepEntityAnalysisPhase().run(ctx, emit);
+    await collectEvents(new DeepEntityAnalysisPhase(), ctx);
     const calls = (deps.path.analyze as ReturnType<typeof vi.fn>).mock.calls.map(
       (c) => (c[0] as { seedAddress: string }).seedAddress,
     );
@@ -52,8 +50,7 @@ describe("DeepEntityAnalysisPhase", () => {
     ctx.state.srcIssuers = [];
     ctx.state.dstIssuers = [];
     ctx.state.isOnChain = true;
-    const { emit, events } = captureEmit();
-    await new DeepEntityAnalysisPhase().run(ctx, emit);
+    const events = await collectEvents(new DeepEntityAnalysisPhase(), ctx);
     // RLUSD issuer is always added — so we still get at least one analysis
     expect(events.some((e) => e.kind === "analysis-started")).toBe(true);
   });
@@ -65,8 +62,7 @@ describe("DeepEntityAnalysisPhase", () => {
     ctx.state.srcIssuers = ISSUERS_BY_CURRENCY.USD ?? [];
     ctx.state.dstIssuers = [];
     ctx.state.isOnChain = false;
-    const { emit, events } = captureEmit();
-    await new DeepEntityAnalysisPhase().run(ctx, emit);
+    const events = await collectEvents(new DeepEntityAnalysisPhase(), ctx);
     expect(
       events.some((e) => e.kind === "tool-result" && e.summary.includes("Analyze failed")),
     ).toBe(true);

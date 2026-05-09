@@ -98,6 +98,7 @@ export const SafePathEvent = z.discriminatedUnion("kind", [
     results: z.array(z.string()),
     at: z.string().datetime(),
   }),
+  // TODO(D.x): no producer yet — agent will emit once path service exposes a /api/risk-engine/evaluate endpoint or risk-engine is published as a shared package.
   z.object({
     kind: z.literal("account-crawled"),
     address: z.string(),

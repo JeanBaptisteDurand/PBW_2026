@@ -3,7 +3,8 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
 import type { SafePathRunRepo } from "../repositories/safe-path-run.repo.js";
-import type { OrchestratorContext, OrchestratorService } from "../services/orchestrator.service.js";
+import type { OrchestratorService } from "../services/orchestrator.service.js";
+import { errMessage, makeInitialState } from "../services/phases/types.js";
 
 const ErrorResp = z.object({ error: z.string() });
 
@@ -30,24 +31,14 @@ export async function registerSafePathRoutes(
         reply.raw.write(`data: ${JSON.stringify(data)}\n\n`);
       };
 
-      let finalCtx: OrchestratorContext = {
-        corridorId: null,
-        corridorLabel: null,
-        corridorStatus: null,
-        reasoning: "",
-        verdict: "NO_PATHS",
-        riskScore: null,
-        analysisIds: [],
-        reportMarkdown: null,
-        resultJson: {},
-      };
+      let finalState = makeInitialState();
 
       try {
         const gen = orchestrator.run(req.body);
         while (true) {
           const next = await gen.next();
           if (next.done) {
-            finalCtx = next.value;
+            finalState = next.value;
             break;
           }
           send(next.value);
@@ -56,25 +47,26 @@ export async function registerSafePathRoutes(
         send({
           kind: "error",
           phase: null,
-          message: (err as Error).message,
+          message: errMessage(err),
           at: new Date().toISOString(),
         });
       }
 
-      const created = await runs.create({
+      await runs.create({
+        id: finalState.runId,
         userId,
         srcCcy: req.body.srcCcy,
         dstCcy: req.body.dstCcy,
         amount: req.body.amount,
         maxRiskTolerance: req.body.maxRiskTolerance ?? "MED",
-        verdict: finalCtx.verdict,
-        reasoning: finalCtx.reasoning || "(no reasoning)",
-        resultJson: finalCtx.resultJson,
-        reportMarkdown: finalCtx.reportMarkdown,
-        corridorId: finalCtx.corridorId,
-        analysisIds: finalCtx.analysisIds,
+        verdict: finalState.verdict,
+        reasoning: finalState.reasoning || "(no reasoning)",
+        resultJson: finalState.resultJson,
+        reportMarkdown: finalState.reportMarkdown,
+        corridorId: finalState.corridor.id,
+        analysisIds: finalState.analysisIds,
+        riskScore: finalState.riskScore,
       });
-      send({ kind: "result-persisted", runId: created.id, at: new Date().toISOString() });
       reply.raw.write("data: [DONE]\n\n");
       reply.raw.end();
     },

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { createOrchestrator } from "../../src/services/orchestrator.service.js";
+import type { Phase, SafePathEvent } from "../../src/services/phases/types.js";
 
 function makeStubs() {
   const corridor = {
@@ -124,5 +125,33 @@ describe("orchestrator.service", () => {
     }
     // Planning swallowed in v2 (try/catch around AI complete) — orchestrator still completes.
     expect(events.find((e) => e.kind === "result")).toBeDefined();
+  });
+
+  it("aborts when signal fires before a phase starts", async () => {
+    const { corridor, path, ai, marketData } = makeStubs();
+    const controller = new AbortController();
+    controller.abort();
+    const noopPhase: Phase = {
+      name: "planning",
+      async *run() {
+        // never reached
+      },
+    };
+    const orch = createOrchestrator({
+      corridor: corridor as never,
+      path: path as never,
+      ai: ai as never,
+      marketData: marketData as never,
+      timeoutMs: 5000,
+      phases: [noopPhase],
+    });
+    const events: SafePathEvent[] = [];
+    for await (const ev of orch.run(
+      { srcCcy: "USD", dstCcy: "EUR", amount: "100" },
+      controller.signal,
+    )) {
+      events.push(ev);
+    }
+    expect(events.some((e) => e.kind === "error" && e.message === "aborted")).toBe(true);
   });
 });

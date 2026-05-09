@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { ACTORS_BY_CURRENCY } from "../../../src/data/currency-meta.js";
 import { OffChainBridgePhase } from "../../../src/services/phases/07-off-chain-bridge.js";
-import { ACTORS_BY_CURRENCY } from "../../../src/services/phases/_currency-meta.js";
-import { captureEmit, makeCtx } from "./_helpers.js";
+import { collectEvents, makeCtx } from "./_helpers.js";
 
 describe("OffChainBridgePhase", () => {
   it("emits reasoning + tool-result when no on-chain paths", async () => {
@@ -10,8 +10,7 @@ describe("OffChainBridgePhase", () => {
     ctx.state.corridor.id = "usd-mxn";
     ctx.state.srcActors = ACTORS_BY_CURRENCY.USD ?? [];
     ctx.state.dstActors = ACTORS_BY_CURRENCY.MXN ?? [];
-    const { emit, events } = captureEmit();
-    await new OffChainBridgePhase().run(ctx, emit);
+    const events = await collectEvents(new OffChainBridgePhase(), ctx);
 
     expect(events.find((e) => e.kind === "reasoning")).toBeDefined();
     expect(events.find((e) => e.kind === "tool-result")).toBeDefined();
@@ -22,8 +21,7 @@ describe("OffChainBridgePhase", () => {
     const ctx = makeCtx();
     ctx.state.isOnChain = true;
     ctx.state.paths = [{ x: 1 }];
-    const { emit, events } = captureEmit();
-    await new OffChainBridgePhase().run(ctx, emit);
+    const events = await collectEvents(new OffChainBridgePhase(), ctx);
     expect(events.length).toBe(0);
   });
 
@@ -31,8 +29,7 @@ describe("OffChainBridgePhase", () => {
     const ctx = makeCtx({ srcCcy: "ZZZ", dstCcy: "AAA" });
     ctx.state.isOnChain = false;
     ctx.state.corridor.id = "zzz-aaa";
-    const { emit, events } = captureEmit();
-    await new OffChainBridgePhase().run(ctx, emit);
+    const events = await collectEvents(new OffChainBridgePhase(), ctx);
     const tr = events.find((e) => e.kind === "tool-result" && e.name === "classifyOffChainBridge");
     expect(tr).toBeDefined();
     expect(tr?.kind === "tool-result" && tr.summary.includes("RED")).toBe(true);
