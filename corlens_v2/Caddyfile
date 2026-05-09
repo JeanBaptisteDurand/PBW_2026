@@ -115,7 +115,15 @@
         import jwt_required
         reverse_proxy agent:3006
     }
+    handle /api/compliance/verify {
+        reverse_proxy agent:3006
+    }
+    handle /api/compliance/*/pdf {
+        import jwt_required
+        reverse_proxy agent:3006
+    }
     handle /api/compliance/* {
+        import jwt_required
         reverse_proxy agent:3006
     }
     handle /api/chat {

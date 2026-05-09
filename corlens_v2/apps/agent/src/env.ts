@@ -9,6 +9,7 @@ const Schema = z.object({
   PATH_BASE_URL: z.string().url(),
   MARKET_DATA_BASE_URL: z.string().url(),
   AI_SERVICE_BASE_URL: z.string().url(),
+  IDENTITY_BASE_URL: z.string().url().default("http://identity:3001"),
   INTERNAL_HMAC_SECRET: z.string().min(32),
   MAX_PHASE_TIMEOUT_MS: z.coerce.number().int().min(5000).max(180000).default(60000),
   RAG_TOP_K: z.coerce.number().int().min(1).max(20).default(5),

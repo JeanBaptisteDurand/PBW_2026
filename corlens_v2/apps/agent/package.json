@@ -13,6 +13,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@corlens/clients": "workspace:*",
     "@corlens/contracts": "workspace:*",
     "@corlens/db": "workspace:*",
     "@corlens/env": "workspace:*",

@@ -209,6 +209,16 @@ export const ComplianceResponse = z.object({
 });
 export type ComplianceResponse = z.infer<typeof ComplianceResponse>;
 
+export const ComplianceVerifyResponse = z.object({
+  valid: z.literal(true),
+  runId: z.string().uuid(),
+  generatedAt: z.string().datetime(),
+  verdict: Verdict,
+  srcCcy: Currency,
+  dstCcy: Currency,
+});
+export type ComplianceVerifyResponse = z.infer<typeof ComplianceVerifyResponse>;
+
 export const ChatRequest = z.object({
   analysisId: z.string().uuid().optional(),
   message: z.string().min(1).max(2000),

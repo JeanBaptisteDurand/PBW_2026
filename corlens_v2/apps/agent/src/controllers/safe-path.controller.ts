@@ -2,17 +2,26 @@ import { agent as ag } from "@corlens/contracts";
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
-import type { SafePathRunRepo } from "../repositories/safe-path-run.repo.js";
+import type { SafePathRunRepo, SafePathRunRow } from "../repositories/safe-path-run.repo.js";
+import type { ComplianceDataService } from "../services/compliance-data.service.js";
 import type { OrchestratorService } from "../services/orchestrator.service.js";
+import type { PdfRendererService } from "../services/pdf-renderer.service.js";
 import { errMessage, makeInitialState } from "../services/phases/types.js";
 
 const ErrorResp = z.object({ error: z.string() });
 
+export type SafePathRouteDeps = {
+  orchestrator: OrchestratorService;
+  runs: SafePathRunRepo;
+  complianceData: ComplianceDataService;
+  pdfRenderer: PdfRendererService;
+};
+
 export async function registerSafePathRoutes(
   app: FastifyInstance,
-  orchestrator: OrchestratorService,
-  runs: SafePathRunRepo,
+  deps: SafePathRouteDeps,
 ): Promise<void> {
+  const { orchestrator, runs, complianceData, pdfRenderer } = deps;
   const typed = app.withTypeProvider<ZodTypeProvider>();
 
   typed.post(
@@ -52,6 +61,25 @@ export async function registerSafePathRoutes(
         });
       }
 
+      const synthetic: SafePathRunRow = {
+        id: finalState.runId,
+        userId,
+        srcCcy: req.body.srcCcy,
+        dstCcy: req.body.dstCcy,
+        amount: req.body.amount,
+        maxRiskTolerance: req.body.maxRiskTolerance ?? "MED",
+        verdict: finalState.verdict,
+        reasoning: finalState.reasoning || "(no reasoning)",
+        resultJson: finalState.resultJson,
+        reportMarkdown: finalState.reportMarkdown,
+        corridorId: finalState.corridor.id,
+        analysisIds: finalState.analysisIds,
+        riskScore: finalState.riskScore,
+        auditHash: null,
+        createdAt: new Date(),
+      };
+      const auditHash = pdfRenderer.computeAuditHash(complianceData.buildComplianceData(synthetic));
+
       await runs.create({
         id: finalState.runId,
         userId,
@@ -66,6 +94,7 @@ export async function registerSafePathRoutes(
         corridorId: finalState.corridor.id,
         analysisIds: finalState.analysisIds,
         riskScore: finalState.riskScore,
+        auditHash,
       });
       reply.raw.write("data: [DONE]\n\n");
       reply.raw.end();

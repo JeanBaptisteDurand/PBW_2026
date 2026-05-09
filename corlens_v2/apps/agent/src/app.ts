@@ -9,16 +9,28 @@ import { createCorridorClient } from "./connectors/corridor.js";
 import { createMarketDataClient } from "./connectors/market-data.js";
 import { createPathClient } from "./connectors/path.js";
 import { registerChatRoutes } from "./controllers/chat.controller.js";
+import { registerCompliancePdfRoutes } from "./controllers/compliance-pdf.controller.js";
+import { registerComplianceVerifyRoutes } from "./controllers/compliance-verify.controller.js";
 import { registerComplianceRoutes } from "./controllers/compliance.controller.js";
 import { registerSafePathRoutes } from "./controllers/safe-path.controller.js";
 import type { AgentEnv } from "./env.js";
+import { createRequirePremiumPreHandler } from "./middleware/require-premium.js";
 import { registerErrorHandler } from "./plugins/error-handler.js";
 import { prismaPlugin } from "./plugins/prisma.js";
 import { registerSwagger } from "./plugins/swagger.js";
 import { createSafePathRunRepo } from "./repositories/safe-path-run.repo.js";
+import { createComplianceDataService } from "./services/compliance-data.service.js";
 import { createOrchestrator } from "./services/orchestrator.service.js";
+import { createPdfRendererService } from "./services/pdf-renderer.service.js";
 
-export async function buildApp(env: AgentEnv): Promise<FastifyInstance> {
+export type BuildAppOptions = {
+  fetch?: typeof fetch;
+};
+
+export async function buildApp(
+  env: AgentEnv,
+  options: BuildAppOptions = {},
+): Promise<FastifyInstance> {
   const app = Fastify({
     logger: { level: process.env.LOG_LEVEL ?? "info" },
   }).withTypeProvider<ZodTypeProvider>();
@@ -35,6 +47,8 @@ export async function buildApp(env: AgentEnv): Promise<FastifyInstance> {
   const marketData = createMarketDataClient({ baseUrl: env.MARKET_DATA_BASE_URL });
 
   const runs = createSafePathRunRepo(app.prisma);
+  const complianceData = createComplianceDataService();
+  const pdfRenderer = createPdfRendererService();
   const orchestrator = createOrchestrator({
     corridor,
     path,
@@ -43,8 +57,16 @@ export async function buildApp(env: AgentEnv): Promise<FastifyInstance> {
     timeoutMs: env.MAX_PHASE_TIMEOUT_MS,
   });
 
-  await registerSafePathRoutes(app, orchestrator, runs);
+  const requirePremium = createRequirePremiumPreHandler({
+    identityBaseUrl: env.IDENTITY_BASE_URL,
+    hmacSecret: env.INTERNAL_HMAC_SECRET,
+    fetch: options.fetch,
+  });
+
+  await registerSafePathRoutes(app, { orchestrator, runs, complianceData, pdfRenderer });
   await registerComplianceRoutes(app, runs);
+  await registerComplianceVerifyRoutes(app, runs);
+  await registerCompliancePdfRoutes(app, { runs, complianceData, pdfRenderer, requirePremium });
   await registerChatRoutes(app, path, corridor);
 
   app.get("/health", { schema: { hide: true } }, async () => ({ status: "ok", service: "agent" }));

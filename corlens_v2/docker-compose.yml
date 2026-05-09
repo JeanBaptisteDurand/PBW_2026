@@ -216,7 +216,8 @@ services:
       PATH_BASE_URL: http://path:3005
       MARKET_DATA_BASE_URL: http://market-data:3002
       AI_SERVICE_BASE_URL: http://ai-service:3003
-      INTERNAL_HMAC_SECRET: ${INTERNAL_HMAC_SECRET:-dev-secret-must-be-at-least-32-chars-long}
+      IDENTITY_BASE_URL: http://identity:3001
+      INTERNAL_HMAC_SECRET: ${INTERNAL_HMAC_SECRET:-dev-internal-hmac-secret-do-not-use-in-prod-aaaaaaa}
       MAX_PHASE_TIMEOUT_MS: "60000"
       RAG_TOP_K: "5"
     ports:
