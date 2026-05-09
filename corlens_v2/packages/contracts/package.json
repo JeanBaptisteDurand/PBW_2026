@@ -25,6 +25,10 @@
     "./dist/path.js": {
       "types": "./dist/path.d.ts",
       "default": "./dist/path.js"
+    },
+    "./dist/agent.js": {
+      "types": "./dist/agent.d.ts",
+      "default": "./dist/agent.js"
     }
   },
   "scripts": {
