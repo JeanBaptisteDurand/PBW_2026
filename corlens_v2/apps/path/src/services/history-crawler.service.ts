@@ -1,14 +1,4 @@
-// Lightweight crawler tailored to the /history page. Issues only the 5 RPCs
-// the history page actually consumes (account_info, account_tx, trust_lines,
-// book_offers asks, book_offers bids), in parallel via Promise.allSettled,
-// and returns a CrawlResult-shaped object so the orchestrator does not need
-// to branch. Ported from v1 corlens/apps/server/src/analysis/historyCrawler.ts.
-//
-// v2 simplification vs. v1: the marketData connector does not expose the
-// `sinceUnixTime` / `apiVersion` knobs of fetchAccountTransactions, so the
-// light crawler ignores those (uses `limit: 200`). The history page never
-// relies on them — date filtering happens upstream in the orchestrator's seed
-// fetch via `ledgerIndexMin`.
+// Lightweight history crawl: 5 parallel RPCs, returns CrawlResult shape.
 
 import type { MarketDataClient } from "../connectors/market-data.js";
 import type { CrawlResult } from "../domain/types.js";
@@ -38,9 +28,8 @@ export function createHistoryCrawlerService(opts: HistoryCrawlerServiceOptions) 
           md.trustLines(seedAddress, { limit: TRUSTLINE_LIGHT_CAP }) as Promise<{
             lines?: unknown[];
           }>,
-          // book_offers with XRP on one side — cheap and good enough to
-          // surface the top ask/bid makers for an issuer. If the account is
-          // not an issuer the call still succeeds with an empty offers array.
+          // book_offers with XRP on one side — cheap and good enough to surface
+          // the top ask/bid makers for an issuer. Non-issuers just get empty.
           md.bookOffers({
             takerGetsCurrency: "XRP",
             takerPaysCurrency: "USD",
@@ -67,22 +56,19 @@ export function createHistoryCrawlerService(opts: HistoryCrawlerServiceOptions) 
       const asks = asksResult.status === "fulfilled" ? (asksResult.value.result?.offers ?? []) : [];
       const bids = bidsResult.status === "fulfilled" ? (bidsResult.value.result?.offers ?? []) : [];
 
-      // Produce a CrawlResult-compatible shape. Everything the history page
-      // does not consume defaults to empty so the orchestrator (and any
-      // accidental reuse) sees a valid object.
       return {
         issuerInfo,
-        trustLines: trustLines as unknown[],
+        trustLines,
         gatewayBalances: { obligations: {} },
         ammPool: null,
         lpHolders: [],
-        asks: asks as unknown[],
-        bids: bids as unknown[],
+        asks,
+        bids,
         paths: [],
         accountObjects: [],
         currencies: null,
         topAccounts: new Map(),
-        accountTransactions: accountTransactions as unknown[],
+        accountTransactions,
         nfts: [],
         channels: [],
         txTypeSummary: [],

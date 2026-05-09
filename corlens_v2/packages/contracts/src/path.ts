@@ -208,10 +208,13 @@ export const HistoryEvent = z.discriminatedUnion("type", [
 ]);
 export type HistoryEvent = z.infer<typeof HistoryEvent>;
 
+// `sinceDays` is intentionally absent: the v2 marketData connector has no
+// `sinceUnixTime` knob, so the orchestrator cannot honor a time-based cutoff.
+// `maxTx` + BFS depth bound the work instead. Re-add only if/when the
+// connector exposes a unix-time argument.
 export const HistoryStreamQuery = z.object({
   address: XrplAddress,
   depth: z.coerce.number().int().min(1).max(3).default(2),
   maxTx: z.coerce.number().int().min(1).max(500).default(200),
-  sinceDays: z.coerce.number().int().min(1).max(90).default(30),
 });
 export type HistoryStreamQuery = z.infer<typeof HistoryStreamQuery>;

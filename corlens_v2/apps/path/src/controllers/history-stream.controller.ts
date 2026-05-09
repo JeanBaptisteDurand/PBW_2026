@@ -43,13 +43,12 @@ export async function registerHistoryStreamRoutes(
         if (!res.writableEnded) res.write(`data: ${JSON.stringify(ev)}\n\n`);
       };
 
-      const { address, depth, maxTx, sinceDays } = req.query;
+      const { address, depth, maxTx } = req.query;
 
       try {
         for await (const ev of history.stream(address, {
           depth,
           maxTx,
-          sinceDays,
           signal: controller.signal,
         })) {
           if (controller.signal.aborted) break;
