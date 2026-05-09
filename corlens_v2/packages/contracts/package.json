@@ -13,6 +13,10 @@
     "./dist/market-data.js": {
       "types": "./dist/market-data.d.ts",
       "default": "./dist/market-data.js"
+    },
+    "./dist/ai.js": {
+      "types": "./dist/ai.d.ts",
+      "default": "./dist/ai.js"
     }
   },
   "scripts": {
