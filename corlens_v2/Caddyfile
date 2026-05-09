@@ -88,25 +88,17 @@
     }
 
     # ─── path (Step 7) — entity audit ──────────────────────────────
-    handle_path /api/analyze* {
-        respond `{"error":"not_implemented","service":"path","step":7}` 503 {
-            close
-        }
+    handle /api/analyze {
+        reverse_proxy path:3005
     }
-    handle_path /api/analysis/* {
-        respond `{"error":"not_implemented","service":"path","step":7}` 503 {
-            close
-        }
+    handle /api/analyze/* {
+        reverse_proxy path:3005
     }
-    handle_path /api/graph/* {
-        respond `{"error":"not_implemented","service":"path","step":7}` 503 {
-            close
-        }
+    handle /api/analysis/* {
+        reverse_proxy path:3005
     }
-    handle_path /api/history/* {
-        respond `{"error":"not_implemented","service":"path","step":7}` 503 {
-            close
-        }
+    handle /api/history/* {
+        reverse_proxy path:3005
     }
 
     # ─── agent (Step 8) — Safe Path orchestrator + reports ─────────
