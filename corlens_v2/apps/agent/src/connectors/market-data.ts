@@ -1,3 +1,5 @@
+import { hmacSigner } from "@corlens/clients";
+
 export type PartnerDepthSummary = {
   actor: string;
   book: string;
@@ -24,23 +26,26 @@ export type MarketDataClient = {
 
 export type MarketDataClientOptions = {
   baseUrl: string;
+  hmacSecret: string;
   fetch?: typeof fetch;
 };
 
 export function createMarketDataClient(opts: MarketDataClientOptions): MarketDataClient {
   const f = opts.fetch ?? fetch;
+  const sign = hmacSigner({ secret: opts.hmacSecret });
 
   async function getJson<T>(p: string): Promise<T> {
-    const res = await f(`${opts.baseUrl}${p}`);
+    const res = await f(`${opts.baseUrl}${p}`, { headers: sign("") });
     if (!res.ok) throw new Error(`market-data ${p} -> ${res.status}`);
     return res.json() as Promise<T>;
   }
 
   async function postJson<T>(p: string, body: unknown): Promise<T> {
+    const bodyStr = JSON.stringify(body);
     const res = await f(`${opts.baseUrl}${p}`, {
       method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(body),
+      headers: { "content-type": "application/json", ...sign(bodyStr) },
+      body: bodyStr,
     });
     if (!res.ok) throw new Error(`market-data ${p} -> ${res.status}`);
     return res.json() as Promise<T>;

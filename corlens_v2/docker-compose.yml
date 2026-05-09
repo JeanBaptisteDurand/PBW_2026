@@ -150,7 +150,7 @@ services:
       REDIS_URL: redis://redis:6379
       MARKET_DATA_BASE_URL: http://market-data:3002
       AI_SERVICE_BASE_URL: http://ai-service:3003
-      INTERNAL_HMAC_SECRET: ${INTERNAL_HMAC_SECRET:-dev-secret-must-be-at-least-32-chars-long}
+      INTERNAL_HMAC_SECRET: ${INTERNAL_HMAC_SECRET:-dev-internal-hmac-secret-do-not-use-in-prod-aaaaaaa}
       SCAN_CONCURRENCY: "4"
       SCAN_TIMEOUT_MS: "20000"
       REFRESH_CRON: "0 * * * *"
@@ -182,7 +182,7 @@ services:
       REDIS_URL: redis://redis:6379
       MARKET_DATA_BASE_URL: http://market-data:3002
       AI_SERVICE_BASE_URL: http://ai-service:3003
-      INTERNAL_HMAC_SECRET: ${INTERNAL_HMAC_SECRET:-dev-secret-must-be-at-least-32-chars-long}
+      INTERNAL_HMAC_SECRET: ${INTERNAL_HMAC_SECRET:-dev-internal-hmac-secret-do-not-use-in-prod-aaaaaaa}
       BFS_CONCURRENCY: "4"
       BFS_MAX_NODES: "800"
       BFS_TIMEOUT_MS: "45000"

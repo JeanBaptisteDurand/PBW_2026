@@ -41,8 +41,14 @@ export async function buildApp(env: CorridorEnv): Promise<FastifyInstance> {
   await app.register(redisPlugin, { url: env.REDIS_URL });
   await registerSwagger(app);
 
-  const marketData = createMarketDataClient({ baseUrl: env.MARKET_DATA_BASE_URL });
-  const ai = createAIServiceClient({ baseUrl: env.AI_SERVICE_BASE_URL });
+  const marketData = createMarketDataClient({
+    baseUrl: env.MARKET_DATA_BASE_URL,
+    hmacSecret: env.INTERNAL_HMAC_SECRET,
+  });
+  const ai = createAIServiceClient({
+    baseUrl: env.AI_SERVICE_BASE_URL,
+    hmacSecret: env.INTERNAL_HMAC_SECRET,
+  });
 
   const corridors = createCorridorRepo(app.prisma);
   const events = createStatusEventRepo(app.prisma);

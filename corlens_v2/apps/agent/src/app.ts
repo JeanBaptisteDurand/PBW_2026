@@ -41,10 +41,22 @@ export async function buildApp(
   await app.register(prismaPlugin, { databaseUrl: env.DATABASE_URL });
   await registerSwagger(app);
 
-  const corridor = createCorridorClient({ baseUrl: env.CORRIDOR_BASE_URL });
-  const path = createPathClient({ baseUrl: env.PATH_BASE_URL });
-  const ai = createAIServiceClient({ baseUrl: env.AI_SERVICE_BASE_URL });
-  const marketData = createMarketDataClient({ baseUrl: env.MARKET_DATA_BASE_URL });
+  const corridor = createCorridorClient({
+    baseUrl: env.CORRIDOR_BASE_URL,
+    hmacSecret: env.INTERNAL_HMAC_SECRET,
+  });
+  const path = createPathClient({
+    baseUrl: env.PATH_BASE_URL,
+    hmacSecret: env.INTERNAL_HMAC_SECRET,
+  });
+  const ai = createAIServiceClient({
+    baseUrl: env.AI_SERVICE_BASE_URL,
+    hmacSecret: env.INTERNAL_HMAC_SECRET,
+  });
+  const marketData = createMarketDataClient({
+    baseUrl: env.MARKET_DATA_BASE_URL,
+    hmacSecret: env.INTERNAL_HMAC_SECRET,
+  });
 
   const runs = createSafePathRunRepo(app.prisma);
   const complianceData = createComplianceDataService();
