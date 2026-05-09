@@ -38,9 +38,7 @@ export type NodeKind =
   | "bridge"
   | "vault";
 
-// GraphNode matches v1 GraphNode exactly: id, kind, label, data, riskFlags.
-// importance/isHub are BFS metadata set by the orchestrator at depth >= 2;
-// optional so depth-1 callers and graph-builder consumers stay unaffected.
+// Optional BFS metadata; depth-1 callers may leave them unset.
 export type GraphNode = {
   id: string;
   kind: NodeKind;

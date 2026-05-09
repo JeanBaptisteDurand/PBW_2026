@@ -835,7 +835,10 @@ export function buildGraph(crawl: CrawlResult, seedAddress: string, seedLabel?: 
     edges.push(makeEdge(issuerId, vaultId, "HAS_VAULT", "has vault"));
   }
 
-  // ── Build stats (single pass) ────────────────────────────────────────────
+  return { nodes, edges, stats: computeGraphStats(nodes, edges) };
+}
+
+export function computeGraphStats(nodes: GraphNode[], edges: GraphEdge[]): GraphStats {
   const nodesByKind: Record<NodeKind, number> = {
     token: 0,
     issuer: 0,
@@ -867,7 +870,7 @@ export function buildGraph(crawl: CrawlResult, seedAddress: string, seedLabel?: 
 
   for (const node of nodes) {
     nodesByKind[node.kind]++;
-    for (const flag of node.riskFlags) {
+    for (const flag of node.riskFlags ?? []) {
       totalRiskFlags++;
       if (flag.severity === "HIGH") highRiskCount++;
       else if (flag.severity === "MED") medRiskCount++;
@@ -875,7 +878,7 @@ export function buildGraph(crawl: CrawlResult, seedAddress: string, seedLabel?: 
     }
   }
 
-  const stats: GraphStats = {
+  return {
     totalNodes: nodes.length,
     totalEdges: edges.length,
     totalRiskFlags,
@@ -884,6 +887,4 @@ export function buildGraph(crawl: CrawlResult, seedAddress: string, seedLabel?: 
     lowRiskCount,
     nodesByKind,
   };
-
-  return { nodes, edges, stats };
 }

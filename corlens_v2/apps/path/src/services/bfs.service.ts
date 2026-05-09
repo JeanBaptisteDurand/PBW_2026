@@ -10,7 +10,8 @@
 // trims secondary nodes from farthest hubs first to keep the merged output
 // under maxNodes.
 
-import { buildGraph } from "../domain/graph-builder.js";
+import { buildGraph, computeGraphStats } from "../domain/graph-builder.js";
+import { enforceMaxNodes, reparentSubGraph } from "../domain/graph-merge.js";
 import { computeRiskFlags } from "../domain/risk-engine.js";
 import type {
   CrawlResult,
@@ -91,114 +92,6 @@ function markImportance(nodes: GraphNode[], defaultImportance: "primary" | "seco
   }
 }
 
-function reparentSubGraph(
-  sub: GraphData,
-  hubAddress: string,
-  merged: Map<string, GraphNode>,
-  mergedEdges: Map<string, GraphEdge>,
-  isRealIssuer: boolean,
-): { anchorId: string } {
-  const subIssuerId = `issuer:${hubAddress}`;
-  const ammId = `ammPool:${hubAddress}`;
-  const acctId = `account:${hubAddress}`;
-  let anchorId: string;
-  if (merged.has(ammId)) {
-    anchorId = ammId;
-  } else if (isRealIssuer) {
-    anchorId = subIssuerId;
-  } else if (merged.has(acctId)) {
-    anchorId = acctId;
-  } else {
-    anchorId = acctId;
-    merged.set(acctId, {
-      id: acctId,
-      kind: "account",
-      label: hubAddress.slice(0, 8),
-      data: { address: hubAddress },
-      riskFlags: [],
-      isHub: true,
-    });
-  }
-
-  const subNodes = isRealIssuer ? sub.nodes : sub.nodes.filter((n) => n.id !== subIssuerId);
-
-  for (const n of subNodes) {
-    const existing = merged.get(n.id);
-    if (!existing) {
-      merged.set(n.id, n);
-    } else if (n.riskFlags?.length) {
-      const seen = new Set(existing.riskFlags.map((f) => f.flag));
-      for (const f of n.riskFlags) {
-        if (!seen.has(f.flag)) existing.riskFlags.push(f);
-      }
-    }
-  }
-
-  for (const e of sub.edges) {
-    const src = e.source === subIssuerId && !isRealIssuer ? anchorId : e.source;
-    const tgt = e.target === subIssuerId && !isRealIssuer ? anchorId : e.target;
-    if (src === tgt) continue;
-    if (!merged.has(src) || !merged.has(tgt)) continue;
-    const id = src === e.source && tgt === e.target ? e.id : `${src}--${e.kind}--${tgt}`;
-    if (!mergedEdges.has(id)) {
-      mergedEdges.set(id, { ...e, id, source: src, target: tgt });
-    }
-  }
-
-  const anchor = merged.get(anchorId);
-  if (anchor) anchor.isHub = true;
-
-  return { anchorId };
-}
-
-function enforceMaxNodes(
-  merged: Map<string, GraphNode>,
-  mergedEdges: Map<string, GraphEdge>,
-  seedAnchorId: string,
-  maxNodes: number,
-): { dropped: number } {
-  if (merged.size <= maxNodes) return { dropped: 0 };
-
-  const adj = new Map<string, Set<string>>();
-  for (const e of mergedEdges.values()) {
-    if (!adj.has(e.source)) adj.set(e.source, new Set());
-    if (!adj.has(e.target)) adj.set(e.target, new Set());
-    adj.get(e.source)?.add(e.target);
-    adj.get(e.target)?.add(e.source);
-  }
-  const dist = new Map<string, number>();
-  const queue: string[] = [seedAnchorId];
-  dist.set(seedAnchorId, 0);
-  while (queue.length) {
-    const cur = queue.shift();
-    if (cur === undefined) break;
-    const d = dist.get(cur) ?? 0;
-    for (const nb of adj.get(cur) ?? []) {
-      if (!dist.has(nb)) {
-        dist.set(nb, d + 1);
-        queue.push(nb);
-      }
-    }
-  }
-
-  const droppable = Array.from(merged.values())
-    .filter((n) => n.importance === "secondary")
-    .sort((a, b) => (dist.get(b.id) ?? 99) - (dist.get(a.id) ?? 99));
-
-  let dropped = 0;
-  for (const n of droppable) {
-    if (merged.size <= maxNodes) break;
-    merged.delete(n.id);
-    dropped++;
-  }
-  for (const [id, e] of mergedEdges) {
-    if (!merged.has(e.source) || !merged.has(e.target)) {
-      mergedEdges.delete(id);
-    }
-  }
-  return { dropped };
-}
-
 function computeContractStats(
   nodes: GraphNode[],
   edges: GraphEdge[],
@@ -214,59 +107,10 @@ function computeContractStats(
   return { nodeCount: nodes.length, edgeCount: edges.length, riskCounts };
 }
 
-function rebuildStats(nodes: GraphNode[], edges: GraphEdge[]): GraphData["stats"] {
-  const nodesByKind = {
-    token: 0,
-    issuer: 0,
-    ammPool: 0,
-    orderBook: 0,
-    account: 0,
-    paymentPath: 0,
-    escrow: 0,
-    check: 0,
-    payChannel: 0,
-    nft: 0,
-    nftOffer: 0,
-    signerList: 0,
-    did: 0,
-    credential: 0,
-    mpToken: 0,
-    oracle: 0,
-    depositPreauth: 0,
-    offer: 0,
-    permissionedDomain: 0,
-    ticket: 0,
-    bridge: 0,
-    vault: 0,
-  } as Record<NodeKind, number>;
-  let totalRiskFlags = 0;
-  let highRiskCount = 0;
-  let medRiskCount = 0;
-  let lowRiskCount = 0;
-  for (const n of nodes) {
-    nodesByKind[n.kind] = (nodesByKind[n.kind] ?? 0) + 1;
-    for (const f of n.riskFlags ?? []) {
-      totalRiskFlags++;
-      if (f.severity === "HIGH") highRiskCount++;
-      else if (f.severity === "MED") medRiskCount++;
-      else lowRiskCount++;
-    }
-  }
-  return {
-    totalNodes: nodes.length,
-    totalEdges: edges.length,
-    totalRiskFlags,
-    highRiskCount,
-    medRiskCount,
-    lowRiskCount,
-    nodesByKind,
-  };
-}
-
 export function createBfsService(opts: BfsServiceOptions) {
   return {
     async run(input: BfsRunInput): Promise<BfsRunResult> {
-      const depth = Math.max(1, Math.min(3, input.depth || 1));
+      const depth = input.depth;
       const concurrency = input.concurrency ?? DEFAULTS.concurrency;
       const maxCrawls = input.maxCrawls ?? DEFAULTS.maxCrawls;
       const crawlTimeoutMs = input.crawlTimeoutMs ?? DEFAULTS.crawlTimeoutMs;
@@ -392,7 +236,7 @@ export function createBfsService(opts: BfsServiceOptions) {
 
       const finalNodes = Array.from(merged.values());
       const finalEdges = Array.from(mergedEdges.values());
-      const finalStats = rebuildStats(finalNodes, finalEdges);
+      const finalStats = computeGraphStats(finalNodes, finalEdges);
       const graph: GraphData = { nodes: finalNodes, edges: finalEdges, stats: finalStats };
       const contractStats = computeContractStats(finalNodes, finalEdges, seedFlags);
 

@@ -37,15 +37,15 @@ export function pickHubsFromCrawl(
   };
 
   if (crawl.ammPool?.account) {
-    push(crawl.ammPool.account as string, "amm", "amm_pool", 0);
+    push(crawl.ammPool.account, "amm", "amm_pool", 0);
   }
   const a2 = crawl.ammPool?.amount2;
   if (a2 && typeof a2 === "object" && a2.issuer && a2.issuer !== seedAddress) {
-    push(a2.issuer as string, "issuer", "amm_counter_issuer", 1);
+    push(a2.issuer, "issuer", "amm_counter_issuer", 1);
   }
   const a1 = crawl.ammPool?.amount;
   if (a1 && typeof a1 === "object" && a1.issuer && a1.issuer !== seedAddress) {
-    push(a1.issuer as string, "issuer", "amm_counter_issuer", 1);
+    push(a1.issuer, "issuer", "amm_counter_issuer", 1);
   }
 
   try {
@@ -63,7 +63,7 @@ export function pickHubsFromCrawl(
     .sort((a, b) => Math.abs(Number(b.balance)) - Math.abs(Number(a.balance)))
     .slice(0, 3);
   for (const t of topTrust) {
-    push(t.account as string, "issuer", "top_trustline_holder", 6);
+    push(t.account, "issuer", "top_trustline_holder", 6);
   }
 
   return Array.from(candidates.values())
