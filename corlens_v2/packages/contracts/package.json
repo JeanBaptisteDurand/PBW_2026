@@ -21,6 +21,10 @@
     "./dist/corridor.js": {
       "types": "./dist/corridor.d.ts",
       "default": "./dist/corridor.js"
+    },
+    "./dist/path.js": {
+      "types": "./dist/path.d.ts",
+      "default": "./dist/path.js"
     }
   },
   "scripts": {
