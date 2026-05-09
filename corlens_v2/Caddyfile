@@ -76,9 +76,7 @@
 
     # ─── ai-service (Step 5) — completions, embeddings, web search ─
     handle_path /api/ai/* {
-        respond `{"error":"not_implemented","service":"ai-service","step":5}` 503 {
-            close
-        }
+        reverse_proxy ai-service:3003
     }
 
     # ─── corridor (Step 6) — catalog, scanner, RAG ─────────────────

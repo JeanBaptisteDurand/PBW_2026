@@ -109,6 +109,33 @@ services:
       retries: 5
       start_period: 30s
 
+  ai-service:
+    build:
+      context: .
+      dockerfile: apps/ai-service/Dockerfile
+    container_name: corlens-v2-ai-service
+    restart: unless-stopped
+    environment:
+      PORT: "3003"
+      HOST: "0.0.0.0"
+      DATABASE_URL: postgresql://corlens:corlens_dev@postgres:5432/corlens
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-sk-placeholder-replace-me}
+      TAVILY_API_KEY: ${TAVILY_API_KEY:-}
+      DEFAULT_CHAT_MODEL: gpt-4o-mini
+      DEFAULT_EMBEDDING_MODEL: text-embedding-3-small
+      WEB_SEARCH_CACHE_HOURS: "24"
+    ports:
+      - "3003:3003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://127.0.0.1:3003/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
 volumes:
   pgdata:
   caddy_data:
