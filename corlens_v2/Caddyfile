@@ -102,20 +102,20 @@
     }
 
     # ─── agent (Step 8) — Safe Path orchestrator + reports ─────────
-    handle_path /api/safe-path* {
-        respond `{"error":"not_implemented","service":"agent","step":8}` 503 {
-            close
-        }
+    handle /api/safe-path {
+        import jwt_required
+        reverse_proxy agent:3006
     }
-    handle_path /api/compliance/* {
-        respond `{"error":"not_implemented","service":"agent","step":8}` 503 {
-            close
-        }
+    handle /api/safe-path/* {
+        import jwt_required
+        reverse_proxy agent:3006
     }
-    handle_path /api/chat* {
-        respond `{"error":"not_implemented","service":"agent","step":8}` 503 {
-            close
-        }
+    handle /api/compliance/* {
+        reverse_proxy agent:3006
+    }
+    handle /api/chat {
+        import jwt_required
+        reverse_proxy agent:3006
     }
 
     # ─── Aggregated docs (Step 11+) — Swagger UI fan-out ───────────

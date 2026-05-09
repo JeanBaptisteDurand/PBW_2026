@@ -381,7 +381,7 @@ This is a greenfield rebuild but ~30k LOC of v1 logic must be ported. Doing it a
 5. **ai-service** — port OpenAI usage + the prompt templates. Replace v1's `webSearch` with Brave or Tavily (P0 #2). ✓ Implemented per [`docs/superpowers/plans/2026-05-08-ai-service.md`](../plans/2026-05-08-ai-service.md). Tavily chosen for web search; PromptLog audit + WebSearchCache live in `ai` schema. 18 tests green.
 6. **corridor** — port catalog (move to JSON seed), scanner, RAG. All XRPL calls now go through market-data; all LLM calls go through ai-service. ✓ Implemented per [`docs/superpowers/plans/2026-05-09-corridor-service.md`](../plans/2026-05-09-corridor-service.md). Catalog seeded from JSON; scanner calls market-data; RAG calls ai-service.
 7. **path** — port BFS / graph / risk engine. Split `graphBuilder.ts` per node kind. Same external rerouting. ✓ Implemented per [`docs/superpowers/plans/2026-05-09-path-service.md`](../plans/2026-05-09-path-service.md). BFS depth-1 MVP; 19 risk flags + 21-node graph builder ported from v1; SSE history deferred.
-8. **agent** — port the 9 phases as separate files. The orchestrator becomes a thin loop.
+8. **agent** — port the 9 phases as separate files. The orchestrator becomes a thin loop. ✓ Implemented per [`docs/superpowers/plans/2026-05-09-agent-service.md`](../plans/2026-05-09-agent-service.md). 6-phase MVP orchestrator + compliance markdown; PDF + 9-phase split deferred.
 9. **web** — port the SPA, regenerate API client from `@corlens/contracts`. Keep Crossmark.
 10. **mcp-server** — regenerate tool defs from `@corlens/contracts`.
 11. **Events validation** — migrate `payment.confirmed` end-to-end through the events package as proof.

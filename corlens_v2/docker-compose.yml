@@ -201,6 +201,41 @@ services:
       retries: 5
       start_period: 60s
 
+  agent:
+    build:
+      context: .
+      dockerfile: apps/agent/Dockerfile
+    container_name: corlens-v2-agent
+    restart: unless-stopped
+    environment:
+      PORT: "3006"
+      HOST: "0.0.0.0"
+      DATABASE_URL: postgresql://corlens:corlens_dev@postgres:5432/corlens
+      CORRIDOR_BASE_URL: http://corridor:3004
+      PATH_BASE_URL: http://path:3005
+      MARKET_DATA_BASE_URL: http://market-data:3002
+      AI_SERVICE_BASE_URL: http://ai-service:3003
+      INTERNAL_HMAC_SECRET: ${INTERNAL_HMAC_SECRET:-dev-secret-must-be-at-least-32-chars-long}
+      MAX_PHASE_TIMEOUT_MS: "60000"
+      RAG_TOP_K: "5"
+    ports:
+      - "3006:3006"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      corridor:
+        condition: service_healthy
+      path:
+        condition: service_healthy
+      ai-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://127.0.0.1:3006/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
 volumes:
   pgdata:
   caddy_data:
