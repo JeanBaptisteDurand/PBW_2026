@@ -32,16 +32,15 @@ export const BookOffersQuery = z.object({
 export const PathFindRequest = z.object({
   sourceAccount: XrplAddress,
   destinationAccount: XrplAddress,
-  destinationAmount: z.union([
-    z.string(),
-    Asset.extend({ value: z.string() }),
-  ]),
+  destinationAmount: z.union([z.string(), Asset.extend({ value: z.string() })]),
 });
 
 // ─── Generic envelope ────────────────────────────────────────────
-export const RawXrplResponse = z.object({
-  result: z.unknown(),
-}).passthrough();
+export const RawXrplResponse = z
+  .object({
+    result: z.unknown(),
+  })
+  .passthrough();
 export type RawXrplResponse = z.infer<typeof RawXrplResponse>;
 
 // ─── Partner depth ───────────────────────────────────────────────

@@ -20,7 +20,7 @@ describe("loadCorridorEnv", () => {
 
   it("rejects a missing MARKET_DATA_BASE_URL", () => {
     const partial: Record<string, string | undefined> = { ...valid };
-    delete partial.MARKET_DATA_BASE_URL;
+    partial.MARKET_DATA_BASE_URL = undefined;
     expect(() => loadCorridorEnv(partial)).toThrow(/MARKET_DATA_BASE_URL/);
   });
 });

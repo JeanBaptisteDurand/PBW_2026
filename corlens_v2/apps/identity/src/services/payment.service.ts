@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { EventBus } from "@corlens/events";
-import type { PaymentRepo } from "../repositories/payment.repo.js";
 import type { XrplPaymentClient } from "../connectors/xrpl.js";
+import type { PaymentRepo } from "../repositories/payment.repo.js";
 
 export type PaymentEnv = {
   XRPL_PAYMENT_WALLET_ADDRESS: string;
@@ -46,14 +46,12 @@ export function createPaymentService(opts: PaymentServiceOptions) {
       };
     },
 
-    async checkStatus(input: { paymentId: string }):
-      Promise<
-        | { status: "pending" }
-        | { status: "confirmed"; txHash: string }
-        | { status: "expired" }
-        | { status: "not_found" }
-      >
-    {
+    async checkStatus(input: { paymentId: string }): Promise<
+      | { status: "pending" }
+      | { status: "confirmed"; txHash: string }
+      | { status: "expired" }
+      | { status: "not_found" }
+    > {
       const req = await opts.payments.findById(input.paymentId);
       if (!req) return { status: "not_found" };
       if (req.status === "confirmed") return { status: "confirmed", txHash: req.txHash! };

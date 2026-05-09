@@ -7,7 +7,7 @@ export function hexToAscii(hex: string): string {
   if (!/^[0-9A-F]+$/i.test(hex)) return hex;
   let out = "";
   for (let i = 0; i < hex.length; i += 2) {
-    const code = parseInt(hex.slice(i, i + 2), 16);
+    const code = Number.parseInt(hex.slice(i, i + 2), 16);
     if (code === 0) continue;
     out += String.fromCharCode(code);
   }

@@ -72,11 +72,13 @@ export type WebSearchResponse = z.infer<typeof WebSearchResponse>;
 // ─── Usage rollup ────────────────────────────────────────────────
 export const UsageRollup = z.object({
   since: z.string().datetime(),
-  byPurpose: z.array(z.object({
-    purpose: z.string(),
-    callCount: z.number().int().min(0),
-    tokensIn: z.number().int().min(0),
-    tokensOut: z.number().int().min(0),
-  })),
+  byPurpose: z.array(
+    z.object({
+      purpose: z.string(),
+      callCount: z.number().int().min(0),
+      tokensIn: z.number().int().min(0),
+      tokensOut: z.number().int().min(0),
+    }),
+  ),
 });
 export type UsageRollup = z.infer<typeof UsageRollup>;

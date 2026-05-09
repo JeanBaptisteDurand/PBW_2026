@@ -16,6 +16,8 @@ const Schema = z.object({
 
 export type AgentEnv = z.infer<typeof Schema>;
 
-export function loadAgentEnv(source?: NodeJS.ProcessEnv | Record<string, string | undefined>): AgentEnv {
+export function loadAgentEnv(
+  source?: NodeJS.ProcessEnv | Record<string, string | undefined>,
+): AgentEnv {
   return loadEnv(Schema, source);
 }

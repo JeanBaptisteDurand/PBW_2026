@@ -75,17 +75,13 @@ function amountIssuer(raw: any): string | null {
 }
 
 function pairKey(a: XRPLAsset, b: XRPLAsset): string {
-  const s = (x: XRPLAsset) =>
-    x.currency === "XRP" ? "XRP" : `${x.currency}:${(x as any).issuer}`;
+  const s = (x: XRPLAsset) => (x.currency === "XRP" ? "XRP" : `${x.currency}:${(x as any).issuer}`);
   return [s(a), s(b)].sort().join("|");
 }
 
 // ─── Main Function ────────────────────────────────────────────────────────────
 
-export function classifyCounterparties(
-  seed: string,
-  txs: any[],
-): ClassifierResult {
+export function classifyCounterparties(seed: string, txs: any[]): ClassifierResult {
   const light = new Map<string, LightEntry>();
   const heavy = new Map<string, HeavyEntry>();
   const ammMap = new Map<string, PendingAmmPair>();
@@ -108,12 +104,7 @@ export function classifyCounterparties(
     else heavy.set(addr, { address: addr, kind, txCount: 1 });
   };
 
-  const addEdge = (
-    to: string,
-    txType: string,
-    ledger?: number,
-    date?: string,
-  ) => {
+  const addEdge = (to: string, txType: string, ledger?: number, date?: string) => {
     if (!to || to === seed) return;
     const id = `${seed}->${to}:${txType}`;
     const cur = edgeMap.get(id);

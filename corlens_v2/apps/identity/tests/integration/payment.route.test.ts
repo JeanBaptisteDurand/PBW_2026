@@ -1,5 +1,5 @@
+import { deriveAddress, deriveKeypair, generateSeed, sign as rippleSign } from "ripple-keypairs";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
-import { generateSeed, deriveKeypair, deriveAddress, sign as rippleSign } from "ripple-keypairs";
 import { buildApp } from "../../src/app.js";
 import { loadIdentityEnv } from "../../src/env.js";
 
@@ -27,10 +27,18 @@ function hexFromUtf8(t: string) {
 
 async function loginAndGetToken(app: Awaited<ReturnType<typeof buildApp>>) {
   const { publicKey, privateKey, address } = newWallet();
-  const c = await app.inject({ method: "POST", url: "/api/auth/login/challenge", payload: { walletAddress: address } });
+  const c = await app.inject({
+    method: "POST",
+    url: "/api/auth/login/challenge",
+    payload: { walletAddress: address },
+  });
   const { challenge } = c.json();
   const signature = rippleSign(hexFromUtf8(challenge), privateKey);
-  const v = await app.inject({ method: "POST", url: "/api/auth/login/verify", payload: { walletAddress: address, challenge, signature, publicKey } });
+  const v = await app.inject({
+    method: "POST",
+    url: "/api/auth/login/verify",
+    payload: { walletAddress: address, challenge, signature, publicKey },
+  });
   return { token: v.json().token as string, address };
 }
 
@@ -40,7 +48,9 @@ describe("payment routes", () => {
     app = await buildApp(env);
     app.xrpl.pollIncomingByMemo = vi.fn(async () => null);
   });
-  afterAll(async () => { await app.close(); });
+  afterAll(async () => {
+    await app.close();
+  });
 
   afterEach(async () => {
     await app.prisma.paymentRequest.deleteMany({});
@@ -59,7 +69,11 @@ describe("payment routes", () => {
   });
 
   it("POST /api/payment/create requires a JWT", async () => {
-    const res = await app.inject({ method: "POST", url: "/api/payment/create", payload: { currency: "XRP" } });
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/payment/create",
+      payload: { currency: "XRP" },
+    });
     expect(res.statusCode).toBe(401);
   });
 
@@ -106,7 +120,10 @@ describe("payment routes", () => {
     });
     const { paymentId } = cRes.json();
 
-    app.xrpl.pollIncomingByMemo = vi.fn(async () => ({ txHash: "A".repeat(64), sourceAccount: "rPayer" }));
+    app.xrpl.pollIncomingByMemo = vi.fn(async () => ({
+      txHash: "A".repeat(64),
+      sourceAccount: "rPayer",
+    }));
 
     const sRes = await app.inject({
       method: "GET",

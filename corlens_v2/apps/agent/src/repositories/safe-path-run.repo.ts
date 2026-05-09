@@ -1,5 +1,5 @@
-import { agentDb } from "@corlens/db/agent";
 import type { Prisma } from "@corlens/db";
+import { agentDb } from "@corlens/db/agent";
 
 export type SafePathRunRow = {
   id: string;

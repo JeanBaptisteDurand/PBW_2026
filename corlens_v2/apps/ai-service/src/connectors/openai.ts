@@ -44,7 +44,7 @@ export function createOpenAIClient(opts: OpenAIClientOptions): OpenAIClient {
       if (input.temperature !== undefined) params.temperature = input.temperature;
       if (input.maxTokens !== undefined) params.max_tokens = input.maxTokens;
 
-      const resp = await opts.openai.chat.completions.create(params as never) as {
+      const resp = (await opts.openai.chat.completions.create(params as never)) as {
         choices: Array<{ message: { content: string | null } }>;
         model: string;
         usage?: { prompt_tokens?: number; completion_tokens?: number };
@@ -59,10 +59,10 @@ export function createOpenAIClient(opts: OpenAIClientOptions): OpenAIClient {
     },
 
     async embed(input) {
-      const resp = await opts.openai.embeddings.create({
+      const resp = (await opts.openai.embeddings.create({
         input: input.input,
         model: input.model,
-      } as never) as {
+      } as never)) as {
         data: Array<{ embedding: number[] }>;
         model: string;
         usage?: { prompt_tokens?: number };

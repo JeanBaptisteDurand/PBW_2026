@@ -1,5 +1,5 @@
+import { deriveAddress, deriveKeypair, generateSeed, sign as rippleSign } from "ripple-keypairs";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-import { generateSeed, deriveKeypair, deriveAddress, sign as rippleSign } from "ripple-keypairs";
 import { buildApp } from "../../src/app.js";
 import { loadIdentityEnv } from "../../src/env.js";
 
@@ -28,8 +28,12 @@ function hexFromUtf8(t: string) {
 
 describe("auth routes", () => {
   let app: Awaited<ReturnType<typeof buildApp>>;
-  beforeAll(async () => { app = await buildApp(env); });
-  afterAll(async () => { await app.close(); });
+  beforeAll(async () => {
+    app = await buildApp(env);
+  });
+  afterAll(async () => {
+    await app.close();
+  });
 
   afterEach(async () => {
     await app.prisma.paymentRequest.deleteMany({});
@@ -106,13 +110,25 @@ describe("auth routes", () => {
 
   it("/api/auth/api-key returns 403 for free users", async () => {
     const { publicKey, privateKey, address } = newWallet();
-    const cRes = await app.inject({ method: "POST", url: "/api/auth/login/challenge", payload: { walletAddress: address } });
+    const cRes = await app.inject({
+      method: "POST",
+      url: "/api/auth/login/challenge",
+      payload: { walletAddress: address },
+    });
     const { challenge } = cRes.json();
     const signature = rippleSign(hexFromUtf8(challenge), privateKey);
-    const vRes = await app.inject({ method: "POST", url: "/api/auth/login/verify", payload: { walletAddress: address, challenge, signature, publicKey } });
+    const vRes = await app.inject({
+      method: "POST",
+      url: "/api/auth/login/verify",
+      payload: { walletAddress: address, challenge, signature, publicKey },
+    });
     const token = vRes.json().token as string;
 
-    const res = await app.inject({ method: "POST", url: "/api/auth/api-key", headers: { authorization: `Bearer ${token}` } });
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/auth/api-key",
+      headers: { authorization: `Bearer ${token}` },
+    });
     expect(res.statusCode).toBe(403);
     expect(res.json().error).toBe("premium_required");
   });

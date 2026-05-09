@@ -1,4 +1,4 @@
-import { Queue, Worker, type Job } from "bullmq";
+import { type Job, Queue, Worker } from "bullmq";
 import IORedis from "ioredis";
 import type { AnalysisRepo } from "../repositories/analysis.repo.js";
 import type { GraphRepo } from "../repositories/graph.repo.js";
@@ -8,7 +8,12 @@ import type { RagIndexService } from "../services/rag-index.service.js";
 
 const QUEUE = "path-analysis";
 
-export type AnalysisJobData = { analysisId: string; seedAddress: string; seedLabel: string | null; depth: number };
+export type AnalysisJobData = {
+  analysisId: string;
+  seedAddress: string;
+  seedLabel: string | null;
+  depth: number;
+};
 
 export type AnalysisQueue = {
   enqueue(data: AnalysisJobData): Promise<void>;
@@ -32,34 +37,60 @@ export async function startAnalysisWorker(opts: WorkerOptions): Promise<Analysis
 
   let worker: Worker | null = null;
   if (opts.enabled) {
-    worker = new Worker<AnalysisJobData>(QUEUE, async (job: Job<AnalysisJobData>) => {
-      const { analysisId, seedAddress, seedLabel, depth } = job.data;
-      try {
-        await opts.analyses.setStatus(analysisId, "running", null);
-        const { graph, flags, contractStats, crawlSummary } = await opts.bfs.run({ seedAddress, seedLabel, depth });
-        const seedNode = graph.nodes.find((n) => n.id === seedAddress) ?? graph.nodes[0];
-        await opts.graphs.persist({
-          analysisId,
-          nodes: graph.nodes.map((n) => ({ nodeId: n.id, kind: n.kind, label: n.label, data: n.data })),
-          edges: graph.edges.map((e) => ({ edgeId: e.id, source: e.source, target: e.target, kind: e.kind, label: e.label ?? null, data: e.data ?? null })),
-          riskFlags: flags.map((f) => ({ nodeId: seedNode?.id ?? seedAddress, flag: f.flag, severity: f.severity, detail: f.detail, data: f.data ?? null })),
-        });
+    worker = new Worker<AnalysisJobData>(
+      QUEUE,
+      async (job: Job<AnalysisJobData>) => {
+        const { analysisId, seedAddress, seedLabel, depth } = job.data;
         try {
-          await opts.ragIndex.index({ analysisId, nodes: graph.nodes, flags });
-        } catch {}
-        try {
-          await opts.explanations.generate({ analysisId, nodes: graph.nodes });
-        } catch {}
-        await opts.analyses.setSummary(analysisId, {
-          stats: contractStats,
-          seedAddress: crawlSummary.seedAddress,
-          isIssuer: crawlSummary.isIssuer,
-        });
-      } catch (err) {
-        await opts.analyses.setStatus(analysisId, "error", (err as Error).message);
-        throw err;
-      }
-    }, { connection: conn, concurrency: opts.concurrency });
+          await opts.analyses.setStatus(analysisId, "running", null);
+          const { graph, flags, contractStats, crawlSummary } = await opts.bfs.run({
+            seedAddress,
+            seedLabel,
+            depth,
+          });
+          const seedNode = graph.nodes.find((n) => n.id === seedAddress) ?? graph.nodes[0];
+          await opts.graphs.persist({
+            analysisId,
+            nodes: graph.nodes.map((n) => ({
+              nodeId: n.id,
+              kind: n.kind,
+              label: n.label,
+              data: n.data,
+            })),
+            edges: graph.edges.map((e) => ({
+              edgeId: e.id,
+              source: e.source,
+              target: e.target,
+              kind: e.kind,
+              label: e.label ?? null,
+              data: e.data ?? null,
+            })),
+            riskFlags: flags.map((f) => ({
+              nodeId: seedNode?.id ?? seedAddress,
+              flag: f.flag,
+              severity: f.severity,
+              detail: f.detail,
+              data: f.data ?? null,
+            })),
+          });
+          try {
+            await opts.ragIndex.index({ analysisId, nodes: graph.nodes, flags });
+          } catch {}
+          try {
+            await opts.explanations.generate({ analysisId, nodes: graph.nodes });
+          } catch {}
+          await opts.analyses.setSummary(analysisId, {
+            stats: contractStats,
+            seedAddress: crawlSummary.seedAddress,
+            isIssuer: crawlSummary.isIssuer,
+          });
+        } catch (err) {
+          await opts.analyses.setStatus(analysisId, "error", (err as Error).message);
+          throw err;
+        }
+      },
+      { connection: conn, concurrency: opts.concurrency },
+    );
   }
 
   return {

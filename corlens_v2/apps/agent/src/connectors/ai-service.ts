@@ -1,6 +1,15 @@
 export type AIServiceClient = {
-  complete(input: { purpose: string; messages: Array<{ role: string; content: string }>; model?: string; temperature?: number; maxTokens?: number }): Promise<{ content: string; tokensIn: number; tokensOut: number }>;
-  embed(input: { purpose: string; input: string }): Promise<{ embedding: number[]; tokensIn: number }>;
+  complete(input: {
+    purpose: string;
+    messages: Array<{ role: string; content: string }>;
+    model?: string;
+    temperature?: number;
+    maxTokens?: number;
+  }): Promise<{ content: string; tokensIn: number; tokensOut: number }>;
+  embed(input: { purpose: string; input: string }): Promise<{
+    embedding: number[];
+    tokensIn: number;
+  }>;
 };
 
 export type AIServiceClientOptions = {
@@ -23,7 +32,10 @@ export function createAIServiceClient(opts: AIServiceClientOptions): AIServiceCl
 
   return {
     async complete(input) {
-      const r = await postJson<{ content: string; tokensIn: number; tokensOut: number }>("/completion", input);
+      const r = await postJson<{ content: string; tokensIn: number; tokensOut: number }>(
+        "/completion",
+        input,
+      );
       return { content: r.content, tokensIn: r.tokensIn, tokensOut: r.tokensOut };
     },
     async embed(input) {

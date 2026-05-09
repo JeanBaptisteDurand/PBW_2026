@@ -20,7 +20,7 @@ describe("loadPathEnv", () => {
 
   it("rejects missing AI_SERVICE_BASE_URL", () => {
     const partial: Record<string, string | undefined> = { ...valid };
-    delete partial.AI_SERVICE_BASE_URL;
+    partial.AI_SERVICE_BASE_URL = undefined;
     expect(() => loadPathEnv(partial)).toThrow(/AI_SERVICE_BASE_URL/);
   });
 });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hexToAscii, decodeCurrency, xrpDropsToString } from "../../src/domain/helpers.js";
+import { decodeCurrency, hexToAscii, xrpDropsToString } from "../../src/domain/helpers.js";
 
 describe("helpers", () => {
   it("hexToAscii decodes valid hex", () => {

@@ -1,10 +1,16 @@
 export type CorridorClient = {
   list(query: { tier?: number; limit?: number }): Promise<unknown[]>;
   getById(id: string): Promise<unknown | null>;
-  chat(input: { corridorId?: string; message: string }): Promise<{ answer: string; sources: Array<{ id: string; snippet: string }> }>;
+  chat(input: { corridorId?: string; message: string }): Promise<{
+    answer: string;
+    sources: Array<{ id: string; snippet: string }>;
+  }>;
 };
 
-export function createCorridorClient(opts: { baseUrl: string; fetch?: typeof fetch }): CorridorClient {
+export function createCorridorClient(opts: {
+  baseUrl: string;
+  fetch?: typeof fetch;
+}): CorridorClient {
   const f = opts.fetch ?? fetch;
   return {
     async list(query) {
@@ -30,7 +36,10 @@ export function createCorridorClient(opts: { baseUrl: string; fetch?: typeof fet
         body: JSON.stringify(input),
       });
       if (!res.ok) throw new Error(`corridor chat -> ${res.status}`);
-      return res.json() as Promise<{ answer: string; sources: Array<{ id: string; snippet: string }> }>;
+      return res.json() as Promise<{
+        answer: string;
+        sources: Array<{ id: string; snippet: string }>;
+      }>;
     },
   };
 }

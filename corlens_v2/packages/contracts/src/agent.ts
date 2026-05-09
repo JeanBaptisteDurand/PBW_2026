@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Verdict, RiskTolerance, Currency } from "./shared.js";
+import { Currency, RiskTolerance, Verdict } from "./shared.js";
 
 export const SafePathRequest = z.object({
   srcCcy: Currency,
@@ -21,14 +21,53 @@ export type SafePathPhase = z.infer<typeof SafePathPhase>;
 
 export const SafePathEvent = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("phase-start"), phase: SafePathPhase, at: z.string().datetime() }),
-  z.object({ kind: z.literal("phase-complete"), phase: SafePathPhase, durationMs: z.number().int(), at: z.string().datetime() }),
+  z.object({
+    kind: z.literal("phase-complete"),
+    phase: SafePathPhase,
+    durationMs: z.number().int(),
+    at: z.string().datetime(),
+  }),
   z.object({ kind: z.literal("reasoning"), text: z.string(), at: z.string().datetime() }),
-  z.object({ kind: z.literal("corridor-context"), corridorId: z.string().nullable(), label: z.string().nullable(), status: z.string().nullable(), at: z.string().datetime() }),
-  z.object({ kind: z.literal("path-active"), pathId: z.string(), riskScore: z.number(), cost: z.string().nullable(), at: z.string().datetime() }),
-  z.object({ kind: z.literal("path-rejected"), pathId: z.string(), reason: z.string(), at: z.string().datetime() }),
-  z.object({ kind: z.literal("partner-depth"), actor: z.string(), summary: z.unknown(), at: z.string().datetime() }),
-  z.object({ kind: z.literal("result"), runId: z.string().uuid(), verdict: Verdict, riskScore: z.number().nullable(), reasoning: z.string(), at: z.string().datetime() }),
-  z.object({ kind: z.literal("error"), phase: SafePathPhase.nullable(), message: z.string(), at: z.string().datetime() }),
+  z.object({
+    kind: z.literal("corridor-context"),
+    corridorId: z.string().nullable(),
+    label: z.string().nullable(),
+    status: z.string().nullable(),
+    at: z.string().datetime(),
+  }),
+  z.object({
+    kind: z.literal("path-active"),
+    pathId: z.string(),
+    riskScore: z.number(),
+    cost: z.string().nullable(),
+    at: z.string().datetime(),
+  }),
+  z.object({
+    kind: z.literal("path-rejected"),
+    pathId: z.string(),
+    reason: z.string(),
+    at: z.string().datetime(),
+  }),
+  z.object({
+    kind: z.literal("partner-depth"),
+    actor: z.string(),
+    summary: z.unknown(),
+    at: z.string().datetime(),
+  }),
+  z.object({
+    kind: z.literal("result"),
+    runId: z.string().uuid(),
+    verdict: Verdict,
+    riskScore: z.number().nullable(),
+    reasoning: z.string(),
+    at: z.string().datetime(),
+  }),
+  z.object({
+    kind: z.literal("error"),
+    phase: SafePathPhase.nullable(),
+    message: z.string(),
+    at: z.string().datetime(),
+  }),
 ]);
 export type SafePathEvent = z.infer<typeof SafePathEvent>;
 

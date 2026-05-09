@@ -11,10 +11,13 @@ export interface RedisPluginOptions {
   url: string;
 }
 
-export const redisPlugin = fp<RedisPluginOptions>(async (app, opts) => {
-  const redis = new IORedis(opts.url, { maxRetriesPerRequest: 3, lazyConnect: false });
-  app.decorate("redis", redis);
-  app.addHook("onClose", async () => {
-    redis.disconnect();
-  });
-}, { name: "redis" });
+export const redisPlugin = fp<RedisPluginOptions>(
+  async (app, opts) => {
+    const redis = new IORedis(opts.url, { maxRetriesPerRequest: 3, lazyConnect: false });
+    app.decorate("redis", redis);
+    app.addHook("onClose", async () => {
+      redis.disconnect();
+    });
+  },
+  { name: "redis" },
+);

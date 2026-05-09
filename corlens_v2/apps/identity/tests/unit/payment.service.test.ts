@@ -44,7 +44,12 @@ function deps() {
 describe("payment.service.create", () => {
   it("creates a request with the configured price for XRP", async () => {
     const d = deps();
-    const svc = createPaymentService({ payments: d.payments as any, xrpl: d.xrpl as any, events: d.events as any, env });
+    const svc = createPaymentService({
+      payments: d.payments as any,
+      xrpl: d.xrpl as any,
+      events: d.events as any,
+      env,
+    });
     const out = await svc.create({ userId: "u1", currency: "XRP" });
     expect(d.payments.create).toHaveBeenCalled();
     const call = d.payments.create.mock.calls[0][0];
@@ -58,7 +63,12 @@ describe("payment.service.create", () => {
 
   it("creates a request with the configured price for RLUSD", async () => {
     const d = deps();
-    const svc = createPaymentService({ payments: d.payments as any, xrpl: d.xrpl as any, events: d.events as any, env });
+    const svc = createPaymentService({
+      payments: d.payments as any,
+      xrpl: d.xrpl as any,
+      events: d.events as any,
+      env,
+    });
     const out = await svc.create({ userId: "u1", currency: "RLUSD" });
     expect(d.payments.create.mock.calls[0][0].amount).toBe("5");
     expect(out.currency).toBe("RLUSD");
@@ -69,7 +79,12 @@ describe("payment.service.checkStatus", () => {
   it("returns confirmed when the request is already confirmed in DB", async () => {
     const d = deps();
     d.payments.findById = vi.fn(async () => ({ id: "pmt-1", status: "confirmed", txHash: "ABCD" }));
-    const svc = createPaymentService({ payments: d.payments as any, xrpl: d.xrpl as any, events: d.events as any, env });
+    const svc = createPaymentService({
+      payments: d.payments as any,
+      xrpl: d.xrpl as any,
+      events: d.events as any,
+      env,
+    });
     const out = await svc.checkStatus({ paymentId: "pmt-1" });
     expect(out).toEqual({ status: "confirmed", txHash: "ABCD" });
   });
@@ -77,15 +92,32 @@ describe("payment.service.checkStatus", () => {
   it("returns not_found when the request does not exist", async () => {
     const d = deps();
     d.payments.findById = vi.fn(async () => null);
-    const svc = createPaymentService({ payments: d.payments as any, xrpl: d.xrpl as any, events: d.events as any, env });
+    const svc = createPaymentService({
+      payments: d.payments as any,
+      xrpl: d.xrpl as any,
+      events: d.events as any,
+      env,
+    });
     expect(await svc.checkStatus({ paymentId: "missing" })).toEqual({ status: "not_found" });
   });
 
   it("expires the request when past expiry and returns expired", async () => {
     const d = deps();
     const past = new Date(Date.now() - 60_000);
-    d.payments.findById = vi.fn(async () => ({ id: "pmt-1", status: "pending", expiresAt: past, destination: "rD", memo: "x", userId: "u1" }));
-    const svc = createPaymentService({ payments: d.payments as any, xrpl: d.xrpl as any, events: d.events as any, env });
+    d.payments.findById = vi.fn(async () => ({
+      id: "pmt-1",
+      status: "pending",
+      expiresAt: past,
+      destination: "rD",
+      memo: "x",
+      userId: "u1",
+    }));
+    const svc = createPaymentService({
+      payments: d.payments as any,
+      xrpl: d.xrpl as any,
+      events: d.events as any,
+      env,
+    });
     expect(await svc.checkStatus({ paymentId: "pmt-1" })).toEqual({ status: "expired" });
     expect(d.payments.expire).toHaveBeenCalledWith("pmt-1");
   });
@@ -103,13 +135,28 @@ describe("payment.service.checkStatus", () => {
       amount: "10",
       currency: "XRP",
     }));
-    d.xrpl.pollIncomingByMemo = vi.fn(async () => ({ txHash: "DEADBEEF".repeat(8), sourceAccount: "rPayer" }));
+    d.xrpl.pollIncomingByMemo = vi.fn(async () => ({
+      txHash: "DEADBEEF".repeat(8),
+      sourceAccount: "rPayer",
+    }));
     d.payments.confirmAtomic = vi.fn(async () => ({
-      req: { id: "pmt-1", status: "confirmed", txHash: "DEADBEEF".repeat(8), userId: "u1", amount: "10", currency: "XRP" },
+      req: {
+        id: "pmt-1",
+        status: "confirmed",
+        txHash: "DEADBEEF".repeat(8),
+        userId: "u1",
+        amount: "10",
+        currency: "XRP",
+      },
       alreadyConfirmed: false,
     }));
 
-    const svc = createPaymentService({ payments: d.payments as any, xrpl: d.xrpl as any, events: d.events as any, env });
+    const svc = createPaymentService({
+      payments: d.payments as any,
+      xrpl: d.xrpl as any,
+      events: d.events as any,
+      env,
+    });
     const out = await svc.checkStatus({ paymentId: "pmt-1" });
 
     expect(out.status).toBe("confirmed");

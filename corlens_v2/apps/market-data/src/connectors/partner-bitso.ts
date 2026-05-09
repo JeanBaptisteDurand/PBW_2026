@@ -13,7 +13,13 @@ export async function fetchBitsoDepth(opts: BitsoOptions): Promise<PartnerDepthS
   const url = `${BITSO_BASE}/order_book/?book=${encodeURIComponent(opts.book)}&aggregate=true`;
   const res = await f(url, { headers: { "User-Agent": "CorLens/2.0 (+https://cor-lens.xyz)" } });
   if (!res.ok) throw new Error(`Bitso ${opts.book} returned HTTP ${res.status}`);
-  const json = (await res.json()) as { success: boolean; payload: { bids: Array<{ price: string; amount: string }>; asks: Array<{ price: string; amount: string }> } };
+  const json = (await res.json()) as {
+    success: boolean;
+    payload: {
+      bids: Array<{ price: string; amount: string }>;
+      asks: Array<{ price: string; amount: string }>;
+    };
+  };
   if (!json.success || !json.payload) throw new Error(`Bitso ${opts.book} returned empty payload`);
   const { bids, asks } = json.payload;
   const topBid = bids[0] ?? null;

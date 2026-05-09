@@ -6,15 +6,23 @@ describe("computeStatus", () => {
     expect(computeStatus({ pathCount: 0, hasError: false, lastRefreshedAt: null })).toBe("UNKNOWN");
   });
   it("RED on error", () => {
-    expect(computeStatus({ pathCount: 0, hasError: true, lastRefreshedAt: new Date() })).toBe("RED");
+    expect(computeStatus({ pathCount: 0, hasError: true, lastRefreshedAt: new Date() })).toBe(
+      "RED",
+    );
   });
   it("RED when zero paths", () => {
-    expect(computeStatus({ pathCount: 0, hasError: false, lastRefreshedAt: new Date() })).toBe("RED");
+    expect(computeStatus({ pathCount: 0, hasError: false, lastRefreshedAt: new Date() })).toBe(
+      "RED",
+    );
   });
   it("AMBER when 1 path", () => {
-    expect(computeStatus({ pathCount: 1, hasError: false, lastRefreshedAt: new Date() })).toBe("AMBER");
+    expect(computeStatus({ pathCount: 1, hasError: false, lastRefreshedAt: new Date() })).toBe(
+      "AMBER",
+    );
   });
   it("GREEN when 2+ paths", () => {
-    expect(computeStatus({ pathCount: 3, hasError: false, lastRefreshedAt: new Date() })).toBe("GREEN");
+    expect(computeStatus({ pathCount: 3, hasError: false, lastRefreshedAt: new Date() })).toBe(
+      "GREEN",
+    );
   });
 });

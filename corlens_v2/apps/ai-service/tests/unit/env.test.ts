@@ -19,13 +19,13 @@ describe("loadAiServiceEnv", () => {
 
   it("rejects a missing OPENAI_API_KEY", () => {
     const partial: Record<string, string | undefined> = { ...valid };
-    delete partial.OPENAI_API_KEY;
+    partial.OPENAI_API_KEY = undefined;
     expect(() => loadAiServiceEnv(partial)).toThrow(/OPENAI_API_KEY/);
   });
 
   it("accepts an optional TAVILY_API_KEY (web search disabled if absent)", () => {
     const partial: Record<string, string | undefined> = { ...valid };
-    delete partial.TAVILY_API_KEY;
+    partial.TAVILY_API_KEY = undefined;
     const env = loadAiServiceEnv(partial);
     expect(env.TAVILY_API_KEY).toBeUndefined();
   });

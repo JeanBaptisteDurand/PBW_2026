@@ -1,5 +1,5 @@
-import { aiDb } from "@corlens/db/ai";
 import type { Prisma } from "@corlens/db";
+import { aiDb } from "@corlens/db/ai";
 
 export function createWebSearchCacheRepo(prisma: Prisma) {
   const db = aiDb(prisma);

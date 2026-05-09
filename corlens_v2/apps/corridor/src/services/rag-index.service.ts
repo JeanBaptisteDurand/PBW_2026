@@ -18,7 +18,9 @@ export type CorridorSummaryForRag = {
 
 export function createRagIndexService(opts: RagIndexServiceOptions) {
   return {
-    async index(input: { corridor: CorridorSummaryForRag; chunks: string[] }): Promise<{ indexed: number }> {
+    async index(input: { corridor: CorridorSummaryForRag; chunks: string[] }): Promise<{
+      indexed: number;
+    }> {
       await opts.repo.clearDocs(input.corridor.id);
       let count = 0;
       for (const chunk of input.chunks) {

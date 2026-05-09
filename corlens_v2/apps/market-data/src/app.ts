@@ -1,23 +1,23 @@
 import Fastify, { type FastifyInstance } from "fastify";
-import { serializerCompiler, validatorCompiler, type ZodTypeProvider } from "fastify-type-provider-zod";
-import { type MarketDataEnv } from "./env.js";
-import { redisPlugin } from "./plugins/redis.js";
+import {
+  type ZodTypeProvider,
+  serializerCompiler,
+  validatorCompiler,
+} from "fastify-type-provider-zod";
+import { registerAdminRoutes } from "./controllers/admin.controller.js";
+import { registerPartnerDepthRoutes } from "./controllers/partner-depth.controller.js";
+import { registerXrplRoutes } from "./controllers/xrpl.controller.js";
+import { startPrewarm } from "./crons/prewarm.js";
+import type { MarketDataEnv } from "./env.js";
 import { registerErrorHandler } from "./plugins/error-handler.js";
+import { redisPlugin } from "./plugins/redis.js";
 import { registerSwagger } from "./plugins/swagger.js";
 import { xrplPlugin } from "./plugins/xrpl.js";
 import { createCacheService } from "./services/cache.service.js";
-import { createXrplService } from "./services/xrpl.service.js";
-import { registerXrplRoutes } from "./controllers/xrpl.controller.js";
 import { createPartnerDepthService } from "./services/partner-depth.service.js";
-import { registerPartnerDepthRoutes } from "./controllers/partner-depth.controller.js";
-import { startPrewarm } from "./crons/prewarm.js";
-import { registerAdminRoutes } from "./controllers/admin.controller.js";
+import { createXrplService } from "./services/xrpl.service.js";
 
-const FALLBACK_ENDPOINTS = [
-  "wss://xrplcluster.com",
-  "wss://s2.ripple.com",
-  "wss://xrpl.ws",
-];
+const FALLBACK_ENDPOINTS = ["wss://xrplcluster.com", "wss://s2.ripple.com", "wss://xrpl.ws"];
 
 export async function buildApp(env: MarketDataEnv): Promise<FastifyInstance> {
   const app = Fastify({
@@ -67,7 +67,9 @@ export async function buildApp(env: MarketDataEnv): Promise<FastifyInstance> {
     cron: env.PREWARM_CRON,
     enabled: env.PREWARM_ENABLED,
   });
-  app.addHook("onClose", async () => { await prewarm.stop(); });
+  app.addHook("onClose", async () => {
+    await prewarm.stop();
+  });
 
   app.get("/health", { schema: { hide: true } }, async () => ({
     status: "ok",

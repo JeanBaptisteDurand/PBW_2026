@@ -17,11 +17,13 @@ describe("loadMarketDataEnv", () => {
 
   it("rejects a missing XRPL_PRIMARY_RPC", () => {
     const partial: Record<string, string | undefined> = { ...validEnv };
-    delete partial.XRPL_PRIMARY_RPC;
+    partial.XRPL_PRIMARY_RPC = undefined;
     expect(() => loadMarketDataEnv(partial)).toThrow(/XRPL_PRIMARY_RPC/);
   });
 
   it("rejects a non-WS XRPL_PRIMARY_RPC", () => {
-    expect(() => loadMarketDataEnv({ ...validEnv, XRPL_PRIMARY_RPC: "http://wrong" })).toThrow(/XRPL_PRIMARY_RPC/);
+    expect(() => loadMarketDataEnv({ ...validEnv, XRPL_PRIMARY_RPC: "http://wrong" })).toThrow(
+      /XRPL_PRIMARY_RPC/,
+    );
   });
 });

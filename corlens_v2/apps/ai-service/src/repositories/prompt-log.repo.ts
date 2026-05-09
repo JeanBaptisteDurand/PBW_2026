@@ -1,5 +1,5 @@
-import { aiDb } from "@corlens/db/ai";
 import type { Prisma } from "@corlens/db";
+import { aiDb } from "@corlens/db/ai";
 
 export type PromptLogInput = {
   purpose: string;
@@ -34,7 +34,9 @@ export function createPromptLogRepo(prisma: Prisma) {
       return { id: row.id };
     },
 
-    async rollupByPurpose(sinceIso: string): Promise<Array<{ purpose: string; callCount: number; tokensIn: number; tokensOut: number }>> {
+    async rollupByPurpose(
+      sinceIso: string,
+    ): Promise<Array<{ purpose: string; callCount: number; tokensIn: number; tokensOut: number }>> {
       const rows = await db.promptLog.groupBy({
         by: ["purpose"],
         where: { createdAt: { gte: new Date(sinceIso) }, error: null },

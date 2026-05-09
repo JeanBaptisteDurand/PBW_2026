@@ -45,16 +45,23 @@ export function createScannerService(opts: ScannerServiceOptions) {
       }
 
       try {
-        const result = await Promise.race([
+        const result = (await Promise.race([
           opts.marketData.pathFind({
             sourceAccount: "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
             destinationAccount: "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
-            destinationAmount: input.dest.currency === "XRP"
-              ? input.amount
-              : { currency: input.dest.currency, issuer: input.dest.issuer ?? "", value: input.amount },
+            destinationAmount:
+              input.dest.currency === "XRP"
+                ? input.amount
+                : {
+                    currency: input.dest.currency,
+                    issuer: input.dest.issuer ?? "",
+                    value: input.amount,
+                  },
           }),
-          new Promise((_, reject) => setTimeout(() => reject(new Error("scan_timeout")), opts.timeoutMs)),
-        ]) as { result?: { alternatives?: unknown[] } };
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("scan_timeout")), opts.timeoutMs),
+          ),
+        ])) as { result?: { alternatives?: unknown[] } };
 
         const pathCount = (result.result?.alternatives ?? []).length;
         const status = computeStatus({ pathCount, hasError: false, lastRefreshedAt: new Date() });

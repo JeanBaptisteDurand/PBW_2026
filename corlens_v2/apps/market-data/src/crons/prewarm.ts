@@ -1,4 +1,4 @@
-import { Queue, Worker, type Job } from "bullmq";
+import { type Job, Queue, Worker } from "bullmq";
 import IORedis from "ioredis";
 import type { XrplService } from "../services/xrpl.service.js";
 

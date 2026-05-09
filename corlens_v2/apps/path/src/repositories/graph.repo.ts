@@ -1,17 +1,32 @@
-import { pathDb } from "@corlens/db/path";
 import type { Prisma } from "@corlens/db";
+import { pathDb } from "@corlens/db/path";
 
 export type GraphPersistInput = {
   analysisId: string;
   nodes: Array<{ nodeId: string; kind: string; label: string; data: unknown }>;
-  edges: Array<{ edgeId: string; source: string; target: string; kind: string; label: string | null; data: unknown }>;
-  riskFlags: Array<{ nodeId: string; flag: string; severity: string; detail: string; data: unknown }>;
+  edges: Array<{
+    edgeId: string;
+    source: string;
+    target: string;
+    kind: string;
+    label: string | null;
+    data: unknown;
+  }>;
+  riskFlags: Array<{
+    nodeId: string;
+    flag: string;
+    severity: string;
+    detail: string;
+    data: unknown;
+  }>;
 };
 
 export function createGraphRepo(prisma: Prisma) {
   const db = pathDb(prisma);
   return {
-    async persist(input: GraphPersistInput): Promise<{ nodeCount: number; edgeCount: number; flagCount: number }> {
+    async persist(
+      input: GraphPersistInput,
+    ): Promise<{ nodeCount: number; edgeCount: number; flagCount: number }> {
       await db.riskFlag.deleteMany({ where: { analysisId: input.analysisId } });
       await db.edge.deleteMany({ where: { analysisId: input.analysisId } });
       await db.node.deleteMany({ where: { analysisId: input.analysisId } });
@@ -54,7 +69,11 @@ export function createGraphRepo(prisma: Prisma) {
           })),
         });
       }
-      return { nodeCount: input.nodes.length, edgeCount: input.edges.length, flagCount: input.riskFlags.length };
+      return {
+        nodeCount: input.nodes.length,
+        edgeCount: input.edges.length,
+        flagCount: input.riskFlags.length,
+      };
     },
 
     async loadGraph(analysisId: string) {

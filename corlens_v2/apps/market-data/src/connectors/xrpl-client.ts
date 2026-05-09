@@ -77,19 +77,27 @@ export function createXrplClient(opts: XrplClientOptions): XrplClient {
 
     for (let attempt = 1; attempt <= requestRetryCount; attempt++) {
       try {
-        const resp = (await client.request({ command, ...params } as never)) as { warning?: string };
+        const resp = (await client.request({ command, ...params } as never)) as {
+          warning?: string;
+        };
         if (resp?.warning === "load") {
           loadWarningActive = true;
-          setTimeout(() => { loadWarningActive = false; }, loadWarningResetMs);
+          setTimeout(() => {
+            loadWarningActive = false;
+          }, loadWarningResetMs);
         } else if (loadWarningActive) {
           loadWarningActive = false;
         }
         return resp;
       } catch (err) {
         const msg = (err as Error).message ?? "";
-        const transient = ["WebSocket is not open", "CONNECTING", "IP limit", "threshold exceeded", "overloaded"].some(
-          (s) => msg.includes(s),
-        );
+        const transient = [
+          "WebSocket is not open",
+          "CONNECTING",
+          "IP limit",
+          "threshold exceeded",
+          "overloaded",
+        ].some((s) => msg.includes(s));
         if (!transient || attempt >= requestRetryCount) throw err;
         await new Promise((r) => setTimeout(r, requestRetryDelayMs * attempt));
       }

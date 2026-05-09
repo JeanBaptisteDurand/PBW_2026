@@ -20,7 +20,7 @@ describe("loadAgentEnv", () => {
 
   it("rejects missing PATH_BASE_URL", () => {
     const partial: Record<string, string | undefined> = { ...valid };
-    delete partial.PATH_BASE_URL;
+    partial.PATH_BASE_URL = undefined;
     expect(() => loadAgentEnv(partial)).toThrow(/PATH_BASE_URL/);
   });
 });

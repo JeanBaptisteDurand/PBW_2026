@@ -1,6 +1,16 @@
 export type MarketDataClient = {
-  pathFind(input: { sourceAccount: string; destinationAccount: string; destinationAmount: unknown }): Promise<unknown>;
-  bookOffers(input: { takerGetsCurrency: string; takerGetsIssuer?: string; takerPaysCurrency: string; takerPaysIssuer?: string; limit?: number }): Promise<unknown>;
+  pathFind(input: {
+    sourceAccount: string;
+    destinationAccount: string;
+    destinationAmount: unknown;
+  }): Promise<unknown>;
+  bookOffers(input: {
+    takerGetsCurrency: string;
+    takerGetsIssuer?: string;
+    takerPaysCurrency: string;
+    takerPaysIssuer?: string;
+    limit?: number;
+  }): Promise<unknown>;
   partnerDepth(actor: string, book: string): Promise<unknown>;
 };
 

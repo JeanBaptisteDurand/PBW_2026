@@ -2,7 +2,9 @@ import { describe, expect, it, vi } from "vitest";
 import { createCrawlerService } from "../../src/services/crawler.service.js";
 
 const stubMarketData = () => ({
-  accountInfo: vi.fn().mockResolvedValue({ result: { account_data: { Account: "rSeed", Domain: "636F726C656E732E696F" } } }),
+  accountInfo: vi.fn().mockResolvedValue({
+    result: { account_data: { Account: "rSeed", Domain: "636F726C656E732E696F" } },
+  }),
   trustLines: vi.fn().mockResolvedValue({ lines: [] }),
   accountObjects: vi.fn().mockResolvedValue({ result: { account_objects: [] } }),
   accountTransactions: vi.fn().mockResolvedValue({ result: { transactions: [] } }),

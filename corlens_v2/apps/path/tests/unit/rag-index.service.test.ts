@@ -3,7 +3,10 @@ import { createRagIndexService } from "../../src/services/rag-index.service.js";
 
 describe("rag-index.service", () => {
   it("clears existing docs, embeds nodes, and adds a flags-summary doc", async () => {
-    const ai = { complete: vi.fn(), embed: vi.fn().mockResolvedValue({ embedding: [0.1, 0.2], tokensIn: 5 }) };
+    const ai = {
+      complete: vi.fn(),
+      embed: vi.fn().mockResolvedValue({ embedding: [0.1, 0.2], tokensIn: 5 }),
+    };
     const repo = {
       upsertDoc: vi.fn(async () => undefined),
       searchByEmbedding: vi.fn(),
@@ -16,7 +19,13 @@ describe("rag-index.service", () => {
       analysisId: "00000000-0000-0000-0000-000000000001",
       nodes: [
         { id: "n1", kind: "account", label: "Seed", data: {}, riskFlags: [] },
-        { id: "n2", kind: "issuer", label: "Bitstamp", data: { domain: "bitstamp.net" }, riskFlags: [] },
+        {
+          id: "n2",
+          kind: "issuer",
+          label: "Bitstamp",
+          data: { domain: "bitstamp.net" },
+          riskFlags: [],
+        },
       ],
       flags: [{ flag: "FROZEN_TRUST_LINE", severity: "HIGH", detail: "1 frozen line" }],
     });

@@ -6,11 +6,21 @@ describe("partner-binance", () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
-        bids: [["0.50000000", "100.0"], ["0.49000000", "50.0"]],
-        asks: [["0.51000000", "120.0"], ["0.52000000", "60.0"]],
+        bids: [
+          ["0.50000000", "100.0"],
+          ["0.49000000", "50.0"],
+        ],
+        asks: [
+          ["0.51000000", "120.0"],
+          ["0.52000000", "60.0"],
+        ],
       }),
     });
-    const snapshot = await fetchBinanceDepth({ symbol: "XRPUSDT", fetch: fetchMock as unknown as typeof fetch, ttlSeconds: 60 });
+    const snapshot = await fetchBinanceDepth({
+      symbol: "XRPUSDT",
+      fetch: fetchMock as unknown as typeof fetch,
+      ttlSeconds: 60,
+    });
     expect(snapshot.actor).toBe("binance");
     expect(snapshot.book).toBe("XRPUSDT");
     expect(snapshot.bidCount).toBe(2);

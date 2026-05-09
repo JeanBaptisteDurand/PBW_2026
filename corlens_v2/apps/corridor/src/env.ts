@@ -12,12 +12,20 @@ const Schema = z.object({
   SCAN_CONCURRENCY: z.coerce.number().int().min(1).max(32).default(4),
   SCAN_TIMEOUT_MS: z.coerce.number().int().min(1000).max(60000).default(20000),
   REFRESH_CRON: z.string().default("0 * * * *"),
-  REFRESH_ENABLED: z.preprocess((v) => v === "false" ? false : v === "true" ? true : v, z.boolean().default(true)),
-  AI_NOTE_ENABLED: z.preprocess((v) => v === "false" ? false : v === "true" ? true : v, z.boolean().default(true)),
+  REFRESH_ENABLED: z.preprocess(
+    (v) => (v === "false" ? false : v === "true" ? true : v),
+    z.boolean().default(true),
+  ),
+  AI_NOTE_ENABLED: z.preprocess(
+    (v) => (v === "false" ? false : v === "true" ? true : v),
+    z.boolean().default(true),
+  ),
 });
 
 export type CorridorEnv = z.infer<typeof Schema>;
 
-export function loadCorridorEnv(source?: NodeJS.ProcessEnv | Record<string, string | undefined>): CorridorEnv {
+export function loadCorridorEnv(
+  source?: NodeJS.ProcessEnv | Record<string, string | undefined>,
+): CorridorEnv {
   return loadEnv(Schema, source);
 }

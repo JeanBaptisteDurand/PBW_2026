@@ -9,19 +9,37 @@ describe("tavily client", () => {
         query: "RLUSD issuer",
         answer: "RLUSD is issued by Ripple's RLUSD account on XRPL.",
         results: [
-          { title: "RLUSD info", url: "https://example.com/rlusd", content: "RLUSD on XRPL...", score: 0.95 },
-          { title: "RLUSD launch", url: "https://example.com/launch", content: "Launched by Ripple", score: 0.80 },
+          {
+            title: "RLUSD info",
+            url: "https://example.com/rlusd",
+            content: "RLUSD on XRPL...",
+            score: 0.95,
+          },
+          {
+            title: "RLUSD launch",
+            url: "https://example.com/launch",
+            content: "Launched by Ripple",
+            score: 0.8,
+          },
         ],
       }),
     });
 
-    const client = createTavilyClient({ apiKey: "tvly-test", fetch: fetchMock as unknown as typeof fetch });
+    const client = createTavilyClient({
+      apiKey: "tvly-test",
+      fetch: fetchMock as unknown as typeof fetch,
+    });
     const out = await client.search({ query: "RLUSD issuer", maxResults: 5 });
 
     expect(out.query).toBe("RLUSD issuer");
     expect(out.answer).toContain("RLUSD");
     expect(out.results).toHaveLength(2);
-    expect(out.results[0]).toEqual({ title: "RLUSD info", url: "https://example.com/rlusd", snippet: "RLUSD on XRPL...", score: 0.95 });
+    expect(out.results[0]).toEqual({
+      title: "RLUSD info",
+      url: "https://example.com/rlusd",
+      snippet: "RLUSD on XRPL...",
+      score: 0.95,
+    });
 
     expect(fetchMock).toHaveBeenCalledWith(
       "https://api.tavily.com/search",
@@ -38,8 +56,13 @@ describe("tavily client", () => {
   });
 
   it("throws on non-2xx", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: false, status: 401, text: async () => "unauthorized" });
-    const client = createTavilyClient({ apiKey: "bad", fetch: fetchMock as unknown as typeof fetch });
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue({ ok: false, status: 401, text: async () => "unauthorized" });
+    const client = createTavilyClient({
+      apiKey: "bad",
+      fetch: fetchMock as unknown as typeof fetch,
+    });
     await expect(client.search({ query: "x", maxResults: 1 })).rejects.toThrow(/401/);
   });
 
@@ -48,7 +71,10 @@ describe("tavily client", () => {
       ok: true,
       json: async () => ({ query: "no hits", answer: null, results: [] }),
     });
-    const client = createTavilyClient({ apiKey: "tvly-test", fetch: fetchMock as unknown as typeof fetch });
+    const client = createTavilyClient({
+      apiKey: "tvly-test",
+      fetch: fetchMock as unknown as typeof fetch,
+    });
     const out = await client.search({ query: "no hits", maxResults: 3 });
     expect(out.results).toEqual([]);
     expect(out.answer).toBeNull();

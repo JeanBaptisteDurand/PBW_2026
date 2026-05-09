@@ -1,38 +1,38 @@
 // Pure graph builder — ported from v1 corlens/apps/server/src/analysis/graphBuilder.ts
 // No I/O. No logger. No xrpl/openai/prisma imports.
 
+import { decodeCurrency, hexToAscii, xrpDropsToString } from "./helpers.js";
 import type {
-  GraphData,
-  GraphNode,
-  GraphEdge,
-  GraphStats,
-  NodeKind,
-  IssuerNodeData,
-  TokenNodeData,
   AMMPoolNodeData,
-  OrderBookNodeData,
   AccountNodeData,
-  EscrowNodeData,
-  CheckNodeData,
-  PayChannelNodeData,
-  NFTNodeData,
-  SignerListNodeData,
-  DIDNodeData,
-  CredentialNodeData,
-  MPTokenNodeData,
-  OracleNodeData,
-  DepositPreauthNodeData,
-  OfferNodeData,
-  PermissionedDomainNodeData,
-  NFTOfferNodeData,
-  TicketNodeData,
   BridgeNodeData,
-  VaultNodeData,
-  RiskFlagData,
-  XRPLAsset,
+  CheckNodeData,
   CrawlResult,
+  CredentialNodeData,
+  DIDNodeData,
+  DepositPreauthNodeData,
+  EscrowNodeData,
+  GraphData,
+  GraphEdge,
+  GraphNode,
+  GraphStats,
+  IssuerNodeData,
+  MPTokenNodeData,
+  NFTNodeData,
+  NFTOfferNodeData,
+  NodeKind,
+  OfferNodeData,
+  OracleNodeData,
+  OrderBookNodeData,
+  PayChannelNodeData,
+  PermissionedDomainNodeData,
+  RiskFlagData,
+  SignerListNodeData,
+  TicketNodeData,
+  TokenNodeData,
+  VaultNodeData,
+  XRPLAsset,
 } from "./types.js";
-import { hexToAscii, decodeCurrency, xrpDropsToString } from "./helpers.js";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -69,11 +69,7 @@ function makeEdge(
 
 // ─── Main Builder ─────────────────────────────────────────────────────────────
 
-export function buildGraph(
-  crawl: CrawlResult,
-  seedAddress: string,
-  seedLabel?: string,
-): GraphData {
+export function buildGraph(crawl: CrawlResult, seedAddress: string, seedLabel?: string): GraphData {
   const nodes: GraphNode[] = [];
   const edges: GraphEdge[] = [];
   const nodeIndex = new Set<string>();
@@ -125,12 +121,7 @@ export function buildGraph(
   };
 
   addNode(
-    makeNode(
-      issuerId,
-      "issuer",
-      seedLabel ?? domain ?? seedAddress.slice(0, 8),
-      issuerNodeData,
-    ),
+    makeNode(issuerId, "issuer", seedLabel ?? domain ?? seedAddress.slice(0, 8), issuerNodeData),
   );
 
   // ── 2. Token nodes ────────────────────────────────────────────────────────
@@ -358,8 +349,7 @@ export function buildGraph(
 
     const bidDepth = crawl.bids
       .reduce((sum: number, o: any) => {
-        const tokenVal =
-          typeof o.TakerGets === "object" ? Number(o.TakerGets?.value ?? 0) : 0;
+        const tokenVal = typeof o.TakerGets === "object" ? Number(o.TakerGets?.value ?? 0) : 0;
         return sum + tokenVal;
       }, 0)
       .toFixed(6);
@@ -373,7 +363,9 @@ export function buildGraph(
       offerCount: crawl.asks.length + crawl.bids.length,
     };
 
-    addNode(makeNode(orderBookId, "orderBook", `XRP/${primaryToken} Order Book`, orderBookNodeData));
+    addNode(
+      makeNode(orderBookId, "orderBook", `XRP/${primaryToken} Order Book`, orderBookNodeData),
+    );
 
     // TRADES_ON: orderBook → token
     for (const [currHex] of Object.entries(obligations)) {
@@ -386,9 +378,7 @@ export function buildGraph(
   }
 
   // ── 6. Escrow nodes ───────────────────────────────────────────────────────
-  const escrowObjects = crawl.accountObjects.filter(
-    (o: any) => o.LedgerEntryType === "Escrow",
-  );
+  const escrowObjects = crawl.accountObjects.filter((o: any) => o.LedgerEntryType === "Escrow");
 
   for (const escrow of escrowObjects) {
     const escrowId = `escrow:${escrow.index ?? escrow.PreviousTxnID ?? Math.random()}`;
@@ -418,17 +408,14 @@ export function buildGraph(
   }
 
   // ── 7. Check nodes ───────────────────────────────────────────────────────
-  const checkObjects = crawl.accountObjects.filter(
-    (o: any) => o.LedgerEntryType === "Check",
-  );
+  const checkObjects = crawl.accountObjects.filter((o: any) => o.LedgerEntryType === "Check");
 
   for (const check of checkObjects) {
     const checkId = `check:${check.index ?? check.PreviousTxnID ?? Math.random()}`;
 
     const sendMax = check.SendMax;
-    const sendMaxStr = typeof sendMax === "string"
-      ? xrpDropsToString(sendMax)
-      : sendMax?.value ?? "0";
+    const sendMaxStr =
+      typeof sendMax === "string" ? xrpDropsToString(sendMax) : (sendMax?.value ?? "0");
     const currency = typeof sendMax === "object" ? decodeCurrency(sendMax?.currency ?? "") : "XRP";
 
     const checkNodeData: CheckNodeData = {
@@ -572,9 +559,7 @@ export function buildGraph(
   }
 
   // ── 11. DID nodes ────────────────────────────────────────────────────────
-  const didObjects = crawl.accountObjects.filter(
-    (o: any) => o.LedgerEntryType === "DID",
-  );
+  const didObjects = crawl.accountObjects.filter((o: any) => o.LedgerEntryType === "DID");
 
   for (const did of didObjects) {
     const didId = `did:${did.index ?? Math.random()}`;
@@ -608,7 +593,12 @@ export function buildGraph(
     };
 
     addNode(
-      makeNode(credId, "credential", `Credential: ${credentialNodeData.credentialType}`, credentialNodeData),
+      makeNode(
+        credId,
+        "credential",
+        `Credential: ${credentialNodeData.credentialType}`,
+        credentialNodeData,
+      ),
     );
 
     edges.push(makeEdge(issuerId, credId, "HAS_CREDENTIAL", "has credential"));
@@ -616,8 +606,7 @@ export function buildGraph(
 
   // ── 13. MPToken / MPTokenIssuance nodes ──────────────────────────────────
   const mptObjects = crawl.accountObjects.filter(
-    (o: any) =>
-      o.LedgerEntryType === "MPTokenIssuance" || o.LedgerEntryType === "MPToken",
+    (o: any) => o.LedgerEntryType === "MPTokenIssuance" || o.LedgerEntryType === "MPToken",
   );
 
   for (const mpt of mptObjects) {
@@ -634,16 +623,19 @@ export function buildGraph(
     };
 
     addNode(
-      makeNode(mptId, "mpToken", `MPT ${(mpt.MPTokenIssuanceID ?? "").slice(0, 8)}`, mpTokenNodeData),
+      makeNode(
+        mptId,
+        "mpToken",
+        `MPT ${(mpt.MPTokenIssuanceID ?? "").slice(0, 8)}`,
+        mpTokenNodeData,
+      ),
     );
 
     edges.push(makeEdge(issuerId, mptId, "ISSUED_MPT", "issued MPT"));
   }
 
   // ── 14. Oracle nodes ─────────────────────────────────────────────────────
-  const oracleObjects = crawl.accountObjects.filter(
-    (o: any) => o.LedgerEntryType === "Oracle",
-  );
+  const oracleObjects = crawl.accountObjects.filter((o: any) => o.LedgerEntryType === "Oracle");
 
   for (const oracle of oracleObjects) {
     const oracleId = `oracle:${oracle.index ?? Math.random()}`;
@@ -658,8 +650,8 @@ export function buildGraph(
         const base = pd.PriceData?.BaseAsset;
         const quote = pd.PriceData?.QuoteAsset;
         return {
-          baseAsset: typeof base === "string" ? base : base?.currency ?? "",
-          quoteAsset: typeof quote === "string" ? quote : quote?.currency ?? "",
+          baseAsset: typeof base === "string" ? base : (base?.currency ?? ""),
+          quoteAsset: typeof quote === "string" ? quote : (quote?.currency ?? ""),
           assetPrice: pd.PriceData?.AssetPrice,
           scale: pd.PriceData?.Scale,
         };
@@ -667,7 +659,12 @@ export function buildGraph(
     };
 
     addNode(
-      makeNode(oracleId, "oracle", `Oracle: ${oracleNodeData.provider ?? "unknown"}`, oracleNodeData),
+      makeNode(
+        oracleId,
+        "oracle",
+        `Oracle: ${oracleNodeData.provider ?? "unknown"}`,
+        oracleNodeData,
+      ),
     );
 
     edges.push(makeEdge(issuerId, oracleId, "PROVIDES_ORACLE", "provides oracle"));
@@ -733,7 +730,12 @@ export function buildGraph(
     };
 
     addNode(
-      makeNode(pdId, "permissionedDomain", `PermDomain ${(pd.index ?? "").slice(0, 8)}`, pdNodeData),
+      makeNode(
+        pdId,
+        "permissionedDomain",
+        `PermDomain ${(pd.index ?? "").slice(0, 8)}`,
+        pdNodeData,
+      ),
     );
 
     edges.push(makeEdge(issuerId, pdId, "HAS_DOMAIN", "has domain"));
@@ -743,9 +745,10 @@ export function buildGraph(
   for (const offer of (crawl.nftOffers ?? []).slice(0, 50)) {
     const offerId = `nftOffer:${offer.nft_offer_index ?? Math.random()}`;
 
-    const amount = typeof offer.amount === "string"
-      ? xrpDropsToString(offer.amount)
-      : offer.amount?.value ?? "0";
+    const amount =
+      typeof offer.amount === "string"
+        ? xrpDropsToString(offer.amount)
+        : (offer.amount?.value ?? "0");
 
     const nftOfferNodeData: NFTOfferNodeData = {
       offerId: offer.nft_offer_index ?? "",
@@ -759,7 +762,12 @@ export function buildGraph(
     };
 
     addNode(
-      makeNode(offerId, "nftOffer", `${offer.isSellOffer ? "Sell" : "Buy"} ${amount}`, nftOfferNodeData),
+      makeNode(
+        offerId,
+        "nftOffer",
+        `${offer.isSellOffer ? "Sell" : "Buy"} ${amount}`,
+        nftOfferNodeData,
+      ),
     );
 
     const nftNodeId = `nft:${offer.nftId}`;
@@ -769,9 +777,7 @@ export function buildGraph(
   }
 
   // ── 19. Ticket nodes ────────────────────────────────────────────────────
-  const ticketObjects = crawl.accountObjects.filter(
-    (o: any) => o.LedgerEntryType === "Ticket",
-  );
+  const ticketObjects = crawl.accountObjects.filter((o: any) => o.LedgerEntryType === "Ticket");
 
   for (const ticket of ticketObjects) {
     const ticketId = `ticket:${ticket.TicketSequence ?? ticket.index ?? Math.random()}`;
@@ -781,17 +787,13 @@ export function buildGraph(
       ticketSequence: ticket.TicketSequence ?? 0,
     };
 
-    addNode(
-      makeNode(ticketId, "ticket", `Ticket #${ticket.TicketSequence ?? ""}`, ticketNodeData),
-    );
+    addNode(makeNode(ticketId, "ticket", `Ticket #${ticket.TicketSequence ?? ""}`, ticketNodeData));
 
     edges.push(makeEdge(issuerId, ticketId, "HAS_TICKET", "has ticket"));
   }
 
   // ── 20. Bridge nodes ────────────────────────────────────────────────────
-  const bridgeObjects = crawl.accountObjects.filter(
-    (o: any) => o.LedgerEntryType === "Bridge",
-  );
+  const bridgeObjects = crawl.accountObjects.filter((o: any) => o.LedgerEntryType === "Bridge");
 
   for (const bridge of bridgeObjects) {
     const bridgeId = `bridge:${bridge.index ?? Math.random()}`;
@@ -800,7 +802,9 @@ export function buildGraph(
       account: bridge.Account ?? seedAddress,
       bridgeAccount: bridge.XChainBridge?.LockingChainDoor ?? bridge.XChainBridge?.IssuingChainDoor,
       bridgeAsset: bridge.XChainBridge?.LockingChainIssue ?? bridge.XChainBridge?.IssuingChainIssue,
-      signatureReward: bridge.SignatureReward ? xrpDropsToString(bridge.SignatureReward) : undefined,
+      signatureReward: bridge.SignatureReward
+        ? xrpDropsToString(bridge.SignatureReward)
+        : undefined,
       minAccountCreateAmount: bridge.MinAccountCreateAmount
         ? xrpDropsToString(bridge.MinAccountCreateAmount)
         : undefined,
@@ -814,9 +818,7 @@ export function buildGraph(
   }
 
   // ── 21. Vault nodes ─────────────────────────────────────────────────────
-  const vaultObjects = crawl.accountObjects.filter(
-    (o: any) => o.LedgerEntryType === "Vault",
-  );
+  const vaultObjects = crawl.accountObjects.filter((o: any) => o.LedgerEntryType === "Vault");
 
   for (const vault of vaultObjects) {
     const vaultId = `vault:${vault.index ?? Math.random()}`;
@@ -828,23 +830,40 @@ export function buildGraph(
       data: vault.Data,
     };
 
-    addNode(
-      makeNode(vaultId, "vault", `Vault ${(vault.index ?? "").slice(0, 8)}`, vaultNodeData),
-    );
+    addNode(makeNode(vaultId, "vault", `Vault ${(vault.index ?? "").slice(0, 8)}`, vaultNodeData));
 
     edges.push(makeEdge(issuerId, vaultId, "HAS_VAULT", "has vault"));
   }
 
   // ── Build stats (single pass) ────────────────────────────────────────────
   const nodesByKind: Record<NodeKind, number> = {
-    token: 0, issuer: 0, ammPool: 0, orderBook: 0,
-    account: 0, paymentPath: 0, escrow: 0,
-    check: 0, payChannel: 0, nft: 0, nftOffer: 0, signerList: 0,
-    did: 0, credential: 0, mpToken: 0, oracle: 0,
-    depositPreauth: 0, offer: 0, permissionedDomain: 0,
-    ticket: 0, bridge: 0, vault: 0,
+    token: 0,
+    issuer: 0,
+    ammPool: 0,
+    orderBook: 0,
+    account: 0,
+    paymentPath: 0,
+    escrow: 0,
+    check: 0,
+    payChannel: 0,
+    nft: 0,
+    nftOffer: 0,
+    signerList: 0,
+    did: 0,
+    credential: 0,
+    mpToken: 0,
+    oracle: 0,
+    depositPreauth: 0,
+    offer: 0,
+    permissionedDomain: 0,
+    ticket: 0,
+    bridge: 0,
+    vault: 0,
   };
-  let totalRiskFlags = 0, highRiskCount = 0, medRiskCount = 0, lowRiskCount = 0;
+  let totalRiskFlags = 0;
+  let highRiskCount = 0;
+  let medRiskCount = 0;
+  let lowRiskCount = 0;
 
   for (const node of nodes) {
     nodesByKind[node.kind]++;

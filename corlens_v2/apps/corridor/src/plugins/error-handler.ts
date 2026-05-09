@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyError } from "fastify";
+import type { FastifyError, FastifyInstance } from "fastify";
 import { ZodError } from "zod";
 
 export function registerErrorHandler(app: FastifyInstance): void {

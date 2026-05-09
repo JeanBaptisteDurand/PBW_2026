@@ -24,19 +24,20 @@ describe("loadIdentityEnv", () => {
   });
 
   it("rejects a JWT_SECRET shorter than 32 chars", () => {
-    expect(() =>
-      loadIdentityEnv({ ...validEnv, JWT_SECRET: "tooshort" }),
-    ).toThrow(/JWT_SECRET/);
+    expect(() => loadIdentityEnv({ ...validEnv, JWT_SECRET: "tooshort" })).toThrow(/JWT_SECRET/);
   });
 
   it("rejects a missing DATABASE_URL", () => {
     const partial: Record<string, string | undefined> = { ...validEnv };
-    delete partial.DATABASE_URL;
+    partial.DATABASE_URL = undefined;
     expect(() => loadIdentityEnv(partial)).toThrow(/DATABASE_URL/);
   });
 
   it("accepts an optional XRPL_DEMO_WALLET_SECRET", () => {
-    const env = loadIdentityEnv({ ...validEnv, XRPL_DEMO_WALLET_SECRET: "sEdTM1uX8pu2do5XmTTqxnVghLeVfDB" });
+    const env = loadIdentityEnv({
+      ...validEnv,
+      XRPL_DEMO_WALLET_SECRET: "sEdTM1uX8pu2do5XmTTqxnVghLeVfDB",
+    });
     expect(env.XRPL_DEMO_WALLET_SECRET).toBe("sEdTM1uX8pu2do5XmTTqxnVghLeVfDB");
   });
 });

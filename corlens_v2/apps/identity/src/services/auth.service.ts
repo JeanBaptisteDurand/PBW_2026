@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import type { Redis } from "ioredis";
-import type { JwtService } from "./jwt.service.js";
-import type { UserRepo } from "../repositories/user.repo.js";
 import type { WalletVerifier } from "../connectors/wallet-verifier.js";
+import type { UserRepo } from "../repositories/user.repo.js";
+import type { JwtService } from "./jwt.service.js";
 
 export type AuthServiceOptions = {
   users: UserRepo;
@@ -25,10 +25,18 @@ function buildChallenge(walletAddress: string, nonce: string): string {
 
 export function createAuthService(opts: AuthServiceOptions) {
   return {
-    async issueChallenge(input: { walletAddress: string }): Promise<{ challenge: string; expiresAt: string }> {
+    async issueChallenge(input: { walletAddress: string }): Promise<{
+      challenge: string;
+      expiresAt: string;
+    }> {
       const nonce = randomUUID();
       const challenge = buildChallenge(input.walletAddress, nonce);
-      await opts.redis.set(challengeKey(input.walletAddress), challenge, "EX", opts.challengeTtlSeconds);
+      await opts.redis.set(
+        challengeKey(input.walletAddress),
+        challenge,
+        "EX",
+        opts.challengeTtlSeconds,
+      );
       const expiresAt = new Date(Date.now() + opts.challengeTtlSeconds * 1000).toISOString();
       return { challenge, expiresAt };
     },
@@ -38,7 +46,10 @@ export function createAuthService(opts: AuthServiceOptions) {
       challenge: string;
       signature: string;
       publicKey: string;
-    }): Promise<{ token: string; user: { id: string; walletAddress: string; role: "free" | "premium" } }> {
+    }): Promise<{
+      token: string;
+      user: { id: string; walletAddress: string; role: "free" | "premium" };
+    }> {
       const stored = await opts.redis.get(challengeKey(input.walletAddress));
       if (!stored) {
         throw new Error("no_challenge");

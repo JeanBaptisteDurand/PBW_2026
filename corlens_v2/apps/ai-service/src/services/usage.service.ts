@@ -1,5 +1,5 @@
-import type { PromptLogRepo } from "../repositories/prompt-log.repo.js";
 import type { UsageRollup } from "@corlens/contracts/dist/ai.js";
+import type { PromptLogRepo } from "../repositories/prompt-log.repo.js";
 
 export type UsageServiceOptions = {
   promptLog: PromptLogRepo;

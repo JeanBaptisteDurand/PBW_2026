@@ -13,8 +13,12 @@ const env = loadCorridorEnv({
 
 describe("corridor routes", () => {
   let app: Awaited<ReturnType<typeof buildApp>>;
-  beforeAll(async () => { app = await buildApp(env); });
-  afterAll(async () => { await app.close(); });
+  beforeAll(async () => {
+    app = await buildApp(env);
+  });
+  afterAll(async () => {
+    await app.close();
+  });
 
   it("/health returns ok", async () => {
     const res = await app.inject({ method: "GET", url: "/health" });

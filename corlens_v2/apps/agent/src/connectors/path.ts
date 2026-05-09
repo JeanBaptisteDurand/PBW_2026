@@ -1,8 +1,14 @@
 export type PathClient = {
-  analyze(input: { seedAddress: string; seedLabel?: string; depth?: number }): Promise<{ id: string; status: string }>;
+  analyze(input: { seedAddress: string; seedLabel?: string; depth?: number }): Promise<{
+    id: string;
+    status: string;
+  }>;
   getAnalysis(id: string): Promise<unknown | null>;
   getGraph(id: string): Promise<unknown | null>;
-  chat(input: { analysisId: string; message: string }): Promise<{ answer: string; sources: Array<{ id: string; snippet: string }> }>;
+  chat(input: { analysisId: string; message: string }): Promise<{
+    answer: string;
+    sources: Array<{ id: string; snippet: string }>;
+  }>;
   history(address: string): Promise<unknown>;
 };
 
@@ -31,13 +37,19 @@ export function createPathClient(opts: { baseUrl: string; fetch?: typeof fetch }
       return res.json();
     },
     async chat(input) {
-      const res = await f(`${opts.baseUrl}/api/analysis/${encodeURIComponent(input.analysisId)}/chat`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ message: input.message }),
-      });
+      const res = await f(
+        `${opts.baseUrl}/api/analysis/${encodeURIComponent(input.analysisId)}/chat`,
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ message: input.message }),
+        },
+      );
       if (!res.ok) throw new Error(`path chat -> ${res.status}`);
-      return res.json() as Promise<{ answer: string; sources: Array<{ id: string; snippet: string }> }>;
+      return res.json() as Promise<{
+        answer: string;
+        sources: Array<{ id: string; snippet: string }>;
+      }>;
     },
     async history(address) {
       const res = await f(`${opts.baseUrl}/api/history/${encodeURIComponent(address)}`);

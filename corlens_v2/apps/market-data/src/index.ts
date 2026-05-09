@@ -5,7 +5,11 @@ async function main() {
   const env = loadMarketDataEnv();
   const app = await buildApp(env);
 
-  const shutdown = async () => { app.log.info("shutting down"); await app.close(); process.exit(0); };
+  const shutdown = async () => {
+    app.log.info("shutting down");
+    await app.close();
+    process.exit(0);
+  };
   process.on("SIGTERM", shutdown);
   process.on("SIGINT", shutdown);
 
@@ -17,4 +21,7 @@ async function main() {
   }
 }
 
-main().catch((err) => { console.error(err); process.exit(1); });
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

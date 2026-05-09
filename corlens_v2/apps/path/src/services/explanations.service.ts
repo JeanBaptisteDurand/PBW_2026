@@ -1,6 +1,6 @@
 import type { AIServiceClient } from "../connectors/ai-service.js";
-import type { GraphRepo } from "../repositories/graph.repo.js";
 import type { GraphNode } from "../domain/types.js";
+import type { GraphRepo } from "../repositories/graph.repo.js";
 
 export type ExplanationsServiceOptions = {
   ai: AIServiceClient;

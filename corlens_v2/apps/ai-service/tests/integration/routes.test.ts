@@ -1,4 +1,4 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "../../src/app.js";
 import { loadAiServiceEnv } from "../../src/env.js";
 
@@ -14,9 +14,11 @@ describe("ai-service routes", () => {
   beforeAll(async () => {
     app = await buildApp(env);
     // Replace runtime connectors with stubs so tests don't hit real APIs
-    (app as never as { openaiClient?: unknown });
+    app as never as { openaiClient?: unknown };
   });
-  afterAll(async () => { await app.close(); });
+  afterAll(async () => {
+    await app.close();
+  });
   afterEach(async () => {
     await app.prisma.promptLog.deleteMany({});
     await app.prisma.webSearchCache.deleteMany({});

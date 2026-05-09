@@ -1,5 +1,5 @@
+import { deriveAddress, deriveKeypair, generateSeed, sign } from "ripple-keypairs";
 import { describe, expect, it } from "vitest";
-import { generateSeed, deriveKeypair, deriveAddress, sign } from "ripple-keypairs";
 import { RippleKeypairsWalletVerifier } from "../../src/connectors/wallet-verifier.js";
 
 const verifier = new RippleKeypairsWalletVerifier();

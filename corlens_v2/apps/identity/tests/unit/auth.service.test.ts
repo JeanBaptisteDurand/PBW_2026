@@ -25,7 +25,14 @@ const wallet = "rExampleWallet1234567890123456789";
 
 function makeDeps() {
   const users = {
-    upsertByWallet: vi.fn(async (w: string) => ({ id: "uid-1", walletAddress: w, role: "free" as const, apiKey: null, createdAt: new Date(), updatedAt: new Date() })),
+    upsertByWallet: vi.fn(async (w: string) => ({
+      id: "uid-1",
+      walletAddress: w,
+      role: "free" as const,
+      apiKey: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })),
   };
   const verifier = { verify: vi.fn(() => true) };
   const jwt = { sign: vi.fn(() => "stub.jwt.token"), verify: vi.fn() };

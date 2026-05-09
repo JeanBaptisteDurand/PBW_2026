@@ -3,7 +3,10 @@ import { createRagIndexService } from "../../src/services/rag-index.service.js";
 
 describe("rag-index.service", () => {
   it("clears existing docs and inserts new ones with embeddings", async () => {
-    const ai = { complete: vi.fn(), embed: vi.fn().mockResolvedValue({ embedding: [0.1, 0.2], tokensIn: 5 }) };
+    const ai = {
+      complete: vi.fn(),
+      embed: vi.fn().mockResolvedValue({ embedding: [0.1, 0.2], tokensIn: 5 }),
+    };
     const repo = {
       upsertDoc: vi.fn(async () => undefined),
       searchByEmbedding: vi.fn(),
@@ -13,7 +16,13 @@ describe("rag-index.service", () => {
     };
     const svc = createRagIndexService({ ai: ai as never, repo: repo as never });
     await svc.index({
-      corridor: { id: "usd-mxn", label: "USD ↔ MXN", description: "test", useCase: "test", aiNote: "ok" },
+      corridor: {
+        id: "usd-mxn",
+        label: "USD ↔ MXN",
+        description: "test",
+        useCase: "test",
+        aiNote: "ok",
+      },
       chunks: ["chunk 1", "chunk 2"],
     });
     expect(repo.clearDocs).toHaveBeenCalledWith("usd-mxn");

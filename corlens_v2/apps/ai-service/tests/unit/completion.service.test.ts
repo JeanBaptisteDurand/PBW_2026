@@ -4,16 +4,25 @@ import { createCompletionService } from "../../src/services/completion.service.j
 describe("completion.service", () => {
   it("calls openai, logs the prompt, and returns response with promptLogId", async () => {
     const openai = {
-      chat: vi.fn().mockResolvedValue({ content: "hi", model: "gpt-4o-mini", tokensIn: 5, tokensOut: 2 }),
+      chat: vi
+        .fn()
+        .mockResolvedValue({ content: "hi", model: "gpt-4o-mini", tokensIn: 5, tokensOut: 2 }),
       embed: vi.fn(),
     };
     const promptLog = {
       insert: vi.fn(async () => ({ id: "log-1" })),
       rollupByPurpose: vi.fn(),
     };
-    const svc = createCompletionService({ openai: openai as never, promptLog: promptLog as never, defaultModel: "gpt-4o-mini" });
+    const svc = createCompletionService({
+      openai: openai as never,
+      promptLog: promptLog as never,
+      defaultModel: "gpt-4o-mini",
+    });
 
-    const out = await svc.complete({ purpose: "test", messages: [{ role: "user", content: "hi" }] });
+    const out = await svc.complete({
+      purpose: "test",
+      messages: [{ role: "user", content: "hi" }],
+    });
 
     expect(out.content).toBe("hi");
     expect(out.promptLogId).toBe("log-1");
@@ -31,7 +40,11 @@ describe("completion.service", () => {
       embed: vi.fn(),
     };
     const promptLog = { insert: vi.fn(async () => ({ id: "log-1" })), rollupByPurpose: vi.fn() };
-    const svc = createCompletionService({ openai: openai as never, promptLog: promptLog as never, defaultModel: "gpt-4o-mini" });
+    const svc = createCompletionService({
+      openai: openai as never,
+      promptLog: promptLog as never,
+      defaultModel: "gpt-4o-mini",
+    });
 
     await expect(
       svc.complete({ purpose: "test", messages: [{ role: "user", content: "hi" }] }),

@@ -14,8 +14,12 @@ const env = loadAgentEnv({
 
 describe("agent routes", () => {
   let app: Awaited<ReturnType<typeof buildApp>>;
-  beforeAll(async () => { app = await buildApp(env); });
-  afterAll(async () => { await app.close(); });
+  beforeAll(async () => {
+    app = await buildApp(env);
+  });
+  afterAll(async () => {
+    await app.close();
+  });
 
   it("/health returns ok", async () => {
     const res = await app.inject({ method: "GET", url: "/health" });
@@ -30,12 +34,18 @@ describe("agent routes", () => {
   });
 
   it("GET /api/safe-path/<unknown> returns 404", async () => {
-    const res = await app.inject({ method: "GET", url: "/api/safe-path/00000000-0000-0000-0000-000000000000" });
+    const res = await app.inject({
+      method: "GET",
+      url: "/api/safe-path/00000000-0000-0000-0000-000000000000",
+    });
     expect(res.statusCode).toBe(404);
   });
 
   it("GET /api/compliance/<unknown> returns 404", async () => {
-    const res = await app.inject({ method: "GET", url: "/api/compliance/00000000-0000-0000-0000-000000000000" });
+    const res = await app.inject({
+      method: "GET",
+      url: "/api/compliance/00000000-0000-0000-0000-000000000000",
+    });
     expect(res.statusCode).toBe(404);
   });
 });

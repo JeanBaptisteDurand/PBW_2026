@@ -8,7 +8,10 @@ const Schema = z.object({
   JWT_SECRET: z.string().min(32),
   XRPL_PAYMENT_WALLET_ADDRESS: z.string().regex(/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/),
   XRPL_TESTNET_RPC: z.string().url(),
-  XRPL_DEMO_WALLET_SECRET: z.preprocess((v) => v === "" ? undefined : v, z.string().min(1).optional()),
+  XRPL_DEMO_WALLET_SECRET: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.string().min(1).optional(),
+  ),
   CHALLENGE_TTL_SECONDS: z.coerce.number().int().min(60).max(3600).default(300),
   PAYMENT_EXPIRY_MINUTES: z.coerce.number().int().min(1).max(120).default(15),
   XRP_PRICE: z.string().default("10"),
@@ -18,6 +21,8 @@ const Schema = z.object({
 
 export type IdentityEnv = z.infer<typeof Schema>;
 
-export function loadIdentityEnv(source?: NodeJS.ProcessEnv | Record<string, string | undefined>): IdentityEnv {
+export function loadIdentityEnv(
+  source?: NodeJS.ProcessEnv | Record<string, string | undefined>,
+): IdentityEnv {
   return loadEnv(Schema, source);
 }

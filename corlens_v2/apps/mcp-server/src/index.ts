@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 // CorLens v2 MCP Server — exposes the v2 gateway as MCP tools over stdio.
 
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { readFileSync } from "fs";
-import { resolve, dirname } from "path";
-import { fileURLToPath } from "url";
 
 function loadEnv() {
   try {
@@ -19,7 +19,10 @@ function loadEnv() {
       const eq = trimmed.indexOf("=");
       if (eq === -1) continue;
       const key = trimmed.slice(0, eq).trim();
-      const val = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, "");
+      const val = trimmed
+        .slice(eq + 1)
+        .trim()
+        .replace(/^["']|["']$/g, "");
       if (!process.env[key]) process.env[key] = val;
     }
   } catch {
@@ -35,7 +38,7 @@ async function apiFetch(path: string, options?: RequestInit): Promise<any> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (API_KEY) {
     if (API_KEY.startsWith("xlens_")) headers["x-api-key"] = API_KEY;
-    else headers["Authorization"] = `Bearer ${API_KEY}`;
+    else headers.Authorization = `Bearer ${API_KEY}`;
   }
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
@@ -54,7 +57,10 @@ server.tool(
   "list_corridors",
   "List XRPL fiat corridors with status, actors, and classification.",
   {
-    region: z.string().optional().describe("Filter: GCC, LATAM, APAC, Europe, Americas, MEA, Africa"),
+    region: z
+      .string()
+      .optional()
+      .describe("Filter: GCC, LATAM, APAC, Europe, Americas, MEA, Africa"),
     status: z.string().optional().describe("Filter: GREEN, AMBER, RED, UNKNOWN"),
     currency: z.string().optional().describe("Filter by currency code, e.g. USD, EUR, MXN"),
     limit: z.number().min(1).max(500).optional().describe("Max corridors (default 100)"),
@@ -66,9 +72,7 @@ server.tool(
     params.set("limit", String(limit ?? 100));
     let corridors: any[] = await apiFetch(`/corridors?${params.toString()}`);
     if (region) {
-      corridors = corridors.filter(
-        (c: any) => c.region?.toLowerCase() === region.toLowerCase(),
-      );
+      corridors = corridors.filter((c: any) => c.region?.toLowerCase() === region.toLowerCase());
     }
     const summary = corridors
       .slice(0, 50)
@@ -184,7 +188,7 @@ server.tool(
   },
   async ({ srcCcy, dstCcy, amount, maxRiskTolerance }) => {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
-    if (API_KEY) headers["Authorization"] = `Bearer ${API_KEY}`;
+    if (API_KEY) headers.Authorization = `Bearer ${API_KEY}`;
     const res = await fetch(`${API_BASE}/safe-path`, {
       method: "POST",
       headers,
@@ -206,21 +210,32 @@ server.tool(
       try {
         const evt = JSON.parse(payload);
         if (evt.kind === "phase-start") steps.push(`[start] ${evt.phase}`);
-        else if (evt.kind === "phase-complete") steps.push(`[done] ${evt.phase} (${evt.durationMs}ms)`);
-        else if (evt.kind === "reasoning") steps.push(`Reasoning: ${(evt.text ?? "").slice(0, 200)}`);
-        else if (evt.kind === "corridor-context") steps.push(`Corridor: ${evt.label ?? "(none)"} status=${evt.status ?? "n/a"}`);
-        else if (evt.kind === "path-active") steps.push(`Path active: ${evt.pathId} risk=${evt.riskScore}`);
-        else if (evt.kind === "path-rejected") steps.push(`Path rejected: ${evt.pathId} -- ${evt.reason}`);
+        else if (evt.kind === "phase-complete")
+          steps.push(`[done] ${evt.phase} (${evt.durationMs}ms)`);
+        else if (evt.kind === "reasoning")
+          steps.push(`Reasoning: ${(evt.text ?? "").slice(0, 200)}`);
+        else if (evt.kind === "corridor-context")
+          steps.push(`Corridor: ${evt.label ?? "(none)"} status=${evt.status ?? "n/a"}`);
+        else if (evt.kind === "path-active")
+          steps.push(`Path active: ${evt.pathId} risk=${evt.riskScore}`);
+        else if (evt.kind === "path-rejected")
+          steps.push(`Path rejected: ${evt.pathId} -- ${evt.reason}`);
         else if (evt.kind === "result") finalResult = evt;
         else if (evt.kind === "result-persisted") runId = evt.runId;
-        else if (evt.kind === "error") steps.push(`Error in ${evt.phase ?? "unknown"}: ${evt.message}`);
+        else if (evt.kind === "error")
+          steps.push(`Error in ${evt.phase ?? "unknown"}: ${evt.message}`);
       } catch {
         // skip malformed lines
       }
     }
     if (!finalResult) {
       return {
-        content: [{ type: "text" as const, text: `Safe Path completed but no result event was returned.\n\nLog:\n${steps.join("\n")}` }],
+        content: [
+          {
+            type: "text" as const,
+            text: `Safe Path completed but no result event was returned.\n\nLog:\n${steps.join("\n")}`,
+          },
+        ],
       };
     }
     const output = [
@@ -230,7 +245,8 @@ server.tool(
       "",
       `Reasoning:\n${finalResult.reasoning ?? ""}`,
     ];
-    if (runId) output.push("", `Run ID: ${runId}`, `Get markdown report: GET /api/compliance/${runId}`);
+    if (runId)
+      output.push("", `Run ID: ${runId}`, `Get markdown report: GET /api/compliance/${runId}`);
     output.push("", "--- Phase log ---", ...steps);
     return {
       content: [{ type: "text" as const, text: output.join("\n") }],

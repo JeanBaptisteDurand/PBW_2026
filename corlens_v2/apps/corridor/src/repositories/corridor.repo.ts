@@ -1,5 +1,5 @@
-import { corridorDb } from "@corlens/db/corridor";
 import type { Prisma } from "@corlens/db";
+import { corridorDb } from "@corlens/db/corridor";
 
 export type CorridorRow = {
   id: string;
@@ -30,7 +30,22 @@ export type CorridorRow = {
 export function createCorridorRepo(prisma: Prisma) {
   const db = corridorDb(prisma);
   return {
-    async upsertSeed(rows: Array<Omit<CorridorRow, "status" | "pathCount" | "recRiskScore" | "recCost" | "flagsJson" | "routesJson" | "liquidityJson" | "aiNote" | "lastRefreshedAt"> & { highlights: unknown; sourceJson: unknown; destJson: unknown }>) {
+    async upsertSeed(
+      rows: Array<
+        Omit<
+          CorridorRow,
+          | "status"
+          | "pathCount"
+          | "recRiskScore"
+          | "recCost"
+          | "flagsJson"
+          | "routesJson"
+          | "liquidityJson"
+          | "aiNote"
+          | "lastRefreshedAt"
+        > & { highlights: unknown; sourceJson: unknown; destJson: unknown }
+      >,
+    ) {
       for (const row of rows) {
         await db.corridor.upsert({
           where: { id: row.id },
@@ -70,14 +85,18 @@ export function createCorridorRepo(prisma: Prisma) {
       }
     },
 
-    async list(filter: { tier?: number; status?: string; currency?: string; limit: number; offset: number }) {
+    async list(filter: {
+      tier?: number;
+      status?: string;
+      currency?: string;
+      limit: number;
+      offset: number;
+    }) {
       const where: Record<string, unknown> = {};
       if (filter.tier !== undefined) where.tier = filter.tier;
       if (filter.status) where.status = filter.status;
       if (filter.currency) {
-        where.OR = [
-          { id: { contains: filter.currency.toLowerCase() } },
-        ];
+        where.OR = [{ id: { contains: filter.currency.toLowerCase() } }];
       }
       return db.corridor.findMany({
         where,
@@ -91,7 +110,18 @@ export function createCorridorRepo(prisma: Prisma) {
       return db.corridor.findUnique({ where: { id } });
     },
 
-    async updateScan(id: string, update: { status: string; pathCount: number; recRiskScore: number | null; recCost: string | null; flagsJson: unknown; routesJson: unknown; liquidityJson: unknown }) {
+    async updateScan(
+      id: string,
+      update: {
+        status: string;
+        pathCount: number;
+        recRiskScore: number | null;
+        recCost: string | null;
+        flagsJson: unknown;
+        routesJson: unknown;
+        liquidityJson: unknown;
+      },
+    ) {
       await db.corridor.update({
         where: { id },
         data: {

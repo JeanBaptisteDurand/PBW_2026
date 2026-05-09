@@ -1,13 +1,17 @@
 import { describe, expect, it, vi } from "vitest";
-import { createXrplClient, type ClientFactory } from "../../src/connectors/xrpl-client.js";
+import { type ClientFactory, createXrplClient } from "../../src/connectors/xrpl-client.js";
 
 class FakeClient {
   isConnected_ = true;
   requestCalls: Array<{ command: string; params: unknown }> = [];
   fail: boolean | "load" = false;
-  isConnected() { return this.isConnected_; }
+  isConnected() {
+    return this.isConnected_;
+  }
   async connect() {}
-  async disconnect() { this.isConnected_ = false; }
+  async disconnect() {
+    this.isConnected_ = false;
+  }
   async request(payload: { command: string }) {
     this.requestCalls.push({ command: payload.command, params: payload });
     if (this.fail === "load") {
@@ -39,9 +43,13 @@ describe("xrpl-client", () => {
 
   it("falls back to the next endpoint when the first one's connect throws", async () => {
     const failing = new FakeClient();
-    failing.connect = async () => { throw new Error("boom"); };
+    failing.connect = async () => {
+      throw new Error("boom");
+    };
     const ok = new FakeClient();
-    const factory: ClientFactory = vi.fn((url: string) => (url.includes("primary") ? failing : ok) as never);
+    const factory: ClientFactory = vi.fn(
+      (url: string) => (url.includes("primary") ? failing : ok) as never,
+    );
     const client = createXrplClient({
       primaryEndpoints: ["wss://primary.example", "wss://fallback.example"],
       pathfindEndpoints: ["wss://primary.example"],

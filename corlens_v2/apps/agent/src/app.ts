@@ -1,20 +1,26 @@
 import Fastify, { type FastifyInstance } from "fastify";
-import { serializerCompiler, validatorCompiler, type ZodTypeProvider } from "fastify-type-provider-zod";
-import { type AgentEnv } from "./env.js";
-import { prismaPlugin } from "./plugins/prisma.js";
-import { registerErrorHandler } from "./plugins/error-handler.js";
-import { registerSwagger } from "./plugins/swagger.js";
+import {
+  type ZodTypeProvider,
+  serializerCompiler,
+  validatorCompiler,
+} from "fastify-type-provider-zod";
+import { createAIServiceClient } from "./connectors/ai-service.js";
 import { createCorridorClient } from "./connectors/corridor.js";
 import { createPathClient } from "./connectors/path.js";
-import { createAIServiceClient } from "./connectors/ai-service.js";
+import { registerChatRoutes } from "./controllers/chat.controller.js";
+import { registerComplianceRoutes } from "./controllers/compliance.controller.js";
+import { registerSafePathRoutes } from "./controllers/safe-path.controller.js";
+import type { AgentEnv } from "./env.js";
+import { registerErrorHandler } from "./plugins/error-handler.js";
+import { prismaPlugin } from "./plugins/prisma.js";
+import { registerSwagger } from "./plugins/swagger.js";
 import { createSafePathRunRepo } from "./repositories/safe-path-run.repo.js";
 import { createOrchestrator } from "./services/orchestrator.service.js";
-import { registerSafePathRoutes } from "./controllers/safe-path.controller.js";
-import { registerComplianceRoutes } from "./controllers/compliance.controller.js";
-import { registerChatRoutes } from "./controllers/chat.controller.js";
 
 export async function buildApp(env: AgentEnv): Promise<FastifyInstance> {
-  const app = Fastify({ logger: { level: process.env.LOG_LEVEL ?? "info" } }).withTypeProvider<ZodTypeProvider>();
+  const app = Fastify({
+    logger: { level: process.env.LOG_LEVEL ?? "info" },
+  }).withTypeProvider<ZodTypeProvider>();
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
   registerErrorHandler(app);
@@ -27,7 +33,12 @@ export async function buildApp(env: AgentEnv): Promise<FastifyInstance> {
   const ai = createAIServiceClient({ baseUrl: env.AI_SERVICE_BASE_URL });
 
   const runs = createSafePathRunRepo(app.prisma);
-  const orchestrator = createOrchestrator({ corridor, path, ai, timeoutMs: env.MAX_PHASE_TIMEOUT_MS });
+  const orchestrator = createOrchestrator({
+    corridor,
+    path,
+    ai,
+    timeoutMs: env.MAX_PHASE_TIMEOUT_MS,
+  });
 
   await registerSafePathRoutes(app, orchestrator, runs);
   await registerComplianceRoutes(app, runs);

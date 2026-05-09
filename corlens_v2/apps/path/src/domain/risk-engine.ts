@@ -1,13 +1,13 @@
 // Pure risk flag computation — ported from v1 corlens/apps/server/src/analysis/riskEngine.ts
 // No I/O. No logger. No xrpl/openai/prisma imports.
 
-import type { RiskFlagData, CrawlResult } from "./types.js";
+import type { CrawlResult, RiskFlagData } from "./types.js";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const GLOBAL_FREEZE_FLAG = 0x00400000;
 const ALLOW_CLAWBACK_FLAG = 0x80000000; // lsfAllowTrustLineClawback
-const DEPOSIT_AUTH_FLAG = 0x01000000;   // lsfDepositAuth
+const DEPOSIT_AUTH_FLAG = 0x01000000; // lsfDepositAuth
 const DISABLE_MASTER_FLAG = 0x00100000; // lsfDisableMasterKey
 const HIGH_TRANSFER_FEE_THRESHOLD = 1_010_000_000; // > 1% fee
 
@@ -95,40 +95,35 @@ export function computeRiskFlags(crawl: CrawlResult, seedAddress: string): RiskF
       }
     }
   }
+  if (crawl.ammPool) {
+    let xrpReserve = 0;
+    let tokenReserve = 0;
 
-  // ── 4. THIN_AMM_POOL (MED) ────────────────────────────────────────────────
-  // TVL < $100k. Estimate: XRP reserve * $2 + token reserve * $1
-  {
-    if (crawl.ammPool) {
-      let xrpReserve = 0;
-      let tokenReserve = 0;
-
-      if (crawl.ammPool.amount) {
-        if (typeof crawl.ammPool.amount === "string") {
-          // XRP in drops
-          xrpReserve = Number(crawl.ammPool.amount) / 1_000_000;
-        } else {
-          tokenReserve = Number(crawl.ammPool.amount.value ?? 0);
-        }
+    if (crawl.ammPool.amount) {
+      if (typeof crawl.ammPool.amount === "string") {
+        // XRP in drops
+        xrpReserve = Number(crawl.ammPool.amount) / 1_000_000;
+      } else {
+        tokenReserve = Number(crawl.ammPool.amount.value ?? 0);
       }
-      if (crawl.ammPool.amount2) {
-        if (typeof crawl.ammPool.amount2 === "string") {
-          xrpReserve = Number(crawl.ammPool.amount2) / 1_000_000;
-        } else {
-          tokenReserve = Number(crawl.ammPool.amount2.value ?? 0);
-        }
+    }
+    if (crawl.ammPool.amount2) {
+      if (typeof crawl.ammPool.amount2 === "string") {
+        xrpReserve = Number(crawl.ammPool.amount2) / 1_000_000;
+      } else {
+        tokenReserve = Number(crawl.ammPool.amount2.value ?? 0);
       }
+    }
 
-      const tvl = xrpReserve * 2 + tokenReserve * 1;
+    const tvl = xrpReserve * 2 + tokenReserve * 1;
 
-      if (tvl < 100_000) {
-        flags.push({
-          flag: "THIN_AMM_POOL",
-          severity: "MED",
-          detail: `AMM pool TVL estimated at $${tvl.toFixed(2)} (threshold: $100,000)`,
-          data: { tvlUsd: tvl, xrpReserve, tokenReserve },
-        });
-      }
+    if (tvl < 100_000) {
+      flags.push({
+        flag: "THIN_AMM_POOL",
+        severity: "MED",
+        detail: `AMM pool TVL estimated at $${tvl.toFixed(2)} (threshold: $100,000)`,
+        data: { tvlUsd: tvl, xrpReserve, tokenReserve },
+      });
     }
   }
 
@@ -241,9 +236,7 @@ export function computeRiskFlags(crawl: CrawlResult, seedAddress: string): RiskF
   // ── 13. ACTIVE_CHECKS (MED) ─────────────────────────────────────────────
   // Outstanding checks represent financial obligations
   {
-    const checks = crawl.accountObjects.filter(
-      (o: any) => o.LedgerEntryType === "Check",
-    );
+    const checks = crawl.accountObjects.filter((o: any) => o.LedgerEntryType === "Check");
     if (checks.length > 0) {
       const totalXrpChecks = checks
         .filter((c: any) => typeof c.SendMax === "string")
@@ -281,7 +274,7 @@ export function computeRiskFlags(crawl: CrawlResult, seedAddress: string): RiskF
         flags.push({
           flag: "HIGH_TX_VELOCITY",
           severity: "MED",
-          detail: `${txCount} recent transactions — ${(dominantPct * 100).toFixed(0)}% are ${dominantType![0]}`,
+          detail: `${txCount} recent transactions — ${(dominantPct * 100).toFixed(0)}% are ${dominantType?.[0]}`,
           data: {
             txCount,
             dominantType: dominantType?.[0],
@@ -316,7 +309,8 @@ export function computeRiskFlags(crawl: CrawlResult, seedAddress: string): RiskF
       flags.push({
         flag: "BLACKHOLED_ACCOUNT",
         severity: "HIGH",
-        detail: "Account is blackholed — master key disabled, no regular key, no signer list. Settings are permanently immutable.",
+        detail:
+          "Account is blackholed — master key disabled, no regular key, no signer list. Settings are permanently immutable.",
         data: { flags: issuerFlags },
       });
     }
@@ -331,7 +325,8 @@ export function computeRiskFlags(crawl: CrawlResult, seedAddress: string): RiskF
       flags.push({
         flag: "NO_REGULAR_KEY",
         severity: "LOW",
-        detail: "Token issuer has no RegularKey set — single master key is the only signing authority",
+        detail:
+          "Token issuer has no RegularKey set — single master key is the only signing authority",
         data: { address: seedAddress },
       });
     }
@@ -401,53 +396,43 @@ export function computeRiskFlags(crawl: CrawlResult, seedAddress: string): RiskF
       });
     }
   }
+  if (crawl.ammPool) {
+    const checkAsset = (asset: any): { currency: string; issuer: string } | null => {
+      if (typeof asset === "string") return null; // XRP
+      if (!asset || !asset.currency || !asset.issuer) return null;
+      return { currency: asset.currency, issuer: asset.issuer };
+    };
 
-  // ── 20. AMM_CLAWBACK_EXPOSURE (HIGH) — XLS-73 ───────────────────────────
-  // XLS-73 (AMM Clawback) lets a token issuer with AllowTrustLineClawback
-  // claw back tokens that LPs have already deposited into an AMM pool —
-  // before the amendment, deposits were "protected". Every LP in such a pool
-  // is exposed.
-  // We surface this on the *consumer* side (per pool), distinct from the
-  // existing CLAWBACK_ENABLED flag which fires on the issuer side.
-  {
-    if (crawl.ammPool) {
-      const checkAsset = (asset: any): { currency: string; issuer: string } | null => {
-        if (typeof asset === "string") return null; // XRP
-        if (!asset || !asset.currency || !asset.issuer) return null;
-        return { currency: asset.currency, issuer: asset.issuer };
-      };
-
-      const exposedAssets: Array<{ currency: string; issuer: string }> = [];
-      for (const asset of [checkAsset(crawl.ammPool.amount), checkAsset(crawl.ammPool.amount2)]) {
-        if (!asset) continue;
-        // Resolve the issuer's flags. If the asset issuer is the seed account,
-        // use issuerInfo (always populated). Otherwise look it up in
-        // topAccounts (populated for top trust line holders / LP holders).
-        let assetIssuerFlags = 0;
-        if (asset.issuer === seedAddress) {
-          assetIssuerFlags = crawl.issuerInfo?.Flags ?? 0;
-        } else {
-          const topAccounts = crawl.topAccounts as Map<string, any>;
-          const enriched = topAccounts.get?.(asset.issuer);
-          assetIssuerFlags = enriched?.Flags ?? 0;
-        }
-        if ((assetIssuerFlags & ALLOW_CLAWBACK_FLAG) !== 0) {
-          exposedAssets.push(asset);
-        }
+    const exposedAssets: Array<{ currency: string; issuer: string }> = [];
+    for (const asset of [checkAsset(crawl.ammPool.amount), checkAsset(crawl.ammPool.amount2)]) {
+      if (!asset) continue;
+      // Resolve the issuer's flags. If the asset issuer is the seed account,
+      // use issuerInfo (always populated). Otherwise look it up in
+      // topAccounts (populated for top trust line holders / LP holders).
+      let assetIssuerFlags = 0;
+      if (asset.issuer === seedAddress) {
+        assetIssuerFlags = crawl.issuerInfo?.Flags ?? 0;
+      } else {
+        const topAccounts = crawl.topAccounts as Map<string, any>;
+        const enriched = topAccounts.get?.(asset.issuer);
+        assetIssuerFlags = enriched?.Flags ?? 0;
       }
-
-      if (exposedAssets.length > 0) {
-        flags.push({
-          flag: "AMM_CLAWBACK_EXPOSURE",
-          severity: "HIGH",
-          detail: `AMM pool contains ${exposedAssets.length} clawback-enabled asset(s) — XLS-73 lets the issuer claw tokens already deposited as LP, exposing every LP in the pool`,
-          data: {
-            poolAccount: crawl.ammPool.account,
-            xlsAmendment: "XLS-73",
-            exposedAssets,
-          },
-        });
+      if ((assetIssuerFlags & ALLOW_CLAWBACK_FLAG) !== 0) {
+        exposedAssets.push(asset);
       }
+    }
+
+    if (exposedAssets.length > 0) {
+      flags.push({
+        flag: "AMM_CLAWBACK_EXPOSURE",
+        severity: "HIGH",
+        detail: `AMM pool contains ${exposedAssets.length} clawback-enabled asset(s) — XLS-73 lets the issuer claw tokens already deposited as LP, exposing every LP in the pool`,
+        data: {
+          poolAccount: crawl.ammPool.account,
+          xlsAmendment: "XLS-73",
+          exposedAssets,
+        },
+      });
     }
   }
 

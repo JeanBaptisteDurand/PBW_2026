@@ -1,7 +1,7 @@
-import type { CrawlerService } from "./crawler.service.js";
 import { buildGraph } from "../domain/graph-builder.js";
 import { computeRiskFlags } from "../domain/risk-engine.js";
-import type { GraphData, CrawlResult, RiskFlagData } from "../domain/types.js";
+import type { CrawlResult, GraphData, RiskFlagData } from "../domain/types.js";
+import type { CrawlerService } from "./crawler.service.js";
 
 export type BfsRunInput = { seedAddress: string; seedLabel: string | null; depth: number };
 
@@ -32,13 +32,20 @@ export function createBfsService(opts: BfsServiceOptions) {
       const flags = computeRiskFlags(crawl, input.seedAddress);
 
       // Attach flags to the seed node
-      const seedNode = graph.nodes.find((n) => n.kind === "account" && (n.id === input.seedAddress || n.label === input.seedAddress)) ?? graph.nodes[0];
+      const seedNode =
+        graph.nodes.find(
+          (n) =>
+            n.kind === "account" && (n.id === input.seedAddress || n.label === input.seedAddress),
+        ) ?? graph.nodes[0];
       if (seedNode) {
         seedNode.riskFlags = flags;
       }
 
       const riskCounts = flags.reduce(
-        (acc, f) => { acc[f.severity] += 1; return acc; },
+        (acc, f) => {
+          acc[f.severity] += 1;
+          return acc;
+        },
         { HIGH: 0, MED: 0, LOW: 0 },
       );
 

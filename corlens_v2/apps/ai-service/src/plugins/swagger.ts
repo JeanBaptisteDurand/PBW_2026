@@ -8,5 +8,8 @@ export async function registerSwagger(app: FastifyInstance): Promise<void> {
     openapi: { info: { title: "@corlens/ai-service", version: "0.1.0" }, servers: [{ url: "/" }] },
     transform: jsonSchemaTransform,
   });
-  await app.register(swaggerUi, { routePrefix: "/docs", uiConfig: { docExpansion: "list", deepLinking: true } });
+  await app.register(swaggerUi, {
+    routePrefix: "/docs",
+    uiConfig: { docExpansion: "list", deepLinking: true },
+  });
 }

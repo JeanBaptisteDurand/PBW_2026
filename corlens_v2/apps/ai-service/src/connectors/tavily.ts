@@ -48,7 +48,12 @@ export function createTavilyClient(opts: TavilyClientOptions): TavilyClient {
       return {
         query: json.query,
         answer: json.answer,
-        results: json.results.map((r) => ({ title: r.title, url: r.url, snippet: r.content, score: r.score })),
+        results: json.results.map((r) => ({
+          title: r.title,
+          url: r.url,
+          snippet: r.content,
+          score: r.score,
+        })),
       };
     },
   };

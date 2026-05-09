@@ -24,7 +24,9 @@ export function createXrplPaymentClient(opts: { rpcUrl: string }): XrplPaymentCl
   async function getClient(): Promise<Client> {
     if (client?.isConnected()) return client;
     if (client) {
-      try { await client.disconnect(); } catch {}
+      try {
+        await client.disconnect();
+      } catch {}
     }
     client = new Client(opts.rpcUrl);
     await client.connect();
@@ -41,7 +43,16 @@ export function createXrplPaymentClient(opts: { rpcUrl: string }): XrplPaymentCl
       });
       const txs = ((resp.result as { transactions?: unknown[] }).transactions ?? []) as unknown[];
       for (const entry of txs) {
-        const e = entry as { tx_json?: { TransactionType?: string; Destination?: string; Account?: string; Memos?: unknown[] }; tx?: unknown; hash?: string };
+        const e = entry as {
+          tx_json?: {
+            TransactionType?: string;
+            Destination?: string;
+            Account?: string;
+            Memos?: unknown[];
+          };
+          tx?: unknown;
+          hash?: string;
+        };
         const tx = e.tx_json ?? (e.tx as typeof e.tx_json | undefined);
         if (!tx || tx.TransactionType !== "Payment") continue;
         if (tx.Destination !== destination) continue;
@@ -68,7 +79,14 @@ export function createXrplPaymentClient(opts: { rpcUrl: string }): XrplPaymentCl
         TransactionType: "Payment",
         Account: wallet.address,
         Destination: destination,
-        Memos: [{ Memo: { MemoData: convertStringToHex(memo), MemoType: convertStringToHex("text/plain") } }],
+        Memos: [
+          {
+            Memo: {
+              MemoData: convertStringToHex(memo),
+              MemoType: convertStringToHex("text/plain"),
+            },
+          },
+        ],
       };
       if (currency === "XRP") {
         blob.Amount = xrpToDrops(amount);
@@ -84,7 +102,9 @@ export function createXrplPaymentClient(opts: { rpcUrl: string }): XrplPaymentCl
 
     async close() {
       if (client) {
-        try { await client.disconnect(); } catch {}
+        try {
+          await client.disconnect();
+        } catch {}
         client = null;
       }
     },

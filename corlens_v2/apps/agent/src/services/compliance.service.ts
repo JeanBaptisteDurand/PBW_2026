@@ -28,6 +28,8 @@ export function renderComplianceMarkdown(run: SafePathRunRow): string {
   lines.push("");
   lines.push("## Disclaimer");
   lines.push("");
-  lines.push("This report is generated programmatically from on-chain XRPL data and corridor intelligence. It is informational only and does not constitute financial or legal advice.");
+  lines.push(
+    "This report is generated programmatically from on-chain XRPL data and corridor intelligence. It is informational only and does not constitute financial or legal advice.",
+  );
   return lines.join("\n");
 }

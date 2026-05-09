@@ -6,7 +6,10 @@ class FakeRedis {
   async get(key: string): Promise<string | null> {
     const e = this.store.get(key);
     if (!e) return null;
-    if (Date.now() > e.expiresAt) { this.store.delete(key); return null; }
+    if (Date.now() > e.expiresAt) {
+      this.store.delete(key);
+      return null;
+    }
     return e.value;
   }
   async set(key: string, value: string, mode: "EX", ttl: number): Promise<"OK"> {
@@ -39,7 +42,11 @@ describe("cache.service", () => {
   it("does not cache when fetcher throws", async () => {
     const r = new FakeRedis();
     const cache = createCacheService({ redis: r as never });
-    await expect(cache.getOrSet("k", 60, async () => { throw new Error("fail"); })).rejects.toThrow("fail");
+    await expect(
+      cache.getOrSet("k", 60, async () => {
+        throw new Error("fail");
+      }),
+    ).rejects.toThrow("fail");
     expect(await r.get("k")).toBeNull();
   });
 

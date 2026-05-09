@@ -1,10 +1,16 @@
-import { corridorDb } from "@corlens/db/corridor";
 import type { Prisma } from "@corlens/db";
+import { corridorDb } from "@corlens/db/corridor";
 
 export function createStatusEventRepo(prisma: Prisma) {
   const db = corridorDb(prisma);
   return {
-    async append(input: { corridorId: string; status: string; pathCount: number; recCost: string | null; source: string }) {
+    async append(input: {
+      corridorId: string;
+      status: string;
+      pathCount: number;
+      recCost: string | null;
+      source: string;
+    }) {
       await db.corridorStatusEvent.create({
         data: { ...input },
       });

@@ -1,5 +1,5 @@
-import { pathDb } from "@corlens/db/path";
 import type { Prisma } from "@corlens/db";
+import { pathDb } from "@corlens/db/path";
 
 export type AnalysisRow = {
   id: string;
@@ -17,7 +17,12 @@ export type AnalysisRow = {
 export function createAnalysisRepo(prisma: Prisma) {
   const db = pathDb(prisma);
   return {
-    async create(input: { seedAddress: string; seedLabel: string | null; depth: number; userId: string | null }): Promise<AnalysisRow> {
+    async create(input: {
+      seedAddress: string;
+      seedLabel: string | null;
+      depth: number;
+      userId: string | null;
+    }): Promise<AnalysisRow> {
       return db.analysis.create({
         data: { ...input, status: "queued" },
       }) as unknown as AnalysisRow;
@@ -47,7 +52,10 @@ export function createAnalysisRepo(prisma: Prisma) {
     },
 
     async setSummary(id: string, summaryJson: unknown): Promise<void> {
-      await db.analysis.update({ where: { id }, data: { summaryJson: summaryJson as never, status: "done" } });
+      await db.analysis.update({
+        where: { id },
+        data: { summaryJson: summaryJson as never, status: "done" },
+      });
     },
   };
 }

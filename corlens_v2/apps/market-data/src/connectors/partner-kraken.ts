@@ -9,7 +9,13 @@ export async function fetchKrakenDepth(opts: KrakenOptions): Promise<PartnerDept
   const url = `${KRAKEN_BASE}/Depth?pair=${encodeURIComponent(opts.pair)}&count=100`;
   const res = await f(url);
   if (!res.ok) throw new Error(`Kraken ${opts.pair} returned HTTP ${res.status}`);
-  const json = (await res.json()) as { error: unknown[]; result: Record<string, { bids: Array<[string, string, number]>; asks: Array<[string, string, number]> }> };
+  const json = (await res.json()) as {
+    error: unknown[];
+    result: Record<
+      string,
+      { bids: Array<[string, string, number]>; asks: Array<[string, string, number]> }
+    >;
+  };
   if (json.error.length > 0) throw new Error(`Kraken error: ${JSON.stringify(json.error)}`);
   const firstKey = Object.keys(json.result)[0];
   if (!firstKey) throw new Error(`Kraken ${opts.pair} returned empty result`);

@@ -13,7 +13,10 @@ export async function fetchBinanceDepth(opts: BinanceOptions): Promise<PartnerDe
   const url = `${BINANCE_BASE}/depth?symbol=${encodeURIComponent(opts.symbol)}&limit=100`;
   const res = await f(url);
   if (!res.ok) throw new Error(`Binance ${opts.symbol} returned HTTP ${res.status}`);
-  const json = (await res.json()) as { bids: Array<[string, string]>; asks: Array<[string, string]> };
+  const json = (await res.json()) as {
+    bids: Array<[string, string]>;
+    asks: Array<[string, string]>;
+  };
   const bids = json.bids.map(([price, amount]) => ({ price, amount }));
   const asks = json.asks.map(([price, amount]) => ({ price, amount }));
   const topBid = bids[0] ?? null;
