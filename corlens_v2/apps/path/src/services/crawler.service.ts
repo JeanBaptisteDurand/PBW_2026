@@ -76,8 +76,7 @@ export function createCrawlerService(opts: CrawlerServiceOptions) {
       const ammAccount = (ammPool?.account ?? null) as string | null;
       if (ammAccount) {
         const lpResp = await safe(
-          () =>
-            md.trustLines(ammAccount, { limit: 500 }) as Promise<{ lines?: unknown[] }>,
+          () => md.trustLines(ammAccount, { limit: 500 }) as Promise<{ lines?: unknown[] }>,
           { lines: [] },
         );
         lpHolders = (lpResp.lines ?? []) as Array<Record<string, unknown>>;
@@ -134,16 +133,14 @@ export function createCrawlerService(opts: CrawlerServiceOptions) {
 
       // 10. account_nfts
       const nftsResp = await safe(
-        () =>
-          md.accountNfts(seedAddress) as Promise<{ result?: { account_nfts?: unknown[] } }>,
+        () => md.accountNfts(seedAddress) as Promise<{ result?: { account_nfts?: unknown[] } }>,
         { result: { account_nfts: [] } },
       );
       const nfts = (nftsResp.result?.account_nfts ?? []) as Array<Record<string, unknown>>;
 
       // 11. account_channels (limit 500)
       const channelsResp = await safe(
-        () =>
-          md.accountChannels(seedAddress) as Promise<{ result?: { channels?: unknown[] } }>,
+        () => md.accountChannels(seedAddress) as Promise<{ result?: { channels?: unknown[] } }>,
         { result: { channels: [] } },
       );
       const channels = (channelsResp.result?.channels ?? []) as Array<Record<string, unknown>>;
@@ -249,17 +246,14 @@ export function createCrawlerService(opts: CrawlerServiceOptions) {
       const nftOffers: Array<Record<string, unknown>> = [];
       for (const nft of nfts.slice(0, 5)) {
         const nftId =
-          ((nft as { NFTokenID?: string }).NFTokenID ??
-            (nft as { nft_id?: string }).nft_id) ?? null;
+          (nft as { NFTokenID?: string }).NFTokenID ?? (nft as { nft_id?: string }).nft_id ?? null;
         if (!nftId) continue;
         const buyResp = await safe(
-          () =>
-            md.nftBuyOffers(nftId) as Promise<{ result?: { offers?: unknown[] } }>,
+          () => md.nftBuyOffers(nftId) as Promise<{ result?: { offers?: unknown[] } }>,
           { result: { offers: [] } },
         );
         const sellResp = await safe(
-          () =>
-            md.nftSellOffers(nftId) as Promise<{ result?: { offers?: unknown[] } }>,
+          () => md.nftSellOffers(nftId) as Promise<{ result?: { offers?: unknown[] } }>,
           { result: { offers: [] } },
         );
         for (const o of (buyResp.result?.offers ?? []) as Array<Record<string, unknown>>) {
