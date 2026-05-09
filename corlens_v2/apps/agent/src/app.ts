@@ -6,6 +6,7 @@ import {
 } from "fastify-type-provider-zod";
 import { createAIServiceClient } from "./connectors/ai-service.js";
 import { createCorridorClient } from "./connectors/corridor.js";
+import { createMarketDataClient } from "./connectors/market-data.js";
 import { createPathClient } from "./connectors/path.js";
 import { registerChatRoutes } from "./controllers/chat.controller.js";
 import { registerComplianceRoutes } from "./controllers/compliance.controller.js";
@@ -31,12 +32,14 @@ export async function buildApp(env: AgentEnv): Promise<FastifyInstance> {
   const corridor = createCorridorClient({ baseUrl: env.CORRIDOR_BASE_URL });
   const path = createPathClient({ baseUrl: env.PATH_BASE_URL });
   const ai = createAIServiceClient({ baseUrl: env.AI_SERVICE_BASE_URL });
+  const marketData = createMarketDataClient({ baseUrl: env.MARKET_DATA_BASE_URL });
 
   const runs = createSafePathRunRepo(app.prisma);
   const orchestrator = createOrchestrator({
     corridor,
     path,
     ai,
+    marketData,
     timeoutMs: env.MAX_PHASE_TIMEOUT_MS,
   });
 
