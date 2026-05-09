@@ -18,6 +18,17 @@ type SeedCorridor = {
   dest: unknown;
 };
 
+function normalizeAsset(raw: unknown): unknown {
+  if (!raw || typeof raw !== "object") return raw;
+  const r = raw as Record<string, unknown>;
+  if (typeof r.currency === "string") return raw;
+  if (typeof r.symbol === "string") {
+    const { symbol, ...rest } = r;
+    return { currency: symbol, ...rest };
+  }
+  return raw;
+}
+
 export type CatalogSeederOptions = {
   repo: CorridorRepo;
   seedPath: string;
@@ -43,8 +54,8 @@ export function createCatalogSeeder(opts: CatalogSeederOptions) {
         useCase: c.useCase,
         highlights: c.highlights,
         amount: c.amount,
-        sourceJson: c.source,
-        destJson: c.dest,
+        sourceJson: normalizeAsset(c.source),
+        destJson: normalizeAsset(c.dest),
       }));
       await opts.repo.upsertSeed(rows);
       return { seeded: true, total: rows.length };

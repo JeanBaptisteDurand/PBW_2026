@@ -7,6 +7,17 @@ import type { StatusEventRepo } from "../repositories/status-event.repo.js";
 
 const ErrorResp = z.object({ error: z.string() });
 
+function normalizeAsset(raw: unknown): unknown {
+  if (!raw || typeof raw !== "object") return raw;
+  const r = raw as Record<string, unknown>;
+  if (typeof r.currency === "string") return raw;
+  if (typeof r.symbol === "string") {
+    const { symbol, ...rest } = r;
+    return { currency: symbol, ...rest };
+  }
+  return raw;
+}
+
 function rowToList(r: Awaited<ReturnType<CorridorRepo["list"]>>[number]) {
   return {
     id: r.id,
@@ -68,8 +79,8 @@ export async function registerCorridorRoutes(
         useCase: r.useCase,
         highlights: (r.highlights as string[]) ?? [],
         amount: r.amount,
-        source: r.sourceJson as never,
-        dest: r.destJson as never,
+        source: normalizeAsset(r.sourceJson) as never,
+        dest: normalizeAsset(r.destJson) as never,
         routes: (r.routesJson as unknown[]) ?? [],
         flags: Array.isArray(r.flagsJson) ? (r.flagsJson as unknown[]) : [],
         liquidity: r.liquidityJson,
