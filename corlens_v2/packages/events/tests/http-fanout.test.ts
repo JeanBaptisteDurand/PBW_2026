@@ -97,4 +97,47 @@ describe("HttpFanoutEventBus", () => {
     });
     expect(() => bus.subscribe("payment.confirmed", () => {})).not.toThrow();
   });
+
+  it("attaches signed headers from the signal callback to every fanout request", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 200 });
+    const signal = vi.fn((body: string) => ({
+      "x-corlens-ts": "1700000000",
+      "x-corlens-sig": `sig-for-${body.length}`,
+    }));
+    const bus = new HttpFanoutEventBus({
+      subscribers: { "payment.confirmed": ["http://a/events", "http://b/events"] },
+      fetch: fetchMock as unknown as typeof fetch,
+      signal,
+    });
+
+    await bus.publish("payment.confirmed", validPayload);
+
+    expect(signal).toHaveBeenCalledTimes(1);
+    const expectedBody = JSON.stringify({ name: "payment.confirmed", payload: validPayload });
+    expect(signal).toHaveBeenCalledWith(expectedBody);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    for (const call of fetchMock.mock.calls) {
+      const init = call[1] as RequestInit;
+      const headers = init.headers as Record<string, string>;
+      expect(headers["content-type"]).toBe("application/json");
+      expect(headers["x-corlens-ts"]).toBe("1700000000");
+      expect(headers["x-corlens-sig"]).toBe(`sig-for-${expectedBody.length}`);
+    }
+  });
+
+  it("omits HMAC headers when no signal callback is provided", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true });
+    const bus = new HttpFanoutEventBus({
+      subscribers: { "payment.confirmed": ["http://x/events"] },
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+
+    await bus.publish("payment.confirmed", validPayload);
+
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+    const headers = init.headers as Record<string, string>;
+    expect(headers["content-type"]).toBe("application/json");
+    expect(headers["x-corlens-ts"]).toBeUndefined();
+    expect(headers["x-corlens-sig"]).toBeUndefined();
+  });
 });

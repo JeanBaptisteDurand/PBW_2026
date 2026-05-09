@@ -1,4 +1,10 @@
-import { type EventBus, InMemoryEventBus } from "@corlens/events";
+import { hmacSigner } from "@corlens/clients";
+import {
+  CompositeEventBus,
+  type EventBus,
+  HttpFanoutEventBus,
+  InMemoryEventBus,
+} from "@corlens/events";
 import Fastify, { type FastifyInstance } from "fastify";
 import {
   type ZodTypeProvider,
@@ -39,7 +45,18 @@ export async function buildApp(env: IdentityEnv): Promise<FastifyInstance> {
   registerErrorHandler(app);
 
   app.decorate("jwtService", createJwtService({ secret: env.JWT_SECRET, ttlSeconds: 86400 }));
-  app.decorate("events", new InMemoryEventBus());
+
+  const inMemBus = new InMemoryEventBus();
+  const fanoutBus = new HttpFanoutEventBus({
+    subscribers: {
+      "payment.confirmed": [
+        `${env.AI_SERVICE_BASE_URL}/events/payment.confirmed`,
+        `${env.AGENT_BASE_URL}/events/payment.confirmed`,
+      ],
+    },
+    signal: hmacSigner({ secret: env.INTERNAL_HMAC_SECRET }),
+  });
+  app.decorate("events", new CompositeEventBus([inMemBus, fanoutBus]));
   app.decorate("xrpl", createXrplPaymentClient({ rpcUrl: env.XRPL_TESTNET_RPC }));
 
   app.addHook("onClose", async () => {

@@ -18,6 +18,8 @@ const Schema = z.object({
   XRP_PRICE: z.string().default("10"),
   RLUSD_PRICE: z.string().default("5"),
   HOST: z.string().default("0.0.0.0"),
+  AI_SERVICE_BASE_URL: z.string().url().default("http://ai-service:3003"),
+  AGENT_BASE_URL: z.string().url().default("http://agent:3006"),
 });
 
 export type IdentityEnv = z.infer<typeof Schema>;

@@ -13,3 +13,4 @@ export interface EventBus {
 
 export { InMemoryEventBus } from "./in-memory.js";
 export { HttpFanoutEventBus } from "./http-fanout.js";
+export { CompositeEventBus } from "./composite.js";

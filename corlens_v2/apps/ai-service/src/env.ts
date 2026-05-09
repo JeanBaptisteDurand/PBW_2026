@@ -10,6 +10,7 @@ const Schema = z.object({
   DEFAULT_CHAT_MODEL: z.string().default("gpt-4o-mini"),
   DEFAULT_EMBEDDING_MODEL: z.string().default("text-embedding-3-small"),
   WEB_SEARCH_CACHE_HOURS: z.coerce.number().int().min(1).max(168).default(24),
+  INTERNAL_HMAC_SECRET: z.string().min(32),
 });
 
 export type AiServiceEnv = z.infer<typeof Schema>;

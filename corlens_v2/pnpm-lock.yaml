@@ -78,6 +78,9 @@ importers:
 
   apps/ai-service:
     dependencies:
+      '@corlens/clients':
+        specifier: workspace:*
+        version: link:../../packages/clients
       '@corlens/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts

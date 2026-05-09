@@ -12,6 +12,7 @@ import { registerChatRoutes } from "./controllers/chat.controller.js";
 import { registerCompliancePdfRoutes } from "./controllers/compliance-pdf.controller.js";
 import { registerComplianceVerifyRoutes } from "./controllers/compliance-verify.controller.js";
 import { registerComplianceRoutes } from "./controllers/compliance.controller.js";
+import { registerEventRoutes } from "./controllers/events.controller.js";
 import { registerSafePathRoutes } from "./controllers/safe-path.controller.js";
 import type { AgentEnv } from "./env.js";
 import { createRequirePremiumPreHandler } from "./middleware/require-premium.js";
@@ -80,6 +81,7 @@ export async function buildApp(
   await registerComplianceVerifyRoutes(app, runs);
   await registerCompliancePdfRoutes(app, { runs, complianceData, pdfRenderer, requirePremium });
   await registerChatRoutes(app, path, corridor);
+  await registerEventRoutes(app, env);
 
   app.get("/health", { schema: { hide: true } }, async () => ({ status: "ok", service: "agent" }));
 

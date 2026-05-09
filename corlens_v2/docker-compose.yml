@@ -66,6 +66,8 @@ services:
       PAYMENT_EXPIRY_MINUTES: "15"
       XRP_PRICE: "10"
       RLUSD_PRICE: "5"
+      AI_SERVICE_BASE_URL: http://ai-service:3003
+      AGENT_BASE_URL: http://agent:3006
     ports:
       - "3001:3001"
     depends_on:
@@ -125,6 +127,7 @@ services:
       DEFAULT_CHAT_MODEL: gpt-4o-mini
       DEFAULT_EMBEDDING_MODEL: text-embedding-3-small
       WEB_SEARCH_CACHE_HOURS: "24"
+      INTERNAL_HMAC_SECRET: ${INTERNAL_HMAC_SECRET:-dev-internal-hmac-secret-do-not-use-in-prod-aaaaaaa}
     ports:
       - "3003:3003"
     depends_on:

@@ -6,6 +6,7 @@ const valid = {
   DATABASE_URL: "postgresql://corlens:corlens_dev@localhost:5435/corlens",
   OPENAI_API_KEY: "sk-test-1234567890",
   TAVILY_API_KEY: "tvly-test-abc",
+  INTERNAL_HMAC_SECRET: "test-internal-hmac-secret-must-be-at-least-32-chars",
 };
 
 describe("loadAiServiceEnv", () => {

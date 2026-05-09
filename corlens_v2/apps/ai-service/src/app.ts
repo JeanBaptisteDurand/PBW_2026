@@ -9,6 +9,7 @@ import { createOpenAIClient } from "./connectors/openai.js";
 import { createTavilyClient } from "./connectors/tavily.js";
 import { registerCompletionRoutes } from "./controllers/completion.controller.js";
 import { registerEmbeddingRoutes } from "./controllers/embedding.controller.js";
+import { registerEventRoutes } from "./controllers/events.controller.js";
 import { registerUsageRoutes } from "./controllers/usage.controller.js";
 import { registerWebSearchRoutes } from "./controllers/web-search.controller.js";
 import type { AiServiceEnv } from "./env.js";
@@ -60,6 +61,7 @@ export async function buildApp(env: AiServiceEnv): Promise<FastifyInstance> {
   await registerEmbeddingRoutes(app, embedding);
   await registerWebSearchRoutes(app, webSearch);
   await registerUsageRoutes(app, usage);
+  await registerEventRoutes(app, env);
 
   app.get("/health", { schema: { hide: true } }, async () => ({
     status: "ok",
