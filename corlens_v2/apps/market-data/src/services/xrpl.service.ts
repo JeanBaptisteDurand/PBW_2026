@@ -45,6 +45,10 @@ export function createXrplService(opts: XrplServiceOptions) {
       cache.getOrSet(`acc:ccy:${address}`, ttl.account, () =>
         fetchers.fetchAccountCurrencies(client, address),
       ),
+    gatewayBalances: (address: string) =>
+      cache.getOrSet(`acc:gw:${address}`, ttl.account, () =>
+        fetchers.fetchGatewayBalances(client, address),
+      ),
     noripple: (address: string, role: "gateway" | "user") =>
       cache.getOrSet(`acc:nr:${address}:${role}`, ttl.account, () =>
         fetchers.fetchNoripppleCheck(client, address, role),

@@ -19,6 +19,9 @@ const stubMarketData = () => ({
   nftBuyOffers: vi.fn(),
   nftSellOffers: vi.fn(),
   pathFind: vi.fn().mockResolvedValue({ result: { alternatives: [] } }),
+  accountCurrencies: vi
+    .fn()
+    .mockResolvedValue({ result: { send_currencies: [], receive_currencies: [] } }),
 });
 
 describe("crawler.service", () => {
@@ -31,6 +34,15 @@ describe("crawler.service", () => {
     expect(Array.isArray(out.trustLines)).toBe(true);
     expect(out.topAccounts instanceof Map).toBe(true);
     expect(md.accountInfo).toHaveBeenCalledWith("rSeed");
+    expect(md.gatewayBalances).toHaveBeenCalledWith("rSeed");
+    expect(md.accountCurrencies).toHaveBeenCalledWith("rSeed");
+    expect(md.pathFind).toHaveBeenCalled();
+    expect(Array.isArray(out.lpHolders)).toBe(true);
+    expect(Array.isArray(out.asks)).toBe(true);
+    expect(Array.isArray(out.bids)).toBe(true);
+    expect(Array.isArray(out.paths)).toBe(true);
+    expect(Array.isArray(out.txTypeSummary)).toBe(true);
+    expect(Array.isArray(out.nftOffers)).toBe(true);
   });
 
   it("tolerates a single failed RPC by setting that field to a default and continuing", async () => {

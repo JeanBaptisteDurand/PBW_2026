@@ -10,6 +10,7 @@ export type MarketDataClient = {
   accountChannels(address: string): Promise<unknown>;
   accountOffers(address: string): Promise<unknown>;
   gatewayBalances(address: string): Promise<unknown>;
+  accountCurrencies(address: string): Promise<unknown>;
   noripple(address: string): Promise<unknown>;
   bookOffers(input: {
     takerGetsCurrency: string;
@@ -79,7 +80,8 @@ export function createMarketDataClient(opts: MarketDataClientOptions): MarketDat
     accountNfts: (a) => getJson(`/xrpl/account/${encodeURIComponent(a)}/nfts`),
     accountChannels: (a) => getJson(`/xrpl/account/${encodeURIComponent(a)}/channels`),
     accountOffers: (a) => getJson(`/xrpl/account/${encodeURIComponent(a)}/offers`),
-    gatewayBalances: (a) => getJson(`/xrpl/account/${encodeURIComponent(a)}/currencies`),
+    gatewayBalances: (a) => getJson(`/xrpl/account/${encodeURIComponent(a)}/gateway-balances`),
+    accountCurrencies: (a) => getJson(`/xrpl/account/${encodeURIComponent(a)}/currencies`),
     noripple: (a) => getJson(`/xrpl/account/${encodeURIComponent(a)}/noripple`),
     bookOffers: (i) => getJson(`/xrpl/book${qs(i)}`),
     ammByPair: (i) => getJson(`/xrpl/amm/by-pair${qs(i)}`),

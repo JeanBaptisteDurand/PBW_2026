@@ -108,6 +108,14 @@ export async function registerXrplRoutes(app: FastifyInstance, svc: XrplService)
   );
 
   typed.get(
+    "/xrpl/account/:address/gateway-balances",
+    {
+      schema: { params: md.AddressParam, response: { 200: RawResponse }, tags: ["xrpl"] },
+    },
+    async (req) => svc.gatewayBalances(req.params.address) as Promise<Raw>,
+  );
+
+  typed.get(
     "/xrpl/account/:address/noripple",
     {
       schema: {
