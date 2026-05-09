@@ -9,5 +9,9 @@ dist/
 .next/
 pnpm-lock.yaml
 screen
-.superpowers/
-!/corlens_v2/pnpm-lock.yaml
+
+# scratch / experimental dirs at repo root
+/PBW/
+/.superpowers/
+/ROADMAP.md
+/SAFE_PATH_AGENT_DEEP_DIVE.md
