@@ -3,6 +3,9 @@
 ### AI-powered risk intelligence & autonomous compliance agent for XRPL DeFi
 
 [![Demo Video](https://img.shields.io/badge/Demo-YouTube-red?logo=youtube)](https://youtu.be/JYIxANpQtms)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](#local-setup)
+[![pnpm](https://img.shields.io/badge/pnpm-%3E%3D9-f69220?logo=pnpm&logoColor=white)](https://pnpm.io/)
 
 CORLens is a full-stack platform for mapping, understanding, and auditing the infrastructure behind cross-border payments on the XRP Ledger.
 
@@ -62,21 +65,63 @@ Trust Lines, AMM Pools, DEX Orderbooks, path_find, Escrow, Signer Lists, XLS-73 
 
 ## Local Setup
 
+### Prerequisites
+
+- **Node.js** ≥ 20
+- **pnpm** ≥ 9 (`corepack enable && corepack prepare pnpm@9 --activate`)
+- **Docker** (for Postgres + Redis — or bring your own)
+- An **OpenAI API key** (used for the Safe Path agent reasoning + corridor RAG embeddings)
+- *(optional but recommended)* A **QuickNode XRPL Mainnet** endpoint — public XRPL nodes work for read-only browsing, but the agent's pathfinding bursts to ~50 req/s and benefits from a dedicated endpoint
+
+### Quick start
+
 ```bash
-cd corlens
+git clone https://github.com/JeanBaptisteDurand/PBW_2026.git
+cd PBW_2026/corlens
 pnpm install
 
-# Set up environment
+# Configure environment
 cp .env.example .env
-# Edit .env with your DATABASE_URL, OPENAI_API_KEY, etc.
+# Open .env and at minimum set OPENAI_API_KEY
 
-# Start Docker services (Postgres + Redis)
-docker compose up -d
+# Start Postgres (with pgvector) + Redis
+docker run -d --name corlens-pg \
+  -e POSTGRES_USER=corlens -e POSTGRES_PASSWORD=corlens_dev -e POSTGRES_DB=corlens \
+  -p 5432:5432 ankane/pgvector:latest
+docker run -d --name corlens-redis -p 6379:6379 redis:7
 
-# Generate Prisma client and start dev servers
+# Apply schema (Prisma) and start the dev servers
 pnpm db:generate
+pnpm db:push
 pnpm dev
 ```
+
+Once the dev servers are up:
+
+| Service | URL |
+| --- | --- |
+| Web app | http://localhost:5173 |
+| API | http://localhost:3001 |
+| Prisma Studio | `pnpm db:studio` → http://localhost:5555 |
+
+### Environment variables
+
+All env vars live in [`corlens/.env.example`](./corlens/.env.example). Copy that file to `.env` and fill in the ones marked **required** below.
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `DATABASE_URL` | yes | Postgres connection string. The database must have the `pgvector` extension (the `ankane/pgvector` image above ships it pre-installed) |
+| `OPENAI_API_KEY` | yes | OpenAI key — powers the Safe Path agent (GPT-4o-mini) and the corridor / entity RAG embeddings |
+| `JWT_SECRET` | yes | Secret used to sign the session JWT issued after Crossmark wallet authentication |
+| `XRPL_PRIMARY_RPC` | recommended | XRPL Mainnet WSS endpoint used for all read calls (account state, AMM, orderbook, trust lines). A working public node is fine for low-traffic dev |
+| `XRPL_PATHFIND_RPC` | recommended | Dedicated XRPL endpoint for `ripple_path_find` (can equal `XRPL_PRIMARY_RPC` in dev) |
+| `REDIS_URL` | no | Defaults to `redis://localhost:6379`. Used by BullMQ to queue audit crawls |
+| `PORT` | no | API port (default `3001`) |
+| `NODE_ENV` | no | `development` (default) / `production` / `test` |
+| `XRPL_TESTNET_RPC` | no | XRPL Testnet WSS endpoint — only required if you exercise the premium subscription payment flow locally |
+| `XRPL_PAYMENT_WALLET_ADDRESS` | no | Receiving wallet address for premium subscription payments (testnet) |
+| `XRPL_PAYMENT_WALLET_SECRET` | no | Seed of the receiving wallet (testnet) |
+| `XRPL_DEMO_WALLET_SECRET` | no | Seed of a funded testnet wallet used by the in-app "pay for premium" demo button. Generate one at https://faucet.altnet.rippletest.net |
 
 ---
 
@@ -117,6 +162,38 @@ corlens/
   packages/
     core/         Shared types and utilities
 ```
+
+---
+
+## Roadmap (Open Source)
+
+CORLens started as a hackathon project. The next phase is to turn it from a single deployable product into a *toolkit* that other teams can pull into their own products — runnable standalone, but also consumable as front-end and back-end libraries.
+
+### Today — standalone deployment
+
+The full stack runs end-to-end as documented above (web UI + API + agent + RAG + MCP server). This is the right fit if you want the entire corridor-and-compliance product, branded as your own.
+
+### Next — embeddable libraries
+
+The plan is to extract the working pieces into focused, independently versioned packages so you can pick the parts you need:
+
+| Package | Surface | What you get |
+| --- | --- | --- |
+| `@corlens/sdk` | TypeScript client (browser + Node) | Typed client for the public REST API — corridor lookup, safe-path runs, entity audits — usable from any frontend or backend |
+| `@corlens/agent` | Headless Node library | Run the 9-phase Safe Path agent inside your own service, BYO LLM key. Stream the same SSE event stream into your own UI |
+| `@corlens/risk-engine` | Pure TypeScript library | The XRPL risk scoring engine (XLS-73 clawback, XLS-77 deep freeze, deposit auth, regular key, global freeze) without the AI layer — for compliance teams who want signals, not narrative |
+| `@corlens/corridor-atlas` | React component | Drop-in 2,436-corridor browser, themable, talks to any CORLens-compatible backend |
+| `@corlens/safe-path-widget` | React component | Embeddable safe-path analysis widget — point it at a CORLens server, get a live streaming compliance report inside your own app |
+| `@corlens/mcp` | MCP server *(already shipped)* | Wraps the public REST API as 7 MCP tools for Claude Desktop / Claude Code |
+
+### Beyond that
+
+- Pluggable chain connectors so the corridor / risk engine isn't XRPL-only
+- First-class Python bindings for data-science teams investigating corridors
+- A CLI (`corlens audit <r-address>`, `corlens safepath USD MXN 1M`) over the SDK
+- Hosted "CORLens-as-a-service" so integrators don't have to run Postgres + Redis + an OpenAI key themselves
+
+Contributions are welcome. If you want to hack on a specific package, please open an issue first so we can align on the contracts before code lands.
 
 ---
 
@@ -161,3 +238,9 @@ All events are streamed as typed SSE events (`SafePathEvent`) -- the frontend re
 42 Blockchain
 
 Built for Hack the Block 2026, Paris Blockchain Week (April 11-12, 2026).
+
+---
+
+## License
+
+CORLens is released under the [MIT License](./LICENSE) — use it, fork it, embed it, ship it. Attribution is appreciated but not required.
