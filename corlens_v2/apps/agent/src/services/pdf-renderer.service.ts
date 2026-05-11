@@ -80,6 +80,28 @@ function screenSanctions(_address: string): {
   };
 }
 
+export type EntityRiskFlag = {
+  flag: string;
+  severity: RiskSeverity;
+  detail: string;
+  data?: unknown;
+};
+
+export type EntityAuditData = {
+  summary: {
+    id: string;
+    seedAddress: string;
+    seedLabel?: string | null;
+    depth: number;
+    stats?: {
+      nodeCount: number;
+      edgeCount: number;
+      riskCounts: { HIGH: number; MED: number; LOW: number };
+    } | null;
+  };
+  flags: EntityRiskFlag[];
+};
+
 export type PdfRendererService = ReturnType<typeof createPdfRendererService>;
 
 export function createPdfRendererService() {
@@ -330,6 +352,71 @@ export function createPdfRendererService() {
 
       doc.end();
       return done;
+    },
+
+    /**
+     * Thin adapter for entity-audit compliance PDFs.
+     * Maps an { summary, flags } shape to ComplianceReportData and delegates to render().
+     */
+    async renderEntity(entity: EntityAuditData, options: PdfRenderOptions = {}): Promise<Buffer> {
+      const overallSeverity: RiskSeverity = entity.flags.some((f) => f.severity === "HIGH")
+        ? "HIGH"
+        : entity.flags.some((f) => f.severity === "MED")
+          ? "MED"
+          : "LOW";
+
+      const stats = entity.summary.stats;
+      const data: ComplianceReportData = {
+        title: `Entity Audit Compliance Report: ${entity.summary.seedLabel ?? entity.summary.seedAddress}`,
+        generatedAt: new Date().toISOString(),
+        seedAddress: entity.summary.seedAddress,
+        seedLabel: entity.summary.seedLabel ?? undefined,
+        summary:
+          `Entity audit for ${entity.summary.seedAddress} at depth ${entity.summary.depth}. ${
+            stats
+              ? `Graph: ${stats.nodeCount} nodes, ${stats.edgeCount} edges. Risk counts — HIGH: ${stats.riskCounts.HIGH}, MED: ${stats.riskCounts.MED}, LOW: ${stats.riskCounts.LOW}.`
+              : ""
+          }`.trim(),
+        riskAssessment: {
+          overall: overallSeverity,
+          flags: entity.flags.map((f) => ({
+            flag: f.flag,
+            severity: f.severity,
+            detail: f.detail,
+            data: f.data as Record<string, unknown> | undefined,
+          })),
+        },
+        entityBreakdown: {
+          tokens: 0,
+          issuers: 0,
+          pools: 0,
+          accounts: stats?.nodeCount ?? 0,
+          orderBooks: 0,
+          escrows: 0,
+          paymentPaths: 0,
+          checks: 0,
+          payChannels: 0,
+          nfts: 0,
+          signerLists: 0,
+          dids: 0,
+          credentials: 0,
+          mpTokens: 0,
+          oracles: 0,
+          depositPreauths: 0,
+          offers: 0,
+          permissionedDomains: 0,
+          nftOffers: 0,
+          tickets: 0,
+          bridges: 0,
+          vaults: 0,
+        },
+        recommendations: [
+          "Review all HIGH-severity flags before any settlement.",
+          "Archive the audit-hashed PDF alongside the settlement record.",
+          "Re-run the entity audit if significant time has elapsed since this report.",
+        ],
+      };
+      return this.render(data, options);
     },
   };
 }

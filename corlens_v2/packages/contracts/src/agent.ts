@@ -228,3 +228,21 @@ export const ChatResponse = z.object({
   answer: z.string(),
   sources: z.array(z.object({ id: z.string(), snippet: z.string() })),
 });
+
+export const AnalysisComplianceRequest = z.object({
+  travelRule: z
+    .object({
+      originatorName: z.string().optional(),
+      beneficiaryName: z.string().optional(),
+    })
+    .optional(),
+  sanctionsCheck: z.boolean().optional(),
+});
+export type AnalysisComplianceRequest = z.infer<typeof AnalysisComplianceRequest>;
+
+export const AnalysisComplianceResponse = z.object({
+  analysisId: z.string().uuid(),
+  markdown: z.string(),
+  auditHash: z.string().length(64),
+});
+export type AnalysisComplianceResponse = z.infer<typeof AnalysisComplianceResponse>;
