@@ -24,6 +24,12 @@ export function makeMockDeps(overrides?: Partial<PhaseContext["deps"]>): PhaseCo
       getGraph: vi.fn().mockResolvedValue({ nodes: [], edges: [] }),
       chat: vi.fn().mockResolvedValue({ answer: "ok", sources: [] }),
       history: vi.fn().mockResolvedValue({}),
+      quickEvalRisk: vi.fn().mockResolvedValue({
+        address: "rDefault",
+        score: 10,
+        flags: [],
+        summary: { isIssuer: false, trustLineCount: 0, hasAmmPool: false },
+      }),
     },
     ai: {
       complete: vi.fn().mockResolvedValue({ content: "stub", tokensIn: 1, tokensOut: 1 }),

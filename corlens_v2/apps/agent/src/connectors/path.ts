@@ -1,4 +1,5 @@
 import { hmacSigner } from "@corlens/clients";
+import { path as pp } from "@corlens/contracts";
 
 export type PathClient = {
   analyze(input: { seedAddress: string; seedLabel?: string; depth?: number }): Promise<{
@@ -12,6 +13,7 @@ export type PathClient = {
     sources: Array<{ id: string; snippet: string }>;
   }>;
   history(address: string): Promise<unknown>;
+  quickEvalRisk(address: string): Promise<pp.RiskQuickEvalResponse>;
 };
 
 export type PathClientOptions = {
@@ -72,6 +74,17 @@ export function createPathClient(opts: PathClientOptions): PathClient {
       });
       if (!res.ok) throw new Error(`path history -> ${res.status}`);
       return res.json();
+    },
+    async quickEvalRisk(address) {
+      const bodyStr = JSON.stringify({ address });
+      const res = await f(`${opts.baseUrl}/api/risk-engine/quick-eval`, {
+        method: "POST",
+        headers: { "content-type": "application/json", ...sign(bodyStr) },
+        body: bodyStr,
+      });
+      if (!res.ok) throw new Error(`path quickEvalRisk -> ${res.status}`);
+      const json = await res.json();
+      return pp.RiskQuickEvalResponse.parse(json);
     },
   };
 }

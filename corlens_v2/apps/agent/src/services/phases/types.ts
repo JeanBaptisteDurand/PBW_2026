@@ -77,6 +77,7 @@ export type SharedState = {
   deepAnalyses: Map<string, DeepAnalysisResult>;
   ragInsights: Map<string, string>;
   analyzedAddresses: Set<string>;
+  crawledAddresses: Set<string>;
   paths: unknown[];
   rejected: Array<{ pathId: string; reason: string; flags: string[] }>;
   splitPlan: SplitLeg[] | null;
@@ -125,6 +126,7 @@ export function makeInitialState(): SharedState {
     deepAnalyses: new Map(),
     ragInsights: new Map(),
     analyzedAddresses: new Set(),
+    crawledAddresses: new Set(),
     paths: [],
     rejected: [],
     splitPlan: null,

@@ -10,6 +10,7 @@ import {
   type DeepAnalysisResult,
   type Phase,
   type PhaseContext,
+  type RiskFlag,
   type SafePathEvent,
   errMessage,
   nowIso,
@@ -20,7 +21,7 @@ async function deepAnalyze(
   q: EventQueue,
   address: string,
   label: string,
-): Promise<{ analysisId: string } & DeepAnalysisResult> {
+): Promise<{ analysisId: string; graphFlags: RiskFlag[] } & DeepAnalysisResult> {
   q.push({
     kind: "tool-call",
     name: "deepAnalyze",
@@ -39,7 +40,7 @@ async function deepAnalyze(
       summary: `Analyze failed: ${errMessage(err)}`,
       at: nowIso(),
     });
-    return { analysisId: "", label, nodeCount: 0, edgeCount: 0 };
+    return { analysisId: "", label, nodeCount: 0, edgeCount: 0, graphFlags: [] };
   }
 
   q.push({
@@ -64,7 +65,7 @@ async function deepAnalyze(
           summary: `Analysis failed: ${a.error ?? "unknown"}`,
           at: nowIso(),
         });
-        return { analysisId, label, nodeCount: 0, edgeCount: 0 };
+        return { analysisId, label, nodeCount: 0, edgeCount: 0, graphFlags: [] };
       }
     } catch {
       // transient; keep polling until deadline
@@ -73,17 +74,33 @@ async function deepAnalyze(
 
   let nodeCount = 0;
   let edgeCount = 0;
+  type GraphNode = {
+    riskFlags?: Array<{ flag: string; severity: string; detail: string; data?: unknown }>;
+  };
+  type GraphResponse = { nodes?: GraphNode[]; edges?: unknown[] } | null;
+  let graphFlags: RiskFlag[] = [];
   try {
-    const graph = (await path.getGraph(analysisId)) as {
-      nodes?: unknown[];
-      edges?: unknown[];
-    } | null;
-    if (graph) {
-      nodeCount = Array.isArray(graph.nodes) ? graph.nodes.length : 0;
-      edgeCount = Array.isArray(graph.edges) ? graph.edges.length : 0;
+    const graphResponse = (await path.getGraph(analysisId)) as GraphResponse;
+    if (graphResponse) {
+      nodeCount = Array.isArray(graphResponse.nodes) ? graphResponse.nodes.length : 0;
+      edgeCount = Array.isArray(graphResponse.edges) ? graphResponse.edges.length : 0;
+      // Approach A: flatten per-node risk flags from the single graph call,
+      // avoiding a second HTTP request to the same endpoint.
+      graphFlags = (graphResponse.nodes ?? []).flatMap((n) =>
+        (n.riskFlags ?? []).map((rf) => ({
+          flag: rf.flag,
+          severity: rf.severity as RiskFlag["severity"],
+          detail: rf.detail,
+          data: rf.data as Record<string, unknown> | undefined,
+        })),
+      );
     }
-  } catch {
-    // graph fetch failed; counts stay zero
+  } catch (err) {
+    // graph fetch failed; counts and flags stay at zero/empty
+    console.warn(
+      { analysisId, error: err instanceof Error ? err.message : String(err) },
+      "deep-entity-analysis: failed to fetch graph, emitting account-crawled with empty flags",
+    );
   }
 
   q.push({
@@ -123,7 +140,7 @@ async function deepAnalyze(
     });
   }
 
-  return { analysisId, label, nodeCount, edgeCount, ragInsight };
+  return { analysisId, label, nodeCount, edgeCount, ragInsight, graphFlags };
 }
 
 async function findActorAddress(
@@ -219,6 +236,34 @@ export class DeepEntityAnalysisPhase implements Phase {
           edgeCount: result.edgeCount,
         });
         if (result.ragInsight) state.ragInsights.set(address, result.ragInsight);
+
+        // Emit account-crawled for each newly-analyzed address so downstream
+        // phases (and the SSE client) know this entity was crawled. Phase 06
+        // uses ctx.state.crawledAddresses to avoid double-emitting.
+        //
+        // Risk flags: graphFlags are extracted inline from the getGraph response
+        // already fetched inside deepAnalyze (Approach A — no second HTTP call).
+        // Since each deep analysis is seeded with a single address (one seed →
+        // one graph), every flag in the result belongs to this target.
+        // Severity weights: HIGH=30, MED=15, LOW=5, capped at 100.
+        if (!state.crawledAddresses.has(address)) {
+          state.crawledAddresses.add(address);
+          const riskFlags: RiskFlag[] = result.graphFlags;
+          let riskScore = 0;
+          for (const rf of riskFlags) {
+            riskScore += rf.severity === "HIGH" ? 30 : rf.severity === "MED" ? 15 : 5;
+          }
+          riskScore = Math.min(100, riskScore);
+          queue.push({
+            kind: "account-crawled",
+            address,
+            name: label,
+            reason: "deep-entity-analysis",
+            score: riskScore,
+            flags: riskFlags,
+            at: nowIso(),
+          });
+        }
       });
 
       queue.push({
