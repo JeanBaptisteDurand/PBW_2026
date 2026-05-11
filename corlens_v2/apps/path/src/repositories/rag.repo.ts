@@ -67,6 +67,17 @@ export function createRagRepo(prisma: Prisma) {
         },
       });
     },
+
+    async findLatestChatByAnalysisId(analysisId: string) {
+      const chat = await db.ragChat.findFirst({
+        where: { analysisId },
+        orderBy: { createdAt: "desc" },
+        include: {
+          messages: { orderBy: { createdAt: "asc" } },
+        },
+      });
+      return chat ?? null;
+    },
   };
 }
 

@@ -39,5 +39,20 @@ export function createChatService(opts: ChatServiceOptions) {
 
       return { answer: result.content.trim(), sources };
     },
+
+    async getLatestForAnalysis(analysisId: string) {
+      const chat = await opts.repo.findLatestChatByAnalysisId(analysisId);
+      if (!chat) return null;
+      return {
+        chatId: chat.id,
+        analysisId,
+        messages: chat.messages.map((m) => ({
+          role: m.role as "user" | "assistant" | "system",
+          content: m.content,
+          sources: m.sources as unknown,
+          createdAt: m.createdAt.toISOString(),
+        })),
+      };
+    },
   };
 }

@@ -18,4 +18,23 @@ export async function registerChatRoutes(app: FastifyInstance, chat: ChatService
     },
     async (req) => chat.ask({ analysisId: req.params.id, message: req.body.message }),
   );
+
+  typed.get(
+    "/api/analysis/:id/chat",
+    {
+      schema: {
+        params: z.object({ id: z.string().uuid() }),
+        response: { 200: pp.ChatHistoryResponse, 404: z.object({ error: z.string() }) },
+        tags: ["analysis"],
+      },
+    },
+    async (req, reply) => {
+      const result = await chat.getLatestForAnalysis(req.params.id);
+      if (!result) {
+        reply.status(404).send({ error: "not_found" });
+        return reply;
+      }
+      return result;
+    },
+  );
 }
