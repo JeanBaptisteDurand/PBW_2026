@@ -1,4 +1,4 @@
-import { classifyOffChainBridgeStatus } from "../../data/currency-meta.js";
+import { classifyOffChainBridgeStatus } from "../../data/xrpl-utils.js";
 import {
   type Phase,
   type PhaseContext,

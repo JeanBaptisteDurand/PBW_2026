@@ -1,6 +1,6 @@
 import { describe, expect, it, type vi } from "vitest";
-import { ACTORS_BY_CURRENCY } from "../../../src/data/currency-meta.js";
 import { ActorResearchPhase } from "../../../src/services/phases/04-actor-research.js";
+import { ACTORS_BY_CURRENCY } from "../../fixtures/currency-meta-fixtures.js";
 import { collectEvents, makeCtx, makeMockDeps } from "./_helpers.js";
 
 describe("ActorResearchPhase", () => {

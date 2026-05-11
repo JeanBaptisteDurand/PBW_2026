@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { agent as ag } from "@corlens/contracts";
+import type { agent as ag, corridor as cc } from "@corlens/contracts";
 import type { AIServiceClient } from "../../connectors/ai-service.js";
 import type { CorridorClient } from "../../connectors/corridor.js";
 import type { MarketDataClient } from "../../connectors/market-data.js";
@@ -63,6 +63,11 @@ export type SharedState = {
     note?: string;
   }>;
   dstActors: SharedState["srcActors"];
+  currencyMeta: {
+    src: cc.CurrencyMeta | null;
+    dst: cc.CurrencyMeta | null;
+    globalHubs: cc.ActorEntry[];
+  };
   corridorRagAnswer: string | null;
   plan: string | null;
   actorResearch: Map<string, string[]>;
@@ -110,6 +115,7 @@ export function makeInitialState(): SharedState {
     dstIssuers: [],
     srcActors: [],
     dstActors: [],
+    currencyMeta: { src: null, dst: null, globalHubs: [] },
     corridorRagAnswer: null,
     plan: null,
     actorResearch: new Map(),

@@ -1,4 +1,4 @@
-import { rankActors } from "../../data/currency-meta.js";
+import { rankActors } from "../../data/xrpl-utils.js";
 import { type Phase, type PhaseContext, type SafePathEvent, errMessage, nowIso } from "./types.js";
 
 export class PlanningPhase implements Phase {

@@ -1,4 +1,4 @@
-import { ACTORS_BY_CURRENCY, ISSUERS_BY_CURRENCY, rankActors } from "../../data/currency-meta.js";
+import { rankActors } from "../../data/xrpl-utils.js";
 import { type Phase, type PhaseContext, type SafePathEvent, nowIso } from "./types.js";
 
 export class CorridorResolutionPhase implements Phase {
@@ -8,10 +8,18 @@ export class CorridorResolutionPhase implements Phase {
     const { input, state, deps } = ctx;
     const corridorId = `${input.srcCcy.toLowerCase()}-${input.dstCcy.toLowerCase()}`;
 
-    state.srcIssuers = ISSUERS_BY_CURRENCY[input.srcCcy] ?? [];
-    state.dstIssuers = ISSUERS_BY_CURRENCY[input.dstCcy] ?? [];
-    state.srcActors = ACTORS_BY_CURRENCY[input.srcCcy] ?? [];
-    state.dstActors = ACTORS_BY_CURRENCY[input.dstCcy] ?? [];
+    // Fetch currency meta from the corridor service, fall back to empty if unavailable.
+    const [srcMeta, dstMeta, hubList] = await Promise.all([
+      deps.corridor.getCurrencyMeta(input.srcCcy).catch(() => null),
+      deps.corridor.getCurrencyMeta(input.dstCcy).catch(() => null),
+      deps.corridor.listCurrencyMeta().catch(() => ({ currencies: [], globalHubs: [] })),
+    ]);
+    state.currencyMeta = { src: srcMeta, dst: dstMeta, globalHubs: hubList.globalHubs };
+
+    state.srcIssuers = srcMeta?.issuers ?? [];
+    state.dstIssuers = dstMeta?.issuers ?? [];
+    state.srcActors = srcMeta?.actors ?? [];
+    state.dstActors = dstMeta?.actors ?? [];
     state.isOnChain = state.srcIssuers.length > 0 && state.dstIssuers.length > 0;
 
     yield {

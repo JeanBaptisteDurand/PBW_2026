@@ -47,10 +47,46 @@ describe("CorridorResolutionPhase", () => {
   });
 
   it("populates issuer/actor lists from currency-meta", async () => {
-    const ctx = makeCtx({ srcCcy: "USD", dstCcy: "EUR" });
+    const deps = makeMockDeps();
+    (deps.corridor.getCurrencyMeta as ReturnType<typeof vi.fn>).mockImplementation(
+      async (code: string) => ({
+        code,
+        issuers: [{ key: "gh", name: "GateHub", address: "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq" }],
+        actors: [{ key: "kraken", name: "Kraken", type: "cex" }],
+        updatedAt: "2026-05-12T00:00:00.000Z",
+      }),
+    );
+    (deps.corridor.listCurrencyMeta as ReturnType<typeof vi.fn>).mockResolvedValue({
+      currencies: [],
+      globalHubs: [],
+    });
+    const ctx = makeCtx({ srcCcy: "USD", dstCcy: "EUR" }, deps);
     await collectEvents(new CorridorResolutionPhase(), ctx);
     expect(ctx.state.srcIssuers.length).toBeGreaterThan(0);
     expect(ctx.state.dstIssuers.length).toBeGreaterThan(0);
     expect(ctx.state.isOnChain).toBe(true);
+  });
+
+  it("populates ctx.state.currencyMeta from corridor connector", async () => {
+    const deps = makeMockDeps();
+    (deps.corridor.getCurrencyMeta as ReturnType<typeof vi.fn>).mockImplementation(
+      async (code: string) => ({
+        code,
+        issuers: [],
+        actors: code === "USD" ? [{ key: "k", name: "n", type: "cex" }] : [],
+        updatedAt: "2026-05-12T00:00:00.000Z",
+      }),
+    );
+    (deps.corridor.listCurrencyMeta as ReturnType<typeof vi.fn>).mockResolvedValue({
+      currencies: [],
+      globalHubs: [{ key: "tranglo", name: "Tranglo", type: "hub" }],
+    });
+    const ctx = makeCtx({ srcCcy: "USD", dstCcy: "EUR" }, deps);
+    await collectEvents(new CorridorResolutionPhase(), ctx);
+    expect(deps.corridor.getCurrencyMeta).toHaveBeenCalledWith("USD");
+    expect(deps.corridor.getCurrencyMeta).toHaveBeenCalledWith("EUR");
+    expect(ctx.state.currencyMeta.src?.code).toBe("USD");
+    expect(ctx.state.currencyMeta.dst?.code).toBe("EUR");
+    expect(ctx.state.currencyMeta.globalHubs).toHaveLength(1);
   });
 });

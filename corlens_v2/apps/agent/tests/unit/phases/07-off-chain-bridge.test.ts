@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { ACTORS_BY_CURRENCY } from "../../../src/data/currency-meta.js";
 import { OffChainBridgePhase } from "../../../src/services/phases/07-off-chain-bridge.js";
+import { ACTORS_BY_CURRENCY } from "../../fixtures/currency-meta-fixtures.js";
 import { collectEvents, makeCtx } from "./_helpers.js";
 
 describe("OffChainBridgePhase", () => {

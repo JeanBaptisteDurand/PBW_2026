@@ -12,6 +12,8 @@ function makeStubs() {
       category: "off-chain-bridge",
     }),
     chat: vi.fn().mockResolvedValue({ answer: "Healthy corridor.", sources: [] }),
+    getCurrencyMeta: vi.fn().mockResolvedValue(null),
+    listCurrencyMeta: vi.fn().mockResolvedValue({ currencies: [], globalHubs: [] }),
   };
   const path = {
     analyze: vi

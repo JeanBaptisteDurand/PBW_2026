@@ -1,4 +1,5 @@
 import { hmacSigner } from "@corlens/clients";
+import { corridor as cc } from "@corlens/contracts";
 
 export type CorridorClient = {
   list(query: { tier?: number; limit?: number }): Promise<unknown[]>;
@@ -7,6 +8,8 @@ export type CorridorClient = {
     answer: string;
     sources: Array<{ id: string; snippet: string }>;
   }>;
+  getCurrencyMeta(code: string): Promise<cc.CurrencyMeta | null>;
+  listCurrencyMeta(): Promise<cc.CurrencyMetaListResponse>;
 };
 
 export type CorridorClientOptions = {
@@ -49,6 +52,19 @@ export function createCorridorClient(opts: CorridorClientOptions): CorridorClien
         answer: string;
         sources: Array<{ id: string; snippet: string }>;
       }>;
+    },
+    async getCurrencyMeta(code) {
+      const res = await f(
+        `${opts.baseUrl}/api/corridors/currency-meta/${encodeURIComponent(code)}`,
+      );
+      if (res.status === 404) return null;
+      if (!res.ok) throw new Error(`corridor getCurrencyMeta -> ${res.status}`);
+      return cc.CurrencyMeta.parse(await res.json());
+    },
+    async listCurrencyMeta() {
+      const res = await f(`${opts.baseUrl}/api/corridors/currency-meta`);
+      if (!res.ok) throw new Error(`corridor listCurrencyMeta -> ${res.status}`);
+      return cc.CurrencyMetaListResponse.parse(await res.json());
     },
   };
 }

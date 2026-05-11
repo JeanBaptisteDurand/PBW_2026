@@ -2,7 +2,7 @@ import {
   type ActorEntry,
   classifyOffChainBridgeStatus,
   rankActors,
-} from "../../data/currency-meta.js";
+} from "../../data/xrpl-utils.js";
 import {
   type Phase,
   type PhaseContext,

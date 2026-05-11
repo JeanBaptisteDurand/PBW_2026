@@ -1,6 +1,6 @@
 import { describe, expect, it, type vi } from "vitest";
-import { ISSUERS_BY_CURRENCY } from "../../../src/data/currency-meta.js";
 import { DeepEntityAnalysisPhase } from "../../../src/services/phases/05-deep-entity-analysis.js";
+import { ISSUERS_BY_CURRENCY } from "../../fixtures/currency-meta-fixtures.js";
 import { collectEvents, makeCtx, makeMockDeps } from "./_helpers.js";
 
 describe("DeepEntityAnalysisPhase", () => {

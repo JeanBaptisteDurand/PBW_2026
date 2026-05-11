@@ -1,5 +1,5 @@
 import type { AIServiceClient } from "../../connectors/ai-service.js";
-import { PARTNER_DEPTH_BOOKS, rankActors } from "../../data/currency-meta.js";
+import { PARTNER_DEPTH_BOOKS, rankActors } from "../../data/xrpl-utils.js";
 import { EventQueue } from "./_event-queue.js";
 import { type Phase, type PhaseContext, type SafePathEvent, errMessage, nowIso } from "./types.js";
 

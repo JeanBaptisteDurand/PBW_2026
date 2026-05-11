@@ -4,7 +4,7 @@ import {
   RLUSD_ISSUER,
   USDC_ISSUER,
   rankActors,
-} from "../../data/currency-meta.js";
+} from "../../data/xrpl-utils.js";
 import { EventQueue } from "./_event-queue.js";
 import {
   type DeepAnalysisResult,

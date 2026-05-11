@@ -13,6 +13,8 @@ export function makeMockDeps(overrides?: Partial<PhaseContext["deps"]>): PhaseCo
       list: vi.fn().mockResolvedValue([]),
       getById: vi.fn().mockResolvedValue(null),
       chat: vi.fn().mockResolvedValue({ answer: "ok", sources: [] }),
+      getCurrencyMeta: vi.fn().mockResolvedValue(null),
+      listCurrencyMeta: vi.fn().mockResolvedValue({ currencies: [], globalHubs: [] }),
     },
     path: {
       analyze: vi
