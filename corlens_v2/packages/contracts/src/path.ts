@@ -28,6 +28,23 @@ export const RiskFlag = z.object({
 });
 export type RiskFlag = z.infer<typeof RiskFlag>;
 
+export const RiskQuickEvalRequest = z.object({
+  address: XrplAddress,
+});
+export type RiskQuickEvalRequest = z.infer<typeof RiskQuickEvalRequest>;
+
+export const RiskQuickEvalResponse = z.object({
+  address: XrplAddress,
+  score: z.number().min(0).max(100),
+  flags: z.array(RiskFlag),
+  summary: z.object({
+    isIssuer: z.boolean(),
+    trustLineCount: z.number().int().min(0),
+    hasAmmPool: z.boolean(),
+  }),
+});
+export type RiskQuickEvalResponse = z.infer<typeof RiskQuickEvalResponse>;
+
 export const GraphStats = z.object({
   nodeCount: z.number().int().min(0),
   edgeCount: z.number().int().min(0),

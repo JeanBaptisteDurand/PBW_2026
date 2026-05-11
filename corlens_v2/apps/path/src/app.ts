@@ -11,6 +11,7 @@ import { registerAnalyzeRoutes } from "./controllers/analyze.controller.js";
 import { registerChatRoutes } from "./controllers/chat.controller.js";
 import { registerHistoryStreamRoutes } from "./controllers/history-stream.controller.js";
 import { registerHistoryRoutes } from "./controllers/history.controller.js";
+import { registerRiskEngineRoutes } from "./controllers/risk-engine.controller.js";
 import type { PathEnv } from "./env.js";
 import { registerErrorHandler } from "./plugins/error-handler.js";
 import { prismaPlugin } from "./plugins/prisma.js";
@@ -25,6 +26,7 @@ import { createCrawlerService } from "./services/crawler.service.js";
 import { createExplanationsService } from "./services/explanations.service.js";
 import { createHistoryCrawlerService } from "./services/history-crawler.service.js";
 import { createHistoryService } from "./services/history.service.js";
+import { createQuickEvalService } from "./services/quick-eval.service.js";
 import { createRagIndexService } from "./services/rag-index.service.js";
 import { startAnalysisWorker } from "./workers/analysis.worker.js";
 
@@ -56,6 +58,7 @@ export async function buildApp(env: PathEnv): Promise<FastifyInstance> {
   const crawler = createCrawlerService({ marketData });
   const bfs = createBfsService({ crawler });
   const historyCrawler = createHistoryCrawlerService({ marketData });
+  const quickEval = createQuickEvalService({ crawler: historyCrawler });
   const history = createHistoryService({ marketData, historyCrawler });
   const explanations = createExplanationsService({ ai, graph: graphs });
   const ragIndex = createRagIndexService({ ai, repo: ragRepo });
@@ -83,6 +86,7 @@ export async function buildApp(env: PathEnv): Promise<FastifyInstance> {
   // makes the precedence intent unambiguous in the event of future churn.
   await registerHistoryStreamRoutes(app, history);
   await registerHistoryRoutes(app, analyses);
+  registerRiskEngineRoutes(app, quickEval, env.INTERNAL_HMAC_SECRET);
 
   app.get("/health", { schema: { hide: true } }, async () => ({ status: "ok", service: "path" }));
 
