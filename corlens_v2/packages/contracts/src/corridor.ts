@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Status } from "./shared.js";
+import { Status, XrplAddress } from "./shared.js";
 
 export const CorridorTier = z.number().int().min(1).max(4);
 export type CorridorTier = z.infer<typeof CorridorTier>;
@@ -88,3 +88,37 @@ export const ChatResponse = z.object({
   sources: z.array(z.object({ id: z.string(), snippet: z.string() })),
 });
 export type ChatResponse = z.infer<typeof ChatResponse>;
+
+export const IssuerEntry = z.object({
+  key: z.string(),
+  name: z.string(),
+  address: XrplAddress,
+});
+export type IssuerEntry = z.infer<typeof IssuerEntry>;
+
+export const ActorEntry = z.object({
+  key: z.string(),
+  name: z.string(),
+  type: z.string(),
+  country: z.string().optional(),
+  supportsXrp: z.boolean().optional(),
+  supportsRlusd: z.boolean().optional(),
+  odl: z.boolean().optional(),
+  direction: z.enum(["in", "out", "both"]).optional(),
+  note: z.string().optional(),
+});
+export type ActorEntry = z.infer<typeof ActorEntry>;
+
+export const CurrencyMeta = z.object({
+  code: z.string().min(3).max(8),
+  issuers: z.array(IssuerEntry),
+  actors: z.array(ActorEntry),
+  updatedAt: z.string().datetime(),
+});
+export type CurrencyMeta = z.infer<typeof CurrencyMeta>;
+
+export const CurrencyMetaListResponse = z.object({
+  currencies: z.array(CurrencyMeta),
+  globalHubs: z.array(ActorEntry),
+});
+export type CurrencyMetaListResponse = z.infer<typeof CurrencyMetaListResponse>;

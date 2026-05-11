@@ -1,0 +1,2609 @@
+{
+  "currencies": [
+    {
+      "code": "AED",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "bitoasis",
+          "name": "BitOasis",
+          "type": "cex",
+          "country": "AE",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "VARA-licensed"
+        },
+        {
+          "key": "rain-ae",
+          "name": "Rain",
+          "type": "cex",
+          "country": "AE",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "ADGM/FSRA, RLUSD listed"
+        },
+        {
+          "key": "coinmena-ae",
+          "name": "CoinMENA",
+          "type": "cex",
+          "country": "AE",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "VARA + CBB"
+        },
+        {
+          "key": "pyypl",
+          "name": "Pyypl",
+          "type": "odl",
+          "country": "AE",
+          "supportsXrp": true,
+          "direction": "both",
+          "odl": true,
+          "note": "Ripple ODL retail remittance"
+        },
+        {
+          "key": "lulu",
+          "name": "LuLu Exchange",
+          "type": "remittance",
+          "country": "AE",
+          "supportsXrp": true,
+          "direction": "onramp",
+          "odl": true,
+          "note": "UAE→IN/PK via Ripple + Federal Bank"
+        },
+        {
+          "key": "al-ansari",
+          "name": "Al Ansari Exchange",
+          "type": "remittance",
+          "country": "AE",
+          "supportsXrp": true,
+          "direction": "onramp",
+          "odl": true,
+          "note": "via Tranglo"
+        },
+        {
+          "key": "zand",
+          "name": "Zand Bank",
+          "type": "bank",
+          "country": "AE",
+          "supportsXrp": true,
+          "direction": "both",
+          "odl": true,
+          "note": "first UAE digital bank Ripple client, May 2025"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "ARS",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "ripio-ar",
+          "name": "Ripio",
+          "type": "cex",
+          "country": "AR",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "satoshitango",
+          "name": "SatoshiTango",
+          "type": "cex",
+          "country": "AR",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "lemon",
+          "name": "Lemon Cash",
+          "type": "fintech",
+          "country": "AR",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "buenbit",
+          "name": "Buenbit",
+          "type": "cex",
+          "country": "AR",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "multi-LATAM (MX/BR/CO/PE/UY)"
+        },
+        {
+          "key": "belo",
+          "name": "Belo",
+          "type": "fintech",
+          "country": "AR",
+          "supportsXrp": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "AUD",
+      "issuers": [
+        {
+          "key": "bs",
+          "name": "Bitstamp (legacy)",
+          "address": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        }
+      ],
+      "actors": [
+        {
+          "key": "ir-au",
+          "name": "Independent Reserve",
+          "type": "cex",
+          "country": "AU",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "AUSTRAC"
+        },
+        {
+          "key": "swyftx",
+          "name": "Swyftx",
+          "type": "cex",
+          "country": "AU",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "coinjar-au",
+          "name": "CoinJar",
+          "type": "cex",
+          "country": "AU",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "btc-markets",
+          "name": "BTC Markets",
+          "type": "cex",
+          "country": "AU",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "flashfx",
+          "name": "FlashFX",
+          "type": "odl",
+          "country": "AU",
+          "supportsXrp": true,
+          "direction": "both",
+          "odl": true
+        },
+        {
+          "key": "novatti",
+          "name": "Novatti",
+          "type": "odl",
+          "country": "AU",
+          "supportsXrp": true,
+          "direction": "both",
+          "odl": true
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "BBRL",
+      "issuers": [
+        {
+          "key": "braza",
+          "name": "Braza Bank",
+          "address": "rH5CJsqvNqZGxrMyGaqLEoMWRYcVTAPZMt"
+        }
+      ],
+      "actors": [],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "BDT",
+      "issuers": [],
+      "actors": [],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "BHD",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "rain-bh",
+          "name": "Rain",
+          "type": "cex",
+          "country": "BH",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "HQ; XRP/BHD + RLUSD"
+        },
+        {
+          "key": "coinmena-bh",
+          "name": "CoinMENA",
+          "type": "cex",
+          "country": "BH",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "HQ"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "BRL",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "travelex-bank",
+          "name": "Travelex Bank",
+          "type": "bank",
+          "country": "BR",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "odl": true,
+          "note": "first LATAM bank on ODL, Aug 2022"
+        },
+        {
+          "key": "mercado-bitcoin",
+          "name": "Mercado Bitcoin",
+          "type": "cex",
+          "country": "BR",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "odl": true,
+          "note": "Ripple Payments partner Oct 2024"
+        },
+        {
+          "key": "braza-bank",
+          "name": "Braza Bank",
+          "type": "bank",
+          "country": "BR",
+          "supportsXrp": false,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "RLUSD distribution, 2026"
+        },
+        {
+          "key": "banco-genial",
+          "name": "Banco Genial",
+          "type": "bank",
+          "country": "BR",
+          "supportsXrp": false,
+          "supportsRlusd": true,
+          "direction": "both"
+        },
+        {
+          "key": "attrus",
+          "name": "Attrus",
+          "type": "fintech",
+          "country": "BR",
+          "supportsXrp": false,
+          "supportsRlusd": true,
+          "direction": "both"
+        },
+        {
+          "key": "foxbit",
+          "name": "Foxbit",
+          "type": "cex",
+          "country": "BR",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both"
+        },
+        {
+          "key": "ripio-br",
+          "name": "Ripio BR",
+          "type": "cex",
+          "country": "BR",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "BTC",
+      "issuers": [
+        {
+          "key": "bs",
+          "name": "Bitstamp",
+          "address": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        }
+      ],
+      "actors": [],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "CAD",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "ndax",
+          "name": "NDAX",
+          "type": "cex",
+          "country": "CA",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "bitbuy",
+          "name": "Bitbuy",
+          "type": "cex",
+          "country": "CA",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "coinsquare",
+          "name": "Coinsquare",
+          "type": "cex",
+          "country": "CA",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "kraken-ca",
+          "name": "Kraken CA",
+          "type": "cex",
+          "country": "CA",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both"
+        },
+        {
+          "key": "netcoins",
+          "name": "Netcoins",
+          "type": "cex",
+          "country": "CA",
+          "supportsXrp": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "CHF",
+      "issuers": [
+        {
+          "key": "bs",
+          "name": "Bitstamp (legacy)",
+          "address": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        }
+      ],
+      "actors": [
+        {
+          "key": "bitcoin-suisse",
+          "name": "Bitcoin Suisse",
+          "type": "cex",
+          "country": "CH",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "FINMA"
+        },
+        {
+          "key": "sygnum",
+          "name": "Sygnum Bank",
+          "type": "bank",
+          "country": "CH",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "amina",
+          "name": "AMINA Bank (ex-SEBA)",
+          "type": "bank",
+          "country": "CH",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "swissquote",
+          "name": "Swissquote",
+          "type": "bank",
+          "country": "CH",
+          "supportsXrp": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "CLP",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "orionx",
+          "name": "OrionX",
+          "type": "cex",
+          "country": "CL",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "cryptomkt",
+          "name": "CryptoMKT",
+          "type": "cex",
+          "country": "CL",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "buda-cl",
+          "name": "Buda.com",
+          "type": "cex",
+          "country": "CL",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "binance-clp-p2p",
+          "name": "Binance P2P (CLP)",
+          "type": "p2p",
+          "country": "CL",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "CLP P2P + RLUSD spot"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "CNY",
+      "issuers": [
+        {
+          "key": "fox",
+          "name": "RippleFox",
+          "address": "rKiCet8SdvWxPXnAgYarFUXMh1zCPz432Y"
+        },
+        {
+          "key": "cn",
+          "name": "RippleCN",
+          "address": "razqQKzJRdB4UxFPWf5NEpEG3WMkmwgcXA"
+        },
+        {
+          "key": "qk",
+          "name": "RippleQK",
+          "address": "rPT74sUcTBTQhkHVD54WGncoqXEAMYbmH7"
+        }
+      ],
+      "actors": [],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "COP",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "bitso-co",
+          "name": "Bitso CO",
+          "type": "cex",
+          "country": "CO",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "free COP rails"
+        },
+        {
+          "key": "buda-co",
+          "name": "Buda.com",
+          "type": "cex",
+          "country": "CO",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "panda",
+          "name": "Panda Exchange",
+          "type": "cex",
+          "country": "CO",
+          "supportsXrp": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "CZK",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "kraken-sepa",
+          "name": "Kraken (SEPA) · CZK",
+          "type": "cex",
+          "country": "IE",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "MiCA CASP; SEPA deposits in all EU/Nordic fiats"
+        },
+        {
+          "key": "bitpanda-sepa",
+          "name": "Bitpanda (SEPA) · CZK",
+          "type": "cex",
+          "country": "AT",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "MiCA CASP; SEPA"
+        },
+        {
+          "key": "binance-sepa",
+          "name": "Binance (SEPA) · CZK",
+          "type": "cex",
+          "country": "MT",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "RLUSD + XRP listed; SEPA rails"
+        },
+        {
+          "key": "coinmate",
+          "name": "Coinmate / Anycoin Direct",
+          "type": "cex",
+          "country": "CZ",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "simplecoin",
+          "name": "SimpleCoin.cz",
+          "type": "cex",
+          "country": "CZ",
+          "supportsXrp": true,
+          "direction": "onramp"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "DKK",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "kraken-sepa",
+          "name": "Kraken (SEPA) · DKK",
+          "type": "cex",
+          "country": "IE",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "MiCA CASP; SEPA deposits in all EU/Nordic fiats"
+        },
+        {
+          "key": "bitpanda-sepa",
+          "name": "Bitpanda (SEPA) · DKK",
+          "type": "cex",
+          "country": "AT",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "MiCA CASP; SEPA"
+        },
+        {
+          "key": "binance-sepa",
+          "name": "Binance (SEPA) · DKK",
+          "type": "cex",
+          "country": "MT",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "RLUSD + XRP listed; SEPA rails"
+        },
+        {
+          "key": "januar",
+          "name": "Januar",
+          "type": "fintech",
+          "country": "DK",
+          "supportsXrp": false,
+          "direction": "onramp",
+          "note": "DKK rails only"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "DZD",
+      "issuers": [],
+      "actors": [],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "EGP",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "coinmena-eg",
+          "name": "CoinMENA",
+          "type": "cex",
+          "country": "EG",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "constrained by CBE Law 194/2020"
+        },
+        {
+          "key": "binance-egp-p2p",
+          "name": "Binance P2P (EGP)",
+          "type": "p2p",
+          "country": "EG",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "P2P EGP → USDT → XRP/RLUSD; de-facto on-ramp"
+        },
+        {
+          "key": "bybit-egp-p2p",
+          "name": "Bybit P2P (EGP)",
+          "type": "p2p",
+          "country": "EG",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "ETB",
+      "issuers": [],
+      "actors": [],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "EUR",
+      "issuers": [
+        {
+          "key": "gh",
+          "name": "GateHub",
+          "address": "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq"
+        },
+        {
+          "key": "europ",
+          "name": "Schuman EURØP",
+          "address": "rMkEuRii9w9uBMQDnWV5AA43gvYZR9JxVK"
+        },
+        {
+          "key": "snap",
+          "name": "SnapSwap",
+          "address": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
+        },
+        {
+          "key": "bs",
+          "name": "Bitstamp (legacy)",
+          "address": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        }
+      ],
+      "actors": [
+        {
+          "key": "bitstamp-eu",
+          "name": "Bitstamp (LU)",
+          "type": "cex",
+          "country": "LU",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "odl": true,
+          "note": "Ripple ODL venue; RLUSD excluded from EU retail pending MiCA EMT"
+        },
+        {
+          "key": "kraken-eu",
+          "name": "Kraken (IE)",
+          "type": "cex",
+          "country": "IE",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "MiCA CASP"
+        },
+        {
+          "key": "coinbase-eu",
+          "name": "Coinbase EU",
+          "type": "cex",
+          "country": "LU",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "MiCA CASP"
+        },
+        {
+          "key": "bitpanda",
+          "name": "Bitpanda",
+          "type": "cex",
+          "country": "AT",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "MiCA CASP"
+        },
+        {
+          "key": "bitvavo",
+          "name": "Bitvavo",
+          "type": "cex",
+          "country": "NL",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "MiCA CASP"
+        },
+        {
+          "key": "bybit-eu",
+          "name": "Bybit EU",
+          "type": "cex",
+          "country": "AT",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "MiCA CASP"
+        },
+        {
+          "key": "okx-eu",
+          "name": "OKX Europe",
+          "type": "cex",
+          "country": "MT",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "MiCA CASP"
+        },
+        {
+          "key": "revolut-eu",
+          "name": "Revolut",
+          "type": "fintech",
+          "country": "CY",
+          "supportsXrp": true,
+          "direction": "onramp",
+          "note": "MiCA EMI"
+        },
+        {
+          "key": "n26",
+          "name": "N26",
+          "type": "bank",
+          "country": "DE",
+          "supportsXrp": true,
+          "direction": "onramp",
+          "note": "via Bitpanda"
+        },
+        {
+          "key": "lemonway",
+          "name": "Lemonway",
+          "type": "odl",
+          "country": "FR",
+          "supportsXrp": true,
+          "direction": "both",
+          "odl": true,
+          "note": "first FR Ripple ODL partner"
+        },
+        {
+          "key": "finci",
+          "name": "FINCI",
+          "type": "odl",
+          "country": "LT",
+          "supportsXrp": true,
+          "direction": "both",
+          "odl": true,
+          "note": "EMI, Ripple ODL"
+        },
+        {
+          "key": "unicambio",
+          "name": "Unicâmbio",
+          "type": "odl",
+          "country": "PT",
+          "supportsXrp": true,
+          "direction": "both",
+          "odl": true,
+          "note": "PT↔BR 2025"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "EUROP",
+      "issuers": [
+        {
+          "key": "schuman",
+          "name": "Schuman Financial",
+          "address": "rMkEuRii9w9uBMQDnWV5AA43gvYZR9JxVK"
+        }
+      ],
+      "actors": [],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "GBP",
+      "issuers": [
+        {
+          "key": "gh",
+          "name": "GateHub",
+          "address": "r4GN9eEoz9K4BhMQXe4H1eYNtvtkwGdt8g"
+        },
+        {
+          "key": "snap",
+          "name": "SnapSwap",
+          "address": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
+        },
+        {
+          "key": "bs",
+          "name": "Bitstamp (legacy)",
+          "address": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        }
+      ],
+      "actors": [
+        {
+          "key": "coinbase-uk",
+          "name": "Coinbase UK",
+          "type": "cex",
+          "country": "UK",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "FCA"
+        },
+        {
+          "key": "kraken-uk",
+          "name": "Kraken UK",
+          "type": "cex",
+          "country": "UK",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both"
+        },
+        {
+          "key": "cex-io",
+          "name": "CEX.IO",
+          "type": "cex",
+          "country": "UK",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "coinjar-uk",
+          "name": "CoinJar",
+          "type": "cex",
+          "country": "UK",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "uphold-uk",
+          "name": "Uphold UK",
+          "type": "cex",
+          "country": "UK",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both"
+        },
+        {
+          "key": "archax",
+          "name": "Archax",
+          "type": "cex",
+          "country": "UK",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "FCA-regulated digital securities"
+        },
+        {
+          "key": "revolut-uk",
+          "name": "Revolut UK",
+          "type": "fintech",
+          "country": "UK",
+          "supportsXrp": true,
+          "direction": "onramp"
+        },
+        {
+          "key": "modulr",
+          "name": "Modulr",
+          "type": "odl",
+          "country": "UK",
+          "supportsXrp": true,
+          "direction": "both",
+          "odl": true,
+          "note": "Ripple Payments EMI"
+        },
+        {
+          "key": "onafriq",
+          "name": "Onafriq",
+          "type": "hub",
+          "country": "UK/Africa",
+          "supportsXrp": true,
+          "direction": "both",
+          "odl": true,
+          "note": "UK→Africa ODL leg, 500M mobile wallets"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "GHS",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "yellow-card-gh",
+          "name": "Yellow Card",
+          "type": "fintech",
+          "country": "GH",
+          "supportsRlusd": true,
+          "direction": "both"
+        },
+        {
+          "key": "chipper-gh",
+          "name": "Chipper Cash",
+          "type": "fintech",
+          "country": "GH",
+          "supportsRlusd": true,
+          "direction": "both",
+          "odl": true
+        },
+        {
+          "key": "onafriq-gh",
+          "name": "Onafriq",
+          "type": "hub",
+          "country": "GH",
+          "supportsXrp": true,
+          "direction": "both",
+          "odl": true,
+          "note": "MTN MoMo"
+        },
+        {
+          "key": "payangel",
+          "name": "PayAngel",
+          "type": "odl",
+          "country": "UK/GH",
+          "supportsXrp": true,
+          "direction": "onramp",
+          "odl": true,
+          "note": "UK→GH via Ripple"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "HKD",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "osl",
+          "name": "OSL HK",
+          "type": "cex",
+          "country": "HK",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "first HK RLUSD listing (SFC VATP)"
+        },
+        {
+          "key": "hashkey",
+          "name": "HashKey Exchange",
+          "type": "cex",
+          "country": "HK",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "licensed VATP"
+        },
+        {
+          "key": "crypto-com-hk",
+          "name": "Crypto.com HK",
+          "type": "cex",
+          "country": "HK",
+          "supportsXrp": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "HUF",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "kraken-sepa",
+          "name": "Kraken (SEPA) · HUF",
+          "type": "cex",
+          "country": "IE",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "MiCA CASP; SEPA deposits in all EU/Nordic fiats"
+        },
+        {
+          "key": "bitpanda-sepa",
+          "name": "Bitpanda (SEPA) · HUF",
+          "type": "cex",
+          "country": "AT",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "MiCA CASP; SEPA"
+        },
+        {
+          "key": "binance-sepa",
+          "name": "Binance (SEPA) · HUF",
+          "type": "cex",
+          "country": "MT",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "RLUSD + XRP listed; SEPA rails"
+        },
+        {
+          "key": "mrcoin",
+          "name": "Mr. Coin",
+          "type": "cex",
+          "country": "HU",
+          "supportsXrp": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "IDR",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "indodax",
+          "name": "Indodax",
+          "type": "cex",
+          "country": "ID",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "Bappebti"
+        },
+        {
+          "key": "tokocrypto",
+          "name": "Tokocrypto",
+          "type": "cex",
+          "country": "ID",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "pintu",
+          "name": "Pintu",
+          "type": "cex",
+          "country": "ID",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "reku",
+          "name": "Reku",
+          "type": "cex",
+          "country": "ID",
+          "supportsXrp": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "ILS",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "bits-of-gold",
+          "name": "Bits of Gold",
+          "type": "cex",
+          "country": "IL",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "CMA-licensed"
+        },
+        {
+          "key": "kraken-il",
+          "name": "Kraken (cross-border ILS)",
+          "type": "cex",
+          "country": "IL/US",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "serves IL residents via wire; RLUSD listed"
+        },
+        {
+          "key": "binance-il",
+          "name": "Binance (cross-border ILS)",
+          "type": "cex",
+          "country": "IL",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "ILS card on-ramp + RLUSD spot"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "INR",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "coindcx",
+          "name": "CoinDCX",
+          "type": "cex",
+          "country": "IN",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "FIU-registered; INR via UPI/IMPS"
+        },
+        {
+          "key": "coinswitch",
+          "name": "CoinSwitch",
+          "type": "cex",
+          "country": "IN",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "FIU-registered"
+        },
+        {
+          "key": "zebpay",
+          "name": "ZebPay",
+          "type": "cex",
+          "country": "IN",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "FIU-registered"
+        },
+        {
+          "key": "bitbns",
+          "name": "Bitbns",
+          "type": "cex",
+          "country": "IN",
+          "supportsXrp": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "JPY",
+      "issuers": [
+        {
+          "key": "mx",
+          "name": "Mr. Exchange",
+          "address": "rB3gZey7VWHYRqJHLoHDEJXJ2pEPNieKiS"
+        },
+        {
+          "key": "tokyo",
+          "name": "Tokyo JPY Gateway",
+          "address": "rMAz5ZnK73nyNUL4foAvaxdreczCkG3vA6"
+        },
+        {
+          "key": "bs",
+          "name": "Bitstamp (legacy)",
+          "address": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        }
+      ],
+      "actors": [
+        {
+          "key": "sbi-vc",
+          "name": "SBI VC Trade",
+          "type": "cex",
+          "country": "JP",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "odl": true,
+          "note": "FSA; RLUSD distribution Q1 2026"
+        },
+        {
+          "key": "sbi-remit",
+          "name": "SBI Remit",
+          "type": "odl",
+          "country": "JP",
+          "supportsXrp": true,
+          "direction": "onramp",
+          "odl": true,
+          "note": "JP→PH/TH/VN/ID since 2021"
+        },
+        {
+          "key": "bitbank",
+          "name": "Bitbank",
+          "type": "cex",
+          "country": "JP",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "bitflyer",
+          "name": "bitFlyer",
+          "type": "cex",
+          "country": "JP",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "coincheck",
+          "name": "Coincheck",
+          "type": "cex",
+          "country": "JP",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "gmo",
+          "name": "GMO Coin",
+          "type": "cex",
+          "country": "JP",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "rakuten-wallet",
+          "name": "Rakuten Wallet",
+          "type": "cex",
+          "country": "JP",
+          "supportsXrp": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "KES",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "yellow-card-ke",
+          "name": "Yellow Card",
+          "type": "fintech",
+          "country": "KE",
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "VASP Oct 2025"
+        },
+        {
+          "key": "chipper-ke",
+          "name": "Chipper Cash",
+          "type": "fintech",
+          "country": "KE",
+          "supportsRlusd": true,
+          "direction": "both",
+          "odl": true
+        },
+        {
+          "key": "kotani",
+          "name": "Kotani Pay",
+          "type": "mobile-money",
+          "country": "KE",
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "M-Pesa USSD bridge"
+        },
+        {
+          "key": "onafriq-ke",
+          "name": "Onafriq",
+          "type": "hub",
+          "country": "KE",
+          "supportsXrp": true,
+          "direction": "both",
+          "odl": true
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "KRW",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "upbit",
+          "name": "Upbit",
+          "type": "cex",
+          "country": "KR",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "~53% market share, >$1T XRP volume 2025"
+        },
+        {
+          "key": "bithumb",
+          "name": "Bithumb",
+          "type": "cex",
+          "country": "KR",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "coinone",
+          "name": "Coinone",
+          "type": "cex",
+          "country": "KR",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "first KR RLUSD listing"
+        },
+        {
+          "key": "korbit",
+          "name": "Korbit",
+          "type": "cex",
+          "country": "KR",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "gopax",
+          "name": "GOPAX",
+          "type": "cex",
+          "country": "KR",
+          "supportsXrp": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "KWD",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "rain-kw",
+          "name": "Rain",
+          "type": "cex",
+          "country": "KW",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both"
+        },
+        {
+          "key": "coinmena-kw",
+          "name": "CoinMENA",
+          "type": "cex",
+          "country": "KW",
+          "supportsXrp": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "LKR",
+      "issuers": [],
+      "actors": [],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "MAD",
+      "issuers": [],
+      "actors": [],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "MXN",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "bitso",
+          "name": "Bitso",
+          "type": "cex",
+          "country": "MX",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "odl": true,
+          "note": "Ripple ODL launch partner, flagship US→MX corridor"
+        },
+        {
+          "key": "volabit",
+          "name": "Volabit",
+          "type": "cex",
+          "country": "MX",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "moonpay-mx",
+          "name": "MoonPay (MXN)",
+          "type": "fintech",
+          "country": "MX",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "onramp"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "MYR",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "luno-my",
+          "name": "Luno MY",
+          "type": "cex",
+          "country": "MY",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "SC-registered DAX"
+        },
+        {
+          "key": "mx-global",
+          "name": "MX Global",
+          "type": "cex",
+          "country": "MY",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "sinegy",
+          "name": "SINEGY DAX",
+          "type": "cex",
+          "country": "MY",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "tranglo",
+          "name": "Tranglo",
+          "type": "hub",
+          "country": "MY",
+          "supportsXrp": true,
+          "direction": "both",
+          "odl": true,
+          "note": "25-corridor APAC ODL hub, 40% Ripple-owned"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "NGN",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "quidax",
+          "name": "Quidax",
+          "type": "cex",
+          "country": "NG",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "SEC provisional"
+        },
+        {
+          "key": "busha",
+          "name": "Busha",
+          "type": "cex",
+          "country": "NG",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "SEC"
+        },
+        {
+          "key": "yellow-card-ng",
+          "name": "Yellow Card",
+          "type": "fintech",
+          "country": "NG",
+          "supportsRlusd": true,
+          "direction": "both"
+        },
+        {
+          "key": "chipper-ng",
+          "name": "Chipper Cash",
+          "type": "fintech",
+          "country": "NG",
+          "supportsRlusd": true,
+          "direction": "both",
+          "odl": true
+        },
+        {
+          "key": "onafriq-ng",
+          "name": "Onafriq",
+          "type": "hub",
+          "country": "NG",
+          "supportsXrp": true,
+          "direction": "both",
+          "odl": true,
+          "note": "mobile-money ODL inbound"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "NOK",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "kraken-sepa",
+          "name": "Kraken (SEPA) · NOK",
+          "type": "cex",
+          "country": "IE",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "MiCA CASP; SEPA deposits in all EU/Nordic fiats"
+        },
+        {
+          "key": "bitpanda-sepa",
+          "name": "Bitpanda (SEPA) · NOK",
+          "type": "cex",
+          "country": "AT",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "MiCA CASP; SEPA"
+        },
+        {
+          "key": "binance-sepa",
+          "name": "Binance (SEPA) · NOK",
+          "type": "cex",
+          "country": "MT",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "RLUSD + XRP listed; SEPA rails"
+        },
+        {
+          "key": "nbx",
+          "name": "Norwegian Block Exchange",
+          "type": "cex",
+          "country": "NO",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "firi",
+          "name": "Firi",
+          "type": "cex",
+          "country": "NO",
+          "supportsXrp": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "NPR",
+      "issuers": [],
+      "actors": [],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "NZD",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "ir-nz",
+          "name": "Independent Reserve NZ",
+          "type": "cex",
+          "country": "NZ",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "easy-crypto",
+          "name": "Easy Crypto NZ",
+          "type": "cex",
+          "country": "NZ",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "kraken-nz",
+          "name": "Kraken (NZD wire)",
+          "type": "cex",
+          "country": "NZ",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "accepts NZD via wire; RLUSD listed"
+        },
+        {
+          "key": "binance-nz",
+          "name": "Binance (NZD on-ramp)",
+          "type": "cex",
+          "country": "NZ",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "OMR",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "rain-om",
+          "name": "Rain",
+          "type": "cex",
+          "country": "OM",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both"
+        },
+        {
+          "key": "coinmena-om",
+          "name": "CoinMENA",
+          "type": "cex",
+          "country": "OM",
+          "supportsXrp": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "PEN",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "fluyez",
+          "name": "Fluyez",
+          "type": "cex",
+          "country": "PE",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "bitinka",
+          "name": "Bitinka",
+          "type": "cex",
+          "country": "PE",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "buenbit-pe",
+          "name": "Buenbit PE",
+          "type": "cex",
+          "country": "PE",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "binance-pen-p2p",
+          "name": "Binance P2P (PEN)",
+          "type": "p2p",
+          "country": "PE",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "PHP",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "coins-ph",
+          "name": "Coins.ph",
+          "type": "cex",
+          "country": "PH",
+          "supportsXrp": true,
+          "direction": "both",
+          "odl": true,
+          "note": "BSP e-money + Ripple partner"
+        },
+        {
+          "key": "pdax",
+          "name": "PDAX",
+          "type": "cex",
+          "country": "PH",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "BSP-licensed"
+        },
+        {
+          "key": "iremit",
+          "name": "iRemit",
+          "type": "odl",
+          "country": "PH",
+          "supportsXrp": true,
+          "direction": "offramp",
+          "odl": true
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "PKR",
+      "issuers": [],
+      "actors": [],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "PLN",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "kraken-sepa",
+          "name": "Kraken (SEPA) · PLN",
+          "type": "cex",
+          "country": "IE",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "MiCA CASP; SEPA deposits in all EU/Nordic fiats"
+        },
+        {
+          "key": "bitpanda-sepa",
+          "name": "Bitpanda (SEPA) · PLN",
+          "type": "cex",
+          "country": "AT",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "MiCA CASP; SEPA"
+        },
+        {
+          "key": "binance-sepa",
+          "name": "Binance (SEPA) · PLN",
+          "type": "cex",
+          "country": "MT",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "RLUSD + XRP listed; SEPA rails"
+        },
+        {
+          "key": "zondacrypto",
+          "name": "Zondacrypto (ex-BitBay)",
+          "type": "cex",
+          "country": "PL",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "largest PL"
+        },
+        {
+          "key": "kanga",
+          "name": "Kanga Exchange",
+          "type": "cex",
+          "country": "PL",
+          "supportsXrp": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "QAR",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "coinmena-qa",
+          "name": "CoinMENA",
+          "type": "cex",
+          "country": "QA",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "qnb-chinabank",
+          "name": "QNB ↔ ChinaBank",
+          "type": "bank",
+          "country": "QA",
+          "supportsXrp": true,
+          "direction": "onramp",
+          "odl": true,
+          "note": "QAR→PHP corridor 2024-25"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "RLUSD",
+      "issuers": [
+        {
+          "key": "ripple",
+          "name": "Ripple",
+          "address": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De"
+        }
+      ],
+      "actors": [],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "RON",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "kraken-sepa",
+          "name": "Kraken (SEPA) · RON",
+          "type": "cex",
+          "country": "IE",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "MiCA CASP; SEPA deposits in all EU/Nordic fiats"
+        },
+        {
+          "key": "bitpanda-sepa",
+          "name": "Bitpanda (SEPA) · RON",
+          "type": "cex",
+          "country": "AT",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "MiCA CASP; SEPA"
+        },
+        {
+          "key": "binance-sepa",
+          "name": "Binance (SEPA) · RON",
+          "type": "cex",
+          "country": "MT",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "RLUSD + XRP listed; SEPA rails"
+        },
+        {
+          "key": "tokero",
+          "name": "Bittnet / Tokero",
+          "type": "cex",
+          "country": "RO",
+          "supportsXrp": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "RUB",
+      "issuers": [],
+      "actors": [],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "SAR",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "rain-sa",
+          "name": "Rain",
+          "type": "cex",
+          "country": "SA",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "XRP/SAR + RLUSD"
+        },
+        {
+          "key": "coinmena-sa",
+          "name": "CoinMENA",
+          "type": "cex",
+          "country": "SA",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "sabb",
+          "name": "SABB (Saudi British Bank)",
+          "type": "bank",
+          "country": "SA",
+          "supportsXrp": true,
+          "direction": "onramp",
+          "odl": true,
+          "note": "legacy RippleNet"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "SEK",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "kraken-sepa",
+          "name": "Kraken (SEPA) · SEK",
+          "type": "cex",
+          "country": "IE",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "MiCA CASP; SEPA deposits in all EU/Nordic fiats"
+        },
+        {
+          "key": "bitpanda-sepa",
+          "name": "Bitpanda (SEPA) · SEK",
+          "type": "cex",
+          "country": "AT",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "MiCA CASP; SEPA"
+        },
+        {
+          "key": "binance-sepa",
+          "name": "Binance (SEPA) · SEK",
+          "type": "cex",
+          "country": "MT",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "RLUSD + XRP listed; SEPA rails"
+        },
+        {
+          "key": "xbaht",
+          "name": "Xbaht",
+          "type": "odl",
+          "country": "SE",
+          "supportsXrp": true,
+          "direction": "both",
+          "odl": true,
+          "note": "SE→TH via Tranglo"
+        },
+        {
+          "key": "safello",
+          "name": "Safello",
+          "type": "cex",
+          "country": "SE",
+          "supportsXrp": true,
+          "direction": "onramp"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "SGD",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "ir-sg",
+          "name": "Independent Reserve SG",
+          "type": "cex",
+          "country": "SG",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "MAS MPI"
+        },
+        {
+          "key": "coinhako",
+          "name": "Coinhako",
+          "type": "cex",
+          "country": "SG",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "MAS"
+        },
+        {
+          "key": "bloom-pilot",
+          "name": "Ripple (MAS BLOOM pilot)",
+          "type": "odl",
+          "country": "SG",
+          "supportsRlusd": true,
+          "direction": "both",
+          "odl": true,
+          "note": "institutional trade-finance pilot"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "SOLO",
+      "issuers": [
+        {
+          "key": "solo",
+          "name": "Sologenic",
+          "address": "rsoLo2S1kiGeCcn6hCUXVrCpGMWLrRrLZz"
+        }
+      ],
+      "actors": [],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "THB",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "bitkub",
+          "name": "Bitkub",
+          "type": "cex",
+          "country": "TH",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "SEC; $8.2B XRP/THB 2025 volume"
+        },
+        {
+          "key": "deemoney",
+          "name": "DeeMoney",
+          "type": "odl",
+          "country": "TH",
+          "supportsXrp": true,
+          "direction": "offramp",
+          "odl": true,
+          "note": "ODL recipient from SBI Remit"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "TND",
+      "issuers": [],
+      "actors": [],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "TRY",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "btcturk",
+          "name": "BtcTurk",
+          "type": "cex",
+          "country": "TR",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "largest TR, high XRP/TRY volume"
+        },
+        {
+          "key": "binance-tr",
+          "name": "Binance TR",
+          "type": "cex",
+          "country": "TR",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both"
+        },
+        {
+          "key": "paribu",
+          "name": "Paribu",
+          "type": "cex",
+          "country": "TR",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "bitexen",
+          "name": "Bitexen",
+          "type": "cex",
+          "country": "TR",
+          "supportsXrp": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "TWD",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "maicoin",
+          "name": "MaiCoin / MAX",
+          "type": "cex",
+          "country": "TW",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "FSC"
+        },
+        {
+          "key": "bitopro",
+          "name": "BitoPro",
+          "type": "cex",
+          "country": "TW",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "ace",
+          "name": "ACE Exchange",
+          "type": "cex",
+          "country": "TW",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "binance-twd",
+          "name": "Binance (cross-border TWD)",
+          "type": "cex",
+          "country": "TW",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "TWD card on-ramp; RLUSD listed"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "TZS",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "yellow-card-tz",
+          "name": "Yellow Card",
+          "type": "fintech",
+          "country": "TZ",
+          "supportsRlusd": true,
+          "direction": "both"
+        },
+        {
+          "key": "chipper-tz",
+          "name": "Chipper Cash",
+          "type": "fintech",
+          "country": "TZ",
+          "supportsRlusd": true,
+          "direction": "both",
+          "odl": true
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "UAH",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "kraken-sepa",
+          "name": "Kraken (SEPA) · UAH",
+          "type": "cex",
+          "country": "IE",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "MiCA CASP; SEPA deposits in all EU/Nordic fiats"
+        },
+        {
+          "key": "bitpanda-sepa",
+          "name": "Bitpanda (SEPA) · UAH",
+          "type": "cex",
+          "country": "AT",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "MiCA CASP; SEPA"
+        },
+        {
+          "key": "binance-sepa",
+          "name": "Binance (SEPA) · UAH",
+          "type": "cex",
+          "country": "MT",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "RLUSD + XRP listed; SEPA rails"
+        },
+        {
+          "key": "whitebit",
+          "name": "WhiteBIT",
+          "type": "cex",
+          "country": "UA",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "PrivatBank + SEPA + P2P"
+        },
+        {
+          "key": "kuna",
+          "name": "Kuna",
+          "type": "cex",
+          "country": "UA",
+          "supportsXrp": true,
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "UGX",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "yellow-card-ug",
+          "name": "Yellow Card",
+          "type": "fintech",
+          "country": "UG",
+          "supportsRlusd": true,
+          "direction": "both"
+        },
+        {
+          "key": "chipper-ug",
+          "name": "Chipper Cash",
+          "type": "fintech",
+          "country": "UG",
+          "supportsRlusd": true,
+          "direction": "both",
+          "odl": true
+        },
+        {
+          "key": "kotani-ug",
+          "name": "Kotani Pay",
+          "type": "mobile-money",
+          "country": "UG",
+          "direction": "both"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "USD",
+      "issuers": [
+        {
+          "key": "rlusd",
+          "name": "Ripple (RLUSD)",
+          "address": "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De"
+        },
+        {
+          "key": "gh",
+          "name": "GateHub",
+          "address": "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq"
+        },
+        {
+          "key": "snap",
+          "name": "SnapSwap",
+          "address": "rMwjYedjc7qqtKYVLiAccJSmCwih4LnE2q"
+        },
+        {
+          "key": "bs",
+          "name": "Bitstamp (legacy)",
+          "address": "rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B"
+        }
+      ],
+      "actors": [
+        {
+          "key": "coinbase",
+          "name": "Coinbase",
+          "type": "cex",
+          "country": "US",
+          "supportsXrp": true,
+          "supportsRlusd": false,
+          "direction": "both",
+          "note": "no RLUSD (USDC commercial conflict)"
+        },
+        {
+          "key": "kraken",
+          "name": "Kraken",
+          "type": "cex",
+          "country": "US",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "drove first $10B RLUSD volume"
+        },
+        {
+          "key": "uphold",
+          "name": "Uphold",
+          "type": "cex",
+          "country": "US",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "day-1 RLUSD launch venue"
+        },
+        {
+          "key": "bitstamp-us",
+          "name": "Bitstamp US",
+          "type": "cex",
+          "country": "US",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both"
+        },
+        {
+          "key": "gemini",
+          "name": "Gemini",
+          "type": "cex",
+          "country": "US",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "NYDFS"
+        },
+        {
+          "key": "lmax",
+          "name": "LMAX Digital",
+          "type": "cex",
+          "country": "UK/US",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "institutional"
+        },
+        {
+          "key": "bullish",
+          "name": "Bullish",
+          "type": "cex",
+          "country": "GI",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both"
+        },
+        {
+          "key": "b2c2",
+          "name": "B2C2",
+          "type": "otc",
+          "country": "US/UK",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "RLUSD market-maker"
+        },
+        {
+          "key": "keyrock",
+          "name": "Keyrock",
+          "type": "otc",
+          "country": "BE",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both"
+        },
+        {
+          "key": "zerohash",
+          "name": "Zero Hash",
+          "type": "fintech",
+          "country": "US",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "BaaS"
+        },
+        {
+          "key": "moonpay",
+          "name": "MoonPay",
+          "type": "fintech",
+          "country": "US",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "onramp"
+        },
+        {
+          "key": "bny",
+          "name": "BNY Mellon",
+          "type": "custodian",
+          "country": "US",
+          "supportsXrp": false,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "RLUSD reserves custodian (Jul 2025)"
+        },
+        {
+          "key": "standard-custody",
+          "name": "Standard Custody & Trust",
+          "type": "custodian",
+          "country": "US",
+          "supportsXrp": false,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "NY-chartered, RLUSD issuer entity"
+        },
+        {
+          "key": "convera",
+          "name": "Convera",
+          "type": "odl",
+          "country": "US",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "odl": true,
+          "note": "ex-Western Union Biz, partner Apr 2026"
+        },
+        {
+          "key": "ripple-prime",
+          "name": "Ripple Prime (ex-Hidden Road)",
+          "type": "otc",
+          "country": "US",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "crypto-owned multi-asset prime broker, Oct 2025"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "USDC",
+      "issuers": [
+        {
+          "key": "circle",
+          "name": "Circle",
+          "address": "rGm7WCVp9gb4jZHWTEtGUr4dd74z2XuWhE"
+        },
+        {
+          "key": "gh",
+          "name": "GateHub",
+          "address": "rcEGREd8NmkKRE8GE424sksyt1tJVFZwu"
+        }
+      ],
+      "actors": [],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "USDT",
+      "issuers": [
+        {
+          "key": "gh",
+          "name": "GateHub",
+          "address": "rcvxE9PS9YBwxtGg1qNeewV6ZB3wGubZq"
+        }
+      ],
+      "actors": [],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "VND",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "remitano",
+          "name": "Remitano",
+          "type": "p2p",
+          "country": "VN",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "tranglo-vn",
+          "name": "Tranglo",
+          "type": "hub",
+          "country": "MY/VN",
+          "supportsXrp": true,
+          "direction": "both",
+          "odl": true,
+          "note": "APAC ODL hub; VN is part of Tranglo's 25-corridor coverage"
+        },
+        {
+          "key": "binance-vnd-p2p",
+          "name": "Binance P2P (VND)",
+          "type": "p2p",
+          "country": "VN",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "VND P2P + RLUSD/USDT offshore spot"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "XAF",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "barka-xaf",
+          "name": "BarkaChange",
+          "type": "mobile-money",
+          "country": "XAF",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "USDT-bridged; XRP-reachable via swap"
+        },
+        {
+          "key": "yellow-card-cm",
+          "name": "Yellow Card (CM)",
+          "type": "fintech",
+          "country": "CM",
+          "supportsRlusd": true,
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "chipper-xaf",
+          "name": "Chipper Cash (CM)",
+          "type": "fintech",
+          "country": "CM",
+          "supportsRlusd": true,
+          "direction": "both",
+          "odl": true
+        },
+        {
+          "key": "onafriq-xaf",
+          "name": "Onafriq",
+          "type": "hub",
+          "country": "XAF",
+          "supportsXrp": true,
+          "direction": "both",
+          "odl": true,
+          "note": "Central Africa mobile-money ODL fan-out"
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "XOF",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "barka-xof",
+          "name": "BarkaChange",
+          "type": "mobile-money",
+          "country": "XOF",
+          "direction": "both",
+          "note": "Orange/Wave/MTN bridge via USDT"
+        },
+        {
+          "key": "yellow-card-sn",
+          "name": "Yellow Card (SN/CI)",
+          "type": "fintech",
+          "country": "SN",
+          "supportsRlusd": true,
+          "direction": "both"
+        },
+        {
+          "key": "onafriq-xof",
+          "name": "Onafriq",
+          "type": "hub",
+          "country": "XOF",
+          "supportsXrp": true,
+          "direction": "both",
+          "odl": true
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    },
+    {
+      "code": "ZAR",
+      "issuers": [],
+      "actors": [
+        {
+          "key": "valr",
+          "name": "VALR",
+          "type": "cex",
+          "country": "ZA",
+          "supportsXrp": true,
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "FSCA-licensed"
+        },
+        {
+          "key": "luno-za",
+          "name": "Luno",
+          "type": "cex",
+          "country": "ZA",
+          "supportsXrp": true,
+          "direction": "both"
+        },
+        {
+          "key": "yellow-card-za",
+          "name": "Yellow Card",
+          "type": "fintech",
+          "country": "ZA",
+          "supportsRlusd": true,
+          "direction": "both",
+          "note": "primary pan-African RLUSD distributor"
+        },
+        {
+          "key": "absa",
+          "name": "Absa Bank",
+          "type": "bank",
+          "country": "ZA",
+          "supportsXrp": true,
+          "direction": "both",
+          "note": "Ripple custody"
+        },
+        {
+          "key": "chipper-za",
+          "name": "Chipper Cash",
+          "type": "fintech",
+          "country": "ZA",
+          "supportsRlusd": true,
+          "direction": "both",
+          "odl": true
+        }
+      ],
+      "updatedAt": "2026-05-11T22:17:37.945Z"
+    }
+  ],
+  "globalHubs": [
+    {
+      "key": "tranglo-hub",
+      "name": "Tranglo",
+      "type": "hub",
+      "country": "MY",
+      "supportsXrp": true,
+      "direction": "both",
+      "odl": true,
+      "note": "25-corridor APAC hub; PH/TH/ID/VN/MY/BD/PK/LK/NP/IN + UAE"
+    },
+    {
+      "key": "onafriq-hub",
+      "name": "Onafriq (ex-MFS Africa)",
+      "type": "hub",
+      "country": "ZA",
+      "supportsXrp": true,
+      "direction": "both",
+      "odl": true,
+      "note": "500M wallets, 40 African countries"
+    },
+    {
+      "key": "yellow-card-hub",
+      "name": "Yellow Card",
+      "type": "hub",
+      "country": "Africa",
+      "supportsRlusd": true,
+      "direction": "both",
+      "note": "primary pan-African RLUSD distributor, 20+ countries"
+    },
+    {
+      "key": "chipper-hub",
+      "name": "Chipper Cash",
+      "type": "hub",
+      "country": "Africa",
+      "supportsRlusd": true,
+      "direction": "both",
+      "odl": true,
+      "note": "9 countries"
+    }
+  ]
+}

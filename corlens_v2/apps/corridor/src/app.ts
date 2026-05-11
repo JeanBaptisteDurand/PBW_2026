@@ -11,6 +11,7 @@ import { createMarketDataClient } from "./connectors/market-data.js";
 import { registerAdminRoutes } from "./controllers/admin.controller.js";
 import { registerChatRoutes } from "./controllers/chat.controller.js";
 import { registerCorridorRoutes } from "./controllers/corridor.controller.js";
+import { registerCurrencyMetaRoutes } from "./controllers/currency-meta.controller.js";
 import { registerPartnerDepthRoutes } from "./controllers/partner-depth.controller.js";
 import { startRefreshCron } from "./crons/refresh.js";
 import type { CorridorEnv } from "./env.js";
@@ -19,11 +20,14 @@ import { prismaPlugin } from "./plugins/prisma.js";
 import { redisPlugin } from "./plugins/redis.js";
 import { registerSwagger } from "./plugins/swagger.js";
 import { createCorridorRepo } from "./repositories/corridor.repo.js";
+import { createCurrencyMetaRepo } from "./repositories/currency-meta.repo.js";
 import { createRagRepo } from "./repositories/rag.repo.js";
 import { createStatusEventRepo } from "./repositories/status-event.repo.js";
 import { createAiNoteService } from "./services/ai-note.service.js";
 import { createCatalogSeeder } from "./services/catalog-seeder.service.js";
 import { createChatService } from "./services/chat.service.js";
+import { createCurrencyMetaSeeder } from "./services/currency-meta-seeder.service.js";
+import { createCurrencyMetaService } from "./services/currency-meta.service.js";
 import { createRagIndexService } from "./services/rag-index.service.js";
 import { createScannerService } from "./services/scanner.service.js";
 
@@ -61,6 +65,18 @@ export async function buildApp(env: CorridorEnv): Promise<FastifyInstance> {
   const seedResult = await seeder.seedIfEmpty();
   app.log.info({ seedResult }, "corridor seed check");
 
+  const currencyMetaRepo = createCurrencyMetaRepo(app.prisma);
+  const currencyMetaSeeder = createCurrencyMetaSeeder({
+    repo: currencyMetaRepo,
+    seedPath: path.join(__dirname, "..", "seed", "currency-meta.json"),
+  });
+  const currencyMetaSeedResult = await currencyMetaSeeder.seedIfEmpty();
+  app.log.info({ currencyMetaSeedResult }, "currency-meta seed check");
+  const currencyMetaService = createCurrencyMetaService({
+    repo: currencyMetaRepo,
+    globalHubs: currencyMetaSeeder.globalHubs(),
+  });
+
   const scanner = createScannerService({ marketData, timeoutMs: env.SCAN_TIMEOUT_MS });
   const aiNote = createAiNoteService({ ai });
   const ragIndex = createRagIndexService({ ai, repo: ragRepo });
@@ -69,6 +85,7 @@ export async function buildApp(env: CorridorEnv): Promise<FastifyInstance> {
   await registerCorridorRoutes(app, corridors, events);
   await registerChatRoutes(app, chat);
   await registerPartnerDepthRoutes(app, marketData);
+  await registerCurrencyMetaRoutes(app, currencyMetaService);
   await registerAdminRoutes(app, corridors, events, scanner);
 
   const refresh = await startRefreshCron({
