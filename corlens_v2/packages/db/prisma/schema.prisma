@@ -157,6 +157,15 @@ model CorridorRagMessage {
   @@schema("corridor")
 }
 
+model CurrencyMeta {
+  code      String   @id              // ISO-4217 or stable token symbol
+  issuers   Json                      // IssuerEntry[]
+  actors    Json                      // ActorEntry[]
+  updatedAt DateTime @updatedAt
+
+  @@schema("corridor")
+}
+
 // ─── path (entity audit) ─────────────────────────────────────
 model Analysis {
   id          String   @id @default(uuid())
