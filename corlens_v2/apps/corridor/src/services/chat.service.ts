@@ -9,6 +9,17 @@ export type ChatServiceOptions = {
 
 export type ChatService = ReturnType<typeof createChatService>;
 
+export type ChatServiceGetByIdResult = {
+  chatId: string;
+  corridorId: string | null;
+  messages: Array<{
+    role: "user" | "assistant" | "system";
+    content: string;
+    sources: unknown;
+    createdAt: string;
+  }>;
+} | null;
+
 export function createChatService(opts: ChatServiceOptions) {
   return {
     async ask(input: { corridorId?: string; message: string }): Promise<{
@@ -49,6 +60,21 @@ export function createChatService(opts: ChatServiceOptions) {
       });
 
       return { answer: result.content.trim(), sources };
+    },
+
+    async getById(chatId: string): Promise<ChatServiceGetByIdResult> {
+      const chat = await opts.repo.findChatById(chatId);
+      if (!chat) return null;
+      return {
+        chatId: chat.id,
+        corridorId: chat.corridorId,
+        messages: chat.messages.map((m) => ({
+          role: m.role as "user" | "assistant" | "system",
+          content: m.content,
+          sources: m.sources as unknown,
+          createdAt: m.createdAt.toISOString(),
+        })),
+      };
     },
   };
 }

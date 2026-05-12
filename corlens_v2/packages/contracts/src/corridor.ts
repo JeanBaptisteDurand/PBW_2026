@@ -89,6 +89,21 @@ export const ChatResponse = z.object({
 });
 export type ChatResponse = z.infer<typeof ChatResponse>;
 
+export const ChatMessageItem = z.object({
+  role: z.enum(["user", "assistant", "system"]),
+  content: z.string(),
+  sources: z.unknown().nullable(),
+  createdAt: z.string().datetime(),
+});
+export type ChatMessageItem = z.infer<typeof ChatMessageItem>;
+
+export const ChatHistoryResponse = z.object({
+  chatId: z.string().uuid(),
+  corridorId: z.string().nullable(),
+  messages: z.array(ChatMessageItem),
+});
+export type ChatHistoryResponse = z.infer<typeof ChatHistoryResponse>;
+
 export const IssuerEntry = z.object({
   key: z.string(),
   name: z.string(),

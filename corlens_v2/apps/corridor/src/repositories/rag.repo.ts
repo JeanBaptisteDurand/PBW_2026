@@ -67,6 +67,13 @@ export function createRagRepo(prisma: Prisma) {
         },
       });
     },
+
+    async findChatById(chatId: string) {
+      return db.corridorRagChat.findUnique({
+        where: { id: chatId },
+        include: { messages: { orderBy: { createdAt: "asc" } } },
+      });
+    },
   };
 }
 
