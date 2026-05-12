@@ -7,6 +7,9 @@ import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
+import { runGetPartnerDepth } from "./tools/partner-depth.js";
+
+export { runGetPartnerDepth };
 
 function loadEnv() {
   try {
@@ -252,6 +255,21 @@ server.tool(
       content: [{ type: "text" as const, text: output.join("\n") }],
     };
   },
+);
+
+server.tool(
+  "get_partner_depth",
+  "Live orderbook depth at off-chain partner venues (e.g. Bitso XRP/MXN). Returns top bid/ask, spread in bps, and depth.",
+  {
+    actor: z
+      .enum(["bitso", "bitstamp", "kraken", "binance", "xrpl-dex"])
+      .describe('Partner venue actor, e.g. "bitso"'),
+    book: z
+      .string()
+      .min(1)
+      .describe('Market book identifier, e.g. "xrp_mxn" (Bitso) or "XRPMXN" (Binance)'),
+  },
+  async ({ actor, book }) => runGetPartnerDepth(actor, book),
 );
 
 async function main() {
