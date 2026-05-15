@@ -47,6 +47,15 @@ export function createAnalysisRepo(prisma: Prisma) {
       }) as unknown as AnalysisRow[];
     },
 
+    async listForUser(userId: string | null, limit: number): Promise<AnalysisRow[]> {
+      const where: Record<string, unknown> = userId ? { userId } : {};
+      return db.analysis.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        take: limit,
+      }) as unknown as AnalysisRow[];
+    },
+
     async setStatus(id: string, status: string, error: string | null): Promise<void> {
       await db.analysis.update({ where: { id }, data: { status, error } });
     },

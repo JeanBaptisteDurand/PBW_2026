@@ -69,6 +69,16 @@ export const AnalysisSummary = z.object({
 });
 export type AnalysisSummary = z.infer<typeof AnalysisSummary>;
 
+export const AnalysisListQuery = z.object({
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+});
+export type AnalysisListQuery = z.infer<typeof AnalysisListQuery>;
+
+export const AnalysisListResponse = z.object({
+  analyses: z.array(AnalysisSummary),
+});
+export type AnalysisListResponse = z.infer<typeof AnalysisListResponse>;
+
 export const GraphNode = z.object({
   nodeId: z.string(),
   kind: z.string(),

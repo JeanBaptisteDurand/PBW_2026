@@ -6,6 +6,7 @@ import {
 } from "fastify-type-provider-zod";
 import { createAIServiceClient } from "./connectors/ai-service.js";
 import { createMarketDataClient } from "./connectors/market-data.js";
+import { registerAnalysesListRoutes } from "./controllers/analyses-list.controller.js";
 import { registerAnalysisRoutes } from "./controllers/analysis.controller.js";
 import { registerAnalyzeRoutes } from "./controllers/analyze.controller.js";
 import { registerChatRoutes } from "./controllers/chat.controller.js";
@@ -80,6 +81,7 @@ export async function buildApp(env: PathEnv): Promise<FastifyInstance> {
 
   await registerAnalyzeRoutes(app, analyses, queue);
   await registerAnalysisRoutes(app, analyses, graphs);
+  registerAnalysesListRoutes(app, analyses);
   await registerChatRoutes(app, chat);
   // Register the SSE stream route BEFORE the param route. Fastify's router
   // would normally prefer the static path, but registering stream first
