@@ -146,10 +146,10 @@
         }
     }
 
-    # ─── Catch-all: minimal landing for the gateway itself ─────────
+    # ─── Catch-all: serve the SPA (Step 9 — web). ──────────────────
+    # Any path not matched above (i.e. anything outside /api/*, /internal/*,
+    # /docs*, /health) is a client-side route handled by React Router.
     handle {
-        respond `{"name":"corlens-v2-gateway","stage":"foundation","docs":"/docs","health":"/health"}` 200 {
-            close
-        }
+        reverse_proxy web:80
     }
 }
