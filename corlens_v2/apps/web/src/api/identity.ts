@@ -10,7 +10,7 @@ type PaymentStatusResponse = id.PaymentStatusResponse;
 export type ProfileResponse = {
   id: string;
   walletAddress: string;
-  role: "free" | "premium" | "api-key";
+  role: "free" | "premium";
   apiKey: string | null;
   createdAt: string;
   updatedAt: string;
