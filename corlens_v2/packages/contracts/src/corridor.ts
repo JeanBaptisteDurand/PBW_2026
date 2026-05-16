@@ -119,7 +119,7 @@ export const ActorEntry = z.object({
   supportsXrp: z.boolean().optional(),
   supportsRlusd: z.boolean().optional(),
   odl: z.boolean().optional(),
-  direction: z.enum(["in", "out", "both"]).optional(),
+  direction: z.enum(["in", "out", "both", "onramp", "offramp"]).optional(),
   note: z.string().optional(),
 });
 export type ActorEntry = z.infer<typeof ActorEntry>;

@@ -82,10 +82,13 @@ export async function buildApp(env: CorridorEnv): Promise<FastifyInstance> {
   const ragIndex = createRagIndexService({ ai, repo: ragRepo });
   const chat = createChatService({ ai, repo: ragRepo, topK: 3 });
 
-  await registerCorridorRoutes(app, corridors, events);
-  await registerChatRoutes(app, chat);
-  await registerPartnerDepthRoutes(app, marketData);
+  // Static-path routes MUST be registered before the `/api/corridors/:id`
+  // catch-all in corridor.controller — otherwise Fastify's router matches
+  // them as `id="currency-meta"` etc. and returns 404 from the corridor repo.
   await registerCurrencyMetaRoutes(app, currencyMetaService);
+  await registerPartnerDepthRoutes(app, marketData);
+  await registerChatRoutes(app, chat);
+  await registerCorridorRoutes(app, corridors, events);
   await registerAdminRoutes(app, corridors, events, scanner);
 
   const refresh = await startRefreshCron({
