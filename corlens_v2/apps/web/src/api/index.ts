@@ -109,9 +109,10 @@ const legacy = {
     const v2 = await corridorApi.listCorridors();
     return { corridors: v2.corridors.map(enrichListItem as never) };
   },
+  refreshCache: invalidateCorridorCache,
   getCorridor: async (id: string): Promise<{ corridor: CorridorDetailResponse }> => {
     const v2 = await corridorApi.getCorridor(id);
-    return { corridor: enrichDetail(v2.corridor as Record<string, unknown>) };
+    return { corridor: enrichDetail(v2 as unknown as Record<string, unknown>) };
   },
   getCorridorHistory: (id: string, days = 30) => corridorApi.getStatusHistory(id, days),
   corridorChat: async (req: { corridorId?: string; message: string }) => {
@@ -133,7 +134,7 @@ const legacy = {
   // crash — the next scanner tick picks up changes.
   refreshCorridor: async (id: string): Promise<{ corridor: CorridorDetailResponse }> => {
     const v2 = await corridorApi.getCorridor(id);
-    return { corridor: enrichDetail(v2.corridor as Record<string, unknown>) };
+    return { corridor: enrichDetail(v2 as unknown as Record<string, unknown>) };
   },
 
   // v1: getPartnerDepth(corridorId, actor='bitso'); v2: (actor, book).

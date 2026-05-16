@@ -16,15 +16,17 @@ export function invalidateCorridorCache(): void {
 }
 
 export const corridorApi = {
+  // v2's GET /api/corridors returns the array directly; wrap in `{corridors}`
+  // here so the v1 ported components keep their `{ corridors }` destructure.
   listCorridors(): Promise<ListResponse> {
     if (cache) return Promise.resolve(cache);
-    return fetchJSON<ListResponse>("/corridors?limit=500").then((data) => {
-      cache = data;
-      return data;
+    return fetchJSON<CorridorListItem[]>("/corridors?limit=500").then((corridors) => {
+      cache = { corridors };
+      return cache;
     });
   },
 
-  getCorridor(id: string): Promise<{ corridor: CorridorDetail }> {
+  getCorridor(id: string): Promise<CorridorDetail> {
     return fetchJSON(`/corridors/${encodeURIComponent(id)}`);
   },
 
