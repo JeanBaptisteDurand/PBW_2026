@@ -1,5 +1,4 @@
 import type {
-  CorridorActor,
   CorridorAsset,
   CorridorDetailResponse,
   CorridorListItem,
