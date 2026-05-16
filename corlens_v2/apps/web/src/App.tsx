@@ -12,6 +12,11 @@ const CorridorHealth = lazy(() => import("./routes/CorridorHealth.js"));
 const CorridorDetail = lazy(() => import("./routes/CorridorDetail.js"));
 const CorridorRoute = lazy(() => import("./routes/CorridorRoute.js"));
 const SafePath = lazy(() => import("./routes/SafePath.js"));
+const Premium = lazy(() => import("./routes/Premium.js"));
+const Account = lazy(() => import("./routes/Account.js"));
+const ApiDocs = lazy(() => import("./routes/ApiDocs.js"));
+const Chat = lazy(() => import("./routes/Chat.js"));
+const ComplianceView = lazy(() => import("./routes/ComplianceView.js"));
 
 function PlaceholderPage({ title }: { title: string }): JSX.Element {
   return (
@@ -98,7 +103,14 @@ export function App(): JSX.Element {
             </Suspense>
           }
         />
-        <Route path="/chat/:analysisId" element={<PlaceholderPage title="Chat" />} />
+        <Route
+          path="/chat/:analysisId"
+          element={
+            <Suspense fallback={<LandingFallback />}>
+              <Chat />
+            </Suspense>
+          }
+        />
         <Route
           path="/safe-path"
           element={
@@ -115,9 +127,38 @@ export function App(): JSX.Element {
             </Suspense>
           }
         />
-        <Route path="/developers" element={<PlaceholderPage title="API Docs" />} />
-        <Route path="/premium" element={<PlaceholderPage title="Premium" />} />
-        <Route path="/account" element={<PlaceholderPage title="Account" />} />
+        <Route
+          path="/developers"
+          element={
+            <Suspense fallback={<LandingFallback />}>
+              <ApiDocs />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/premium"
+          element={
+            <Suspense fallback={<LandingFallback />}>
+              <Premium />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/account"
+          element={
+            <Suspense fallback={<LandingFallback />}>
+              <Account />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/compliance/:analysisId"
+          element={
+            <Suspense fallback={<LandingFallback />}>
+              <ComplianceView />
+            </Suspense>
+          }
+        />
         <Route path="/verify" element={<PlaceholderPage title="Compliance Verify" />} />
         <Route path="*" element={<PlaceholderPage title="Not Found" />} />
       </Route>
