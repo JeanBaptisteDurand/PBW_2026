@@ -15,15 +15,15 @@ describe("App bootstrap", () => {
     expect(container.firstChild).not.toBeNull();
   });
 
-  it("renders the Layout + a placeholder card for an in-app route like /corridors", () => {
+  it("renders the Layout shell with Navbar for any in-app route", () => {
     render(
-      <MemoryRouter initialEntries={["/corridors"]}>
+      <MemoryRouter initialEntries={["/account"]}>
         <App />
       </MemoryRouter>,
     );
-    // CardTitle "Corridor Atlas" (h3) renders alongside the Navbar's NavLink with the same
-    // label — both are valid evidence the Layout + the route content mounted.
-    expect(screen.getByRole("heading", { name: "Corridor Atlas" })).toBeDefined();
+    // /account still resolves to the placeholder card (its v1 port lands in a
+    // later commit), so we use it as a stable Layout smoke target.
     expect(screen.getByText("corelens")).toBeDefined();
+    expect(screen.getByRole("navigation")).toBeDefined();
   });
 });

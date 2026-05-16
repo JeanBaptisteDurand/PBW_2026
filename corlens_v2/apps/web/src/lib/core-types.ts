@@ -642,22 +642,26 @@ export interface CorridorPairDef {
 // Backwards compatibility alias used by older code paths.
 export type CorridorCatalogEntry = CorridorPairDef;
 
+// v1 shape preserved verbatim. The v2 legacy adapter (`src/api/index.ts`)
+// fills any v2-absent fields with safe defaults so this interface stays
+// "required" at the component-call boundary and the v1 component code
+// keeps the same defensive guards / data-access patterns.
 export interface CorridorListItem extends CorridorPairDef {
-  status: CorridorStatus; // status of the winning route
+  status: CorridorStatus;
   bestRouteId: string | null;
   routeResults: CorridorRouteResult[];
   lastRefreshedAt: string | null;
-  pathCount: number; // winner's
+  pathCount: number;
   recommendedRiskScore: number | null;
   recommendedHops: number | null;
   recommendedCost: string | null;
-  flags: RiskFlagData[]; // winner's
+  flags: RiskFlagData[];
   aiNote: string | null;
-  liquidity: CorridorLiquiditySnapshot | null; // winner's
+  liquidity: CorridorLiquiditySnapshot | null;
 }
 
 export interface CorridorDetailResponse extends CorridorListItem {
-  analysis: CorridorAnalysis | null; // winner's full analysis
+  analysis: CorridorAnalysis | null;
 }
 
 export interface CorridorChatRequest {

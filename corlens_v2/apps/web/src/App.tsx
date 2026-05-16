@@ -8,6 +8,9 @@ const Home = lazy(() => import("./routes/Home.js"));
 const Analyze = lazy(() => import("./routes/Analyze.js"));
 const GraphView = lazy(() => import("./routes/GraphView.js"));
 const History = lazy(() => import("./routes/History.js"));
+const CorridorHealth = lazy(() => import("./routes/CorridorHealth.js"));
+const CorridorDetail = lazy(() => import("./routes/CorridorDetail.js"));
+const CorridorRoute = lazy(() => import("./routes/CorridorRoute.js"));
 
 function PlaceholderPage({ title }: { title: string }): JSX.Element {
   return (
@@ -54,8 +57,30 @@ export function App(): JSX.Element {
             </Suspense>
           }
         />
-        <Route path="/corridors" element={<PlaceholderPage title="Corridor Atlas" />} />
-        <Route path="/corridors/:id" element={<PlaceholderPage title="Corridor Detail" />} />
+        <Route
+          path="/corridors"
+          element={
+            <Suspense fallback={<LandingFallback />}>
+              <CorridorHealth />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/corridors/:id"
+          element={
+            <Suspense fallback={<LandingFallback />}>
+              <CorridorDetail />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/corridor-route/:id/:routeId"
+          element={
+            <Suspense fallback={<LandingFallback />}>
+              <CorridorRoute />
+            </Suspense>
+          }
+        />
         <Route
           path="/analyze"
           element={
