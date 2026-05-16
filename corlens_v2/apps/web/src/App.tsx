@@ -1,6 +1,9 @@
+import { Suspense, lazy } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Layout } from "./components/layout/Layout.js";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card.js";
+
+const Landing = lazy(() => import("./routes/Landing/Landing.js"));
 
 function PlaceholderPage({ title }: { title: string }): JSX.Element {
   return (
@@ -18,16 +21,11 @@ function PlaceholderPage({ title }: { title: string }): JSX.Element {
   );
 }
 
-function LandingPlaceholder(): JSX.Element {
+function LandingFallback(): JSX.Element {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
-      <div className="rounded-2xl border border-xrp-700/40 bg-slate-900/60 px-8 py-6 text-center shadow-xl">
-        <h1 className="font-mono text-2xl tracking-tight text-xrp-300">corlens v2</h1>
-        <p className="mt-2 text-sm text-slate-400">
-          SPA bootstrap OK — Landing scene ships in WI-3
-        </p>
-      </div>
-    </main>
+    <div className="flex min-h-screen items-center justify-center bg-slate-950">
+      <span className="inline-block h-7 w-7 animate-spin rounded-full border-4 border-xrp-500/30 border-t-xrp-500" />
+    </div>
   );
 }
 
@@ -36,7 +34,14 @@ export function App(): JSX.Element {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Navigate to="/landing" replace />} />
-        <Route path="/landing" element={<LandingPlaceholder />} />
+        <Route
+          path="/landing"
+          element={
+            <Suspense fallback={<LandingFallback />}>
+              <Landing />
+            </Suspense>
+          }
+        />
         <Route path="/home" element={<PlaceholderPage title="Home" />} />
         <Route path="/corridors" element={<PlaceholderPage title="Corridor Atlas" />} />
         <Route path="/corridors/:id" element={<PlaceholderPage title="Corridor Detail" />} />
