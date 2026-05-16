@@ -6,7 +6,12 @@
     "outDir": "./dist",
     "rootDir": ".",
     "noEmit": true,
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    // The SPA is a verbatim port of the v1 React app (~14 kLOC). Backend
+    // services keep noUncheckedIndexedAccess: true; relaxing it here lets
+    // the v1 component code compile without rewriting every array read.
+    // Strict null checks + noImplicitAny + verbatimModuleSyntax stay on.
+    "noUncheckedIndexedAccess": false
   },
   "include": ["src", "tests", "vite.config.ts", "vitest.config.ts"]
 }
