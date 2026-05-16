@@ -11,5 +11,5 @@ dist/
 .turbo/
 .superpowers/
 coverage/
-corlens_v2/apps/web/test-results/
-corlens_v2/apps/web/playwright-report/
+apps/web/test-results/
+apps/web/playwright-report/
