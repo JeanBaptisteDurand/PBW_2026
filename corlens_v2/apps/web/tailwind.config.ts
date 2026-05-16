@@ -1,4 +1,7 @@
 import type { Config } from "tailwindcss";
+import { designTokens } from "./src/styles/design-tokens.js";
+
+const { colors, spacing, typography, radius, shadow } = designTokens;
 
 export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
@@ -6,28 +9,24 @@ export default {
   theme: {
     extend: {
       colors: {
-        xrp: {
-          50: "#eaf2ff",
-          100: "#cfe0ff",
-          200: "#9fc0ff",
-          300: "#6f9eff",
-          400: "#467df0",
-          500: "#2960d8",
-          600: "#1f4ab0",
-          700: "#173987",
-          800: "#102862",
-          900: "#0a1a40",
-        },
-        risk: {
-          low: "#3dcf7c",
-          med: "#f3a43e",
-          high: "#ef4444",
+        xrp: colors.brand,
+        slate: colors.slate,
+        app: {
+          bg: colors.bg,
+          text: colors.text,
+          border: colors.border,
+          risk: colors.risk,
         },
       },
+      spacing,
+      borderRadius: radius,
+      boxShadow: shadow,
+      fontSize: typography.fontSize,
       fontFamily: {
-        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
-        mono: ["JetBrains Mono", "ui-monospace", "monospace"],
+        sans: [typography.fontFamily.base],
+        mono: [typography.fontFamily.mono],
       },
+      letterSpacing: typography.letterSpacing,
     },
   },
   plugins: [],

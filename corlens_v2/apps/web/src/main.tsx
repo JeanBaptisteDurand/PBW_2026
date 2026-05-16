@@ -3,6 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { App } from "./App.js";
+import { applyDesignTokens } from "./styles/design-tokens.js";
 import "./styles/tailwind.css";
 
 const queryClient = new QueryClient({
@@ -10,6 +11,8 @@ const queryClient = new QueryClient({
     queries: { staleTime: 30_000, retry: 1 },
   },
 });
+
+applyDesignTokens();
 
 const rootEl = document.getElementById("root");
 if (!rootEl) throw new Error("#root element missing in index.html");
