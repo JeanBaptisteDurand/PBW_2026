@@ -7,6 +7,7 @@ const Landing = lazy(() => import("./routes/Landing/Landing.js"));
 const Home = lazy(() => import("./routes/Home.js"));
 const Analyze = lazy(() => import("./routes/Analyze.js"));
 const GraphView = lazy(() => import("./routes/GraphView.js"));
+const History = lazy(() => import("./routes/History.js"));
 
 function PlaceholderPage({ title }: { title: string }): JSX.Element {
   return (
@@ -73,7 +74,14 @@ export function App(): JSX.Element {
         />
         <Route path="/chat/:analysisId" element={<PlaceholderPage title="Chat" />} />
         <Route path="/safe-path" element={<PlaceholderPage title="Safe Path Agent" />} />
-        <Route path="/history" element={<PlaceholderPage title="History" />} />
+        <Route
+          path="/history"
+          element={
+            <Suspense fallback={<LandingFallback />}>
+              <History />
+            </Suspense>
+          }
+        />
         <Route path="/developers" element={<PlaceholderPage title="API Docs" />} />
         <Route path="/premium" element={<PlaceholderPage title="Premium" />} />
         <Route path="/account" element={<PlaceholderPage title="Account" />} />
