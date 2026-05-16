@@ -11,6 +11,7 @@ const History = lazy(() => import("./routes/History.js"));
 const CorridorHealth = lazy(() => import("./routes/CorridorHealth.js"));
 const CorridorDetail = lazy(() => import("./routes/CorridorDetail.js"));
 const CorridorRoute = lazy(() => import("./routes/CorridorRoute.js"));
+const SafePath = lazy(() => import("./routes/SafePath.js"));
 
 function PlaceholderPage({ title }: { title: string }): JSX.Element {
   return (
@@ -98,7 +99,14 @@ export function App(): JSX.Element {
           }
         />
         <Route path="/chat/:analysisId" element={<PlaceholderPage title="Chat" />} />
-        <Route path="/safe-path" element={<PlaceholderPage title="Safe Path Agent" />} />
+        <Route
+          path="/safe-path"
+          element={
+            <Suspense fallback={<LandingFallback />}>
+              <SafePath />
+            </Suspense>
+          }
+        />
         <Route
           path="/history"
           element={
