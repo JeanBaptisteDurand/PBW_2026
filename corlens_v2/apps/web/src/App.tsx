@@ -4,6 +4,7 @@ import { Layout } from "./components/layout/Layout.js";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card.js";
 
 const Landing = lazy(() => import("./routes/Landing/Landing.js"));
+const Home = lazy(() => import("./routes/Home.js"));
 
 function PlaceholderPage({ title }: { title: string }): JSX.Element {
   return (
@@ -42,7 +43,14 @@ export function App(): JSX.Element {
             </Suspense>
           }
         />
-        <Route path="/home" element={<PlaceholderPage title="Home" />} />
+        <Route
+          path="/home"
+          element={
+            <Suspense fallback={<LandingFallback />}>
+              <Home />
+            </Suspense>
+          }
+        />
         <Route path="/corridors" element={<PlaceholderPage title="Corridor Atlas" />} />
         <Route path="/corridors/:id" element={<PlaceholderPage title="Corridor Detail" />} />
         <Route path="/analyze" element={<PlaceholderPage title="Entity Audit" />} />
