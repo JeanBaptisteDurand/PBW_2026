@@ -89,6 +89,35 @@ test("GET /api/auth/profile without a JWT returns 401 (forward_auth gates the ro
   expect(res.status()).toBe(401);
 });
 
+test("GET /api/analyses without a JWT returns 401 (the v2 list endpoint is gated)", async ({
+  request,
+}) => {
+  // Regression for a real Caddyfile gap: /api/analyses was falling through
+  // to the SPA catch-all (HTML 200) before commit 9e8b3f5.
+  const res = await request.get("/api/analyses");
+  expect(res.status()).toBe(401);
+});
+
+test("GET /api/safe-path without a JWT returns 401 (the agent list endpoint is gated)", async ({
+  request,
+}) => {
+  const res = await request.get("/api/safe-path");
+  expect(res.status()).toBe(401);
+});
+
+test("POST /api/analyze starts (or reuses) an analysis without a JWT", async ({ request }) => {
+  // /api/analyze is public in dev so the Atlas demo flow works without
+  // Crossmark sign-in. The path service caches done runs per seed+depth,
+  // so this either creates one or returns the existing cached id.
+  const res = await request.post("/api/analyze", {
+    data: { seedAddress: "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De", depth: 1 },
+  });
+  expect(res.status()).toBe(200);
+  const body = await res.json();
+  expect(body.id).toMatch(/^[0-9a-f-]{36}$/);
+  expect(["queued", "running", "done"]).toContain(body.status);
+});
+
 test("GET /health on the gateway returns the dev status payload", async ({ request }) => {
   const res = await request.get("/health");
   expect(res.status()).toBe(200);

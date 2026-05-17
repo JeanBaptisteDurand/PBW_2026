@@ -102,6 +102,10 @@
     handle /api/analysis/* {
         reverse_proxy path:3005
     }
+    handle /api/analyses {
+        import jwt_required
+        reverse_proxy path:3005
+    }
     handle /api/history/* {
         reverse_proxy path:3005
     }
